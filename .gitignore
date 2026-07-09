@@ -25,7 +25,6 @@ backend/app/api/__pycache__/
 backend/app/utils/__pycache__/
 backend/app/main/__pycache__/
 backend/.env
-backend/app/core/settings.py
 *.pyc
 venv/
 .venv/
