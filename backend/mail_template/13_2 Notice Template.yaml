@@ -1,0 +1,155 @@
+template:
+  name: sarfaesi_notice_section_13_2
+  category: legal_notice
+  act: SARFAESI Act, 2002
+  section: 13(2)
+  language: en
+
+header:
+  date: "{{notice_date}}"
+
+addressees:
+  - index: 1
+    name: "{{borrower_1_name}}"
+    address: "{{borrower_1_address}}"
+    mortgaged_property: "{{mortgaged_property_address}}"
+
+  - index: 2
+    name: "{{borrower_2_name}}"
+    address: "{{borrower_2_address}}"
+    mortgaged_property: "{{mortgaged_property_address}}"
+
+  - index: 3
+    name: "{{borrower_3_name}}"
+    address: "{{borrower_3_address}}"
+    mortgaged_property: "{{mortgaged_property_address}}"
+
+collective_reference:
+  term: Borrowers
+
+subject:
+  title: >
+    NOTICE OF DEMAND UNDER SECTION 13(2) OF THE
+    SECURITISATION AND RECONSTRUCTION OF FINANCIAL ASSETS
+    AND ENFORCEMENT OF SECURITY INTEREST ACT, 2002 READ
+    WITH SECURITY INTEREST (ENFORCEMENT) RULES, 2002
+    AS AMENDED.
+
+reference:
+  loan_facility_amount_numeric: "{{total_disbursed_amount_numeric}}"
+  loan_facility_amount_words: "{{total_disbursed_amount_words}}"
+
+salutation: "Dear Sir/Madam,"
+
+issuer_intro: >
+  Prudent ARC Limited (Assignee), a Company incorporated under the Companies
+  Act, 1956 and registered with Reserve Bank of India under Section 3 of the
+  SARFAESI Act, 2002 as Securitization and Asset Reconstruction Company, having
+  its registered office at 611, D-Mall, Plot No. A-1, Netaji Subhash Place,
+  Pitampura, New Delhi – 110034 in its capacity as Trustee of Prudent Trust
+  {{trust_name}}.
+
+assignment_paragraph: >
+  Prudent ARC Limited has acquired the secured debt of the borrower and its
+  Co-borrower/Mortgagors/Guarantors with underlying securities from the original
+  lender {{assignor_name}} (Assignor) under the provisions of Section 5 of the
+  SARFAESI Act, 2002 vide Assignment Agreement dated {{assignment_date}}.
+
+authority_paragraph: >
+  I, undersigned being Authorized Officer under the provision of the
+  Securitization and Reconstruction of Financial Assets and Enforcement of
+  Security Interest Act, 2002, of Prudent ARC Limited (Prudent Trust
+  {{trust_name}}) do hereby serve upon you with the following effect:
+
+clauses:
+  - clause_no: 1
+    content: >
+      That {{borrower_name}} and {{co_borrower_names}} has availed Loan vide
+      Loan Agreement(s) bearing Loan Account No(s). {{loan_account_numbers}}
+      having a loan amount of Rs. {{loan_amount_numeric}}/-
+      (Rupees {{loan_amount_words}} only) dated {{loan_agreement_dates}}
+      (hereinafter referred to as “Facility Agreements”) which were executed by
+      you in the capacity of borrower and co-borrower with the original lender
+      {{original_lender_name}}, whereby financial assistance was availed for the
+      purpose of {{loan_purpose}} and agreed to abide by the terms and conditions
+      governing the said loan.
+
+  - clause_no: 2
+    content: >
+      That in terms of the Facility Agreements, you had created mortgage in
+      respect of the property described in Schedule–I hereunder and deposited
+      certain documents including title deeds and mortgage deed in respect of
+      the said property, thereby securing the said facility.
+
+  - clause_no: 3
+    content: >
+      We hereby inform you that you (Borrower and Co-borrower) have committed
+      breach of the terms and conditions of the Facility Agreement by inter-alia
+      defaulting in payment of equated monthly installments and interest thereon
+      and further failed and neglected to clear the outstanding amount despite
+      various reminders.
+
+  - clause_no: 4
+    content: >
+      As the interest and/or installment of principal has remained overdue for
+      a period of more than 90 days, your loan account has been classified as a
+      Non-Performing Asset (NPA) on {{npa_date}} in accordance with the Master
+      Circular/Guidelines issued by the Reserve Bank of India.
+
+  - clause_no: 5
+    content: >
+      We hereby inform you that we are the secured creditor and the debt owing to
+      us is a secured debt on the above said property which is a secured asset of
+      Prudent Trust {{trust_name}}. As per the statement of account maintained in
+      ordinary course of business as on {{outstanding_as_on_date}}, there is a
+      total balance outstanding amount of Rs. {{outstanding_amount_numeric}}/-
+      (Rupees {{outstanding_amount_words}} only) which is due and payable by you.
+      In addition to the said outstanding dues, you are also liable to pay
+      interest and other charges accruing to the loan account.
+
+  - clause_no: 6
+    content: >
+      In view of the above, on behalf of Prudent Trust {{trust_name}}, we hereby
+      call upon you to make payment of the above outstanding amount of
+      Rs. {{demand_amount_numeric}}/- (Rupees {{demand_amount_words}} only)
+      within a period of 60 days from the date of this notice failing which
+      Prudent Trust {{trust_name}} shall be constrained to exercise all or any
+      of the rights as mentioned in sub-section (4) of Section 13 of the
+      SARFAESI Act, 2002 including taking possession of the secured asset.
+
+  - clause_no: 7
+    content: >
+      Please note that this notice is issued under Section 13(2) of the
+      SARFAESI Act, 2002 and upon failure on your part to comply with the demand
+      contained herein, the secured creditor shall be entitled to exercise all
+      rights under Section 13(4) of the said Act.
+
+  - clause_no: 8
+    content: >
+      You are restrained from disposing of or dealing with the secured assets
+      or transferring the same by way of sale, lease or otherwise without prior
+      written consent of Prudent Trust {{trust_name}}. Any non-compliance shall
+      be punishable under Section 29 of the Act.
+
+  - clause_no: 9
+    content: >
+      This notice is without prejudice to the rights and remedies available to
+      Prudent Trust {{trust_name}} under law including initiation of appropriate
+      legal proceedings before competent courts or tribunals.
+
+closing_paragraph: >
+  You are therefore advised to comply with the demand made herein along with
+  applicable interest till the date of payment within 60 (Sixty) days from the
+  date of this notice, failing which further action under the SARFAESI Act,
+  2002 shall be initiated at your risk as to cost and consequences.
+
+sign_off:
+  faithfully: "Yours faithfully,"
+  company: "For Prudent ARC Limited"
+  trust: "Prudent Trust {{trust_name}}"
+  designation: "Authorized Officer"
+
+schedule:
+  schedule_1:
+    title: "Details of Security / Mortgaged Property"
+    description: "{{schedule_1_property_details}}"

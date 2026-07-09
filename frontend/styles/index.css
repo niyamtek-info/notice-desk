@@ -1,0 +1,68 @@
+/* Selected or active menu item: background and text */
+.ant-layout-sider .ant-menu .ant-menu-item-selected,
+.ant-layout-sider .ant-menu .ant-menu-item-active {
+  color: #fff !important;
+  background-color: var(--color-primary-500) !important;
+}
+
+/* Selected anchor inside item */
+.ant-layout-sider .ant-menu .ant-menu-item-selected a,
+.ant-layout-sider .ant-menu .ant-menu-item-active a {
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+/* Submenu parent: primary bg and white text when any child is selected */
+.ant-menu-submenu-selected>.ant-menu-submenu-title {
+  background: var(--color-primary-500) !important;
+  color: #fff !important;
+}
+
+/* Prevent hover from overriding selected submenu styling */
+.ant-menu-submenu-selected>.ant-menu-submenu-title:hover {
+  background: var(--color-primary-500) !important;
+  color: #fff !important;
+}
+
+/* Parent icon color in selected state */
+.ant-menu-submenu-selected>.ant-menu-submenu-title .anticon {
+  color: #fff !important;
+}
+
+/* Menu item padding and radius */
+.ant-layout-sider .ant-menu .ant-menu-item,
+.ant-menu-submenu .ant-menu-submenu-title {
+  padding-left: 20px !important;
+  border-radius: 5px !important;
+}
+
+.sidebar-not-hovered.ant-layout-sider .ant-menu .ant-menu-item,
+.sidebar-not-hovered .ant-menu-submenu .ant-menu-submenu-title {
+  padding-left: 25px !important;
+}
+
+/* Submenu: indentation for nested menus */
+.ant-menu-submenu .ant-menu.ant-menu-sub.ant-menu-inline {
+  padding-left: 17px !important;
+}
+
+.ant-table-thead>tr>th {
+  white-space: nowrap !important;
+}
+
+.ant-segmented,
+.ant-segmented-group,
+.ant-segmented-item,
+.ant-segmented-item-label,
+.ant-segmented-thumb {
+  border-radius: 999px !important;
+}
+
+#loan-property-form :is(.custom-input-field, .custom-select-field) {
+  height: 40px;
+}
+
+#loan-property-form label {
+  color: var(--color-gray-700);
+  font-weight: 600;
+}

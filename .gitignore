@@ -1,0 +1,42 @@
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.zip
+backend/app/storage/
+!backend/app/storage/fonts/
+!backend/app/storage/fonts/**
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Dependencies (redundant if in subfolders but good practice)
+node_modules/
+__pycache__/
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/db/__pycache__/
+backend/app/core/__pycache__/
+backend/app/models/__pycache__/
+backend/app/services/__pycache__/
+backend/app/schemas/__pycache__/
+backend/app/api/__pycache__/
+backend/app/utils/__pycache__/
+backend/app/main/__pycache__/
+backend/.env
+backend/app/core/settings.py
+*.pyc
+venv/
+.venv/
+env/
+backend/app/uploads/
+ backend/app/uploads/*
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+docker-compose.override.yml

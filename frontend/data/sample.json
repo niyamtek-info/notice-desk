@@ -1,0 +1,17 @@
+{
+   "Aadhar": { "AadharCard_Number": "3977 8800 0234",
+    "name": "Deepak Vasant Surve",
+    "DOB_Year": "1967",
+    "Gender": "Male",
+    "Father_Name": "Vasant Surve",
+    "Address": {
+        "Building": "Hendre Buidg] No. 17, Room no.3, Groundloor",
+        "Street": "D.N.Singh Road",
+        "City": "Mumbai",
+        "State": "Maharashtra",
+        "Pincode": 400010
+    },
+    "PhoneNumber": "9969651728",
+    "EnrollmentNumber": "1190/11450/02075",
+    "EnrollmentDate": "06/01/2012"}
+}

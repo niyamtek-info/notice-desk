@@ -1,0 +1,1323 @@
+{
+  "report_fields": [
+    {
+      "field": "fcl_as_on_date",
+      "model_field": "fcl_as_on_date",
+      "excel_header": "FCL (As on Date)",
+      "placeholder": "FCL_AMOUNT"
+    },
+    {
+      "field": "batch_code",
+      "model_field": "batch_code",
+      "excel_header": "Batch Code",
+      "placeholder": "BATCH_CODE"
+    },
+    {
+      "field": "niyamtek_user",
+      "model_field": "niyamtek_user",
+      "excel_header": "NIYAMTEK USER ID OR NAME",
+      "placeholder": "NIYAMTEK_USER"
+    },
+    {
+      "field": "client_code",
+      "model_field": "client_code",
+      "excel_header": "Client ID (CODE)",
+      "placeholder": "CLIENT_CODE"
+    },
+    {
+      "field": "company_name",
+      "model_field": "company_name",
+      "excel_header": "Company Name",
+      "placeholder": "COMPANY_NAME"
+    },
+    {
+      "field": "loan_account_number",
+      "model_field": "loan_account_number",
+      "excel_header": "LOAN ACCOUNT NO.",
+      "placeholder": "LOAN_ACCOUNT_NUMBER"
+    },
+    {
+      "field": "trust_number",
+      "model_field": "trust_number",
+      "excel_header": "Trust Number",
+      "placeholder": "TRUST_NUMBER"
+    },
+    {
+      "field": "assignment_agreement_date",
+      "model_field": "assignment_agreement_date",
+      "excel_header": "Assignment agreement Date",
+      "placeholder": "ASSIGNMENT_AGREEMENT_DATE"
+    },
+    {
+      "field": "ao_name",
+      "model_field": "ao_name",
+      "excel_header": "AO NAME",
+      "placeholder": "AO_NAME"
+    },
+    {
+      "field": "branch",
+      "model_field": "branch",
+      "excel_header": "BRANCH",
+      "placeholder": "BRANCH"
+    },
+    {
+      "field": "state",
+      "model_field": "state",
+      "excel_header": "STATE",
+      "placeholder": "STATE"
+    },
+    {
+      "field": "region",
+      "model_field": "region",
+      "excel_header": "Region",
+      "placeholder": "REGION"
+    },
+    {
+      "field": "property_address",
+      "model_field": "property_address",
+      "excel_header": "Address of Mortgaged Property",
+      "placeholder": "MORTGAGED_PROPERTY_ADDRESS"
+    },
+    {
+      "field": "borrower_name",
+      "model_field": "borrower_name",
+      "excel_header": "NAME OF BORROWER",
+      "placeholder": "BORROWER_NAME"
+    },
+    {
+      "field": "borrower_address",
+      "model_field": "borrower_address",
+      "excel_header": "Borrower Address",
+      "placeholder": "BORROWER_ADDRESS"
+    },
+    {
+      "field": "borrower_address_also_at",
+      "model_field": "borrower_address_also_at",
+      "excel_header": "Borrower Address_(Also At)",
+      "placeholder": "BORROWER_ADDRESS_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_name",
+      "model_field": "co_borrower_1_name",
+      "excel_header": "Co-Borrower Name",
+      "placeholder": "CO_BORROWER_NAME"
+    },
+    {
+      "field": "co_borrower_address",
+      "model_field": "co_borrower_1_address",
+      "excel_header": "Co-Borrower Address",
+      "placeholder": "CO_BORROWER_ADDRESS"
+    },
+    {
+      "field": "co_borrower_address_also_at",
+      "model_field": "co_borrower_1_address_also_at",
+      "excel_header": "Co-Borrower Address (Also At)",
+      "placeholder": "CO_BORROWER_ADDRESS_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_name_1",
+      "model_field": "co_borrower_1_name",
+      "excel_header": "Co-Borrower Name_1",
+      "placeholder": "CO_BORROWER_NAME_1"
+    },
+    {
+      "field": "co_borrower_address_1",
+      "model_field": "co_borrower_1_address",
+      "excel_header": "Co-Borrower Address_1",
+      "placeholder": "CO_BORROWER_ADDRESS_1"
+    },
+    {
+      "field": "co_borrower_address_1_also_at",
+      "model_field": "co_borrower_1_address_also_at",
+      "excel_header": "Co-Borrower Address_1 (Also At)",
+      "placeholder": "CO_BORROWER_ADDRESS_1_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_name_2",
+      "model_field": "co_borrower_2_name",
+      "excel_header": "Co-Borrower Name_2",
+      "placeholder": "CO_BORROWER_NAME_2"
+    },
+    {
+      "field": "co_borrower_address_2",
+      "model_field": "co_borrower_2_address",
+      "excel_header": "Co-Borrower Address_2",
+      "placeholder": "CO_BORROWER_ADDRESS_2"
+    },
+    {
+      "field": "co_borrower_address_2_also_at",
+      "model_field": "co_borrower_2_address_also_at",
+      "excel_header": "Co-Borrower Address_2 (Also At)",
+      "placeholder": "CO_BORROWER_ADDRESS_2_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_name_3",
+      "model_field": "co_borrower_3_name",
+      "excel_header": "Co-Borrower Name_3",
+      "placeholder": "CO_BORROWER_NAME_3"
+    },
+    {
+      "field": "co_borrower_address_3",
+      "model_field": "co_borrower_3_address",
+      "excel_header": "Co-Borrower Address_3",
+      "placeholder": "CO_BORROWER_ADDRESS_3"
+    },
+    {
+      "field": "co_borrower_address_3_also_at",
+      "model_field": "co_borrower_3_address_also_at",
+      "excel_header": "Co-Borrower Address_3 (Also At)",
+      "placeholder": "CO_BORROWER_ADDRESS_3_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_name_4",
+      "model_field": "co_borrower_4_name",
+      "excel_header": "Co-Borrower Name_4",
+      "placeholder": "CO_BORROWER_NAME_4"
+    },
+    {
+      "field": "co_borrower_address_4",
+      "model_field": "co_borrower_4_address",
+      "excel_header": "Co-Borrower Address_4",
+      "placeholder": "CO_BORROWER_ADDRESS_4"
+    },
+    {
+      "field": "co_borrower_address_4_also_at",
+      "model_field": "co_borrower_4_address_also_at",
+      "excel_header": "Co-Borrower Address_4 (Also At)",
+      "placeholder": "CO_BORROWER_ADDRESS_4_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_name_5",
+      "model_field": "co_borrower_5_name",
+      "excel_header": "Co-Borrower Name_5",
+      "placeholder": "CO_BORROWER_NAME_5"
+    },
+    {
+      "field": "co_borrower_address_5",
+      "model_field": "co_borrower_5_address",
+      "excel_header": "Co-Borrower Address_5",
+      "placeholder": "CO_BORROWER_ADDRESS_5"
+    },
+    {
+      "field": "co_borrower_address_5_also_at",
+      "model_field": "co_borrower_5_address_also_at",
+      "excel_header": "Co-Borrower Address_5 (Also At)",
+      "placeholder": "CO_BORROWER_ADDRESS_5_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_name_6",
+      "model_field": "co_borrower_6_name",
+      "excel_header": "Co-Borrower Name_6",
+      "placeholder": "CO_BORROWER_NAME_6"
+    },
+    {
+      "field": "co_borrower_address_6",
+      "model_field": "co_borrower_6_address",
+      "excel_header": "Co-Borrower Address_6",
+      "placeholder": "CO_BORROWER_ADDRESS_6"
+    },
+    {
+      "field": "property_description",
+      "model_field": "property_description",
+      "excel_header": "Property Description",
+      "placeholder": "PROPERTY_DESCRIPTION"
+    },
+    {
+      "field": "guarantor_1_name",
+      "model_field": "guarantor_1_name",
+      "excel_header": "Guarantor Name_1",
+      "placeholder": "GUARANTOR_1_NAME"
+    },
+    {
+      "field": "guarantor_1_address",
+      "model_field": "guarantor_1_address",
+      "excel_header": "Guarantor Address_1",
+      "placeholder": "GUARANTOR_1_ADDRESS"
+    },
+    {
+      "field": "guarantor_2_name",
+      "model_field": "guarantor_2_name",
+      "excel_header": "Guarantor Name_2",
+      "placeholder": "GUARANTOR_2_NAME"
+    },
+    {
+      "field": "guarantor_2_address",
+      "model_field": "guarantor_2_address",
+      "excel_header": "Guarantor Address_2",
+      "placeholder": "GUARANTOR_2_ADDRESS"
+    },
+    {
+      "field": "date_of_npa",
+      "model_field": "date_of_npa",
+      "excel_header": "Date of NPA",
+      "placeholder": "DATE_OF_NPA"
+    },
+    {
+      "field": "dpd_as_on_notice",
+      "model_field": "dpd_as_on_notice",
+      "excel_header": "DPD as on Notice Issuance Date",
+      "placeholder": "DPD_AS_ON_NOTICE"
+    },
+    {
+      "field": "disbursement_type",
+      "model_field": "disbursement_type",
+      "excel_header": "Disbursement Type (Loan / OD / CC / HL / BLG)",
+      "placeholder": "DISBURSEMENT_TYPE"
+    },
+    {
+      "field": "disbursal_date",
+      "model_field": "disbursal_date",
+      "excel_header": "Disbursal Date",
+      "placeholder": "DISBURSAL_DATE"
+    },
+    {
+      "field": "disbursal_amount",
+      "model_field": "disbursal_amount",
+      "excel_header": "Disbursal Amount",
+      "placeholder": "DISBURSAL_AMOUNT"
+    },
+    {
+      "field": "loan_agreement_date",
+      "model_field": "loan_agreement_date",
+      "excel_header": "Loan Agreement Date",
+      "placeholder": "LOAN_AGREEMENT_DATE"
+    },
+    {
+      "field": "loan_amount",
+      "model_field": "loan_amount",
+      "excel_header": "Loan Amount",
+      "placeholder": "LOAN_AMOUNT"
+    },
+    {
+      "field": "loan_amount_words",
+      "model_field": "loan_amount_words",
+      "excel_header": "Loan Amount in Words",
+      "placeholder": "LOAN_AMOUNT_WORDS"
+    },
+    {
+      "field": "future_principal",
+      "model_field": "future_principal",
+      "excel_header": "Future Principle",
+      "placeholder": "FUTURE_PRINCIPAL"
+    },
+    {
+      "field": "principal_outstanding",
+      "model_field": "principal_outstanding",
+      "excel_header": "Principal Outstanding",
+      "placeholder": "PRINCIPAL_OUTSTANDING"
+    },
+    {
+      "field": "instalment_overdue_amount",
+      "model_field": "instalment_overdue_amount",
+      "excel_header": "Instalment_overdue_amount",
+      "placeholder": "INSTALMENT_OVERDUE_AMOUNT"
+    },
+    {
+      "field": "interest_on_termination",
+      "model_field": "interest_on_termination",
+      "excel_header": "Interest on Termination",
+      "placeholder": "INTEREST_ON_TERMINATION"
+    },
+    {
+      "field": "late_payment_penalty",
+      "model_field": "late_payment_penalty",
+      "excel_header": "Late Payment Penalty",
+      "placeholder": "LATE_PAYMENT_PENALTY"
+    },
+    {
+      "field": "cheque_bounce_charges",
+      "model_field": "cheque_bounce_charges",
+      "excel_header": "Cheque Bounce Charges (Including Others)",
+      "placeholder": "CHEQUE_BOUNCE_CHARGES"
+    },
+    {
+      "field": "other_amount",
+      "model_field": "other_amount",
+      "excel_header": "Other Amount",
+      "placeholder": "OTHER_AMOUNT"
+    },
+    {
+      "field": "foreclosure_charges",
+      "model_field": "foreclosure_charges",
+      "excel_header": "Foreclosure Charges",
+      "placeholder": "FORECLOSURE_CHARGES"
+    },
+    {
+      "field": "total_outstanding",
+      "model_field": "total_outstanding",
+      "excel_header": "Total Outstanding",
+      "placeholder": "TOTAL_OUTSTANDING"
+    },
+    {
+      "field": "total_outstanding_words",
+      "model_field": "total_outstanding_words",
+      "excel_header": "Total Outstanding in words",
+      "placeholder": "TOTAL_OUTSTANDING_WORDS"
+    },
+    {
+      "field": "sec_13_2_notice_date",
+      "model_field": "sec_13_2_notice_date",
+      "excel_header": "13(2) Demand Notice (date)",
+      "placeholder": "SEC_13_2_NOTICE_DATE"
+    },
+    {
+      "field": "notice_13_2_amount",
+      "model_field": "notice_13_2_amount",
+      "excel_header": "13 (2) NOTICE AMT",
+      "placeholder": "NOTICE_13_2_AMOUNT"
+    },
+    {
+      "field": "notice_dispatch_date",
+      "model_field": "notice_dispatch_date",
+      "excel_header": "Dispatch Date",
+      "placeholder": "NOTICE_DISPATCH_DATE"
+    },
+    {
+      "field": "notice_pasting_date",
+      "model_field": "notice_pasting_date",
+      "excel_header": "Pasting Date (optional)",
+      "placeholder": "NOTICE_PASTING_DATE"
+    },
+    {
+      "field": "delivery_status",
+      "model_field": "delivery_status",
+      "excel_header": "Delivered /undelivered with Date",
+      "placeholder": "DELIVERY_STATUS"
+    },
+    {
+      "field": "delivery_status_date",
+      "model_field": "delivery_status_date",
+      "excel_header": "Delivery Status Date",
+      "placeholder": "DELIVERY_STATUS_DATE"
+    },
+    {
+      "field": "delivered_address",
+      "model_field": "delivered_address",
+      "excel_header": "Delivered address",
+      "placeholder": "DELIVERED_ADDRESS"
+    },
+    {
+      "field": "undelivered_address",
+      "model_field": "undelivered_address",
+      "excel_header": "Undelivered address",
+      "placeholder": "UNDELIVERED_ADDRESS"
+    },
+    {
+      "field": "total_address",
+      "model_field": "total_address",
+      "excel_header": "Total address",
+      "placeholder": "TOTAL_ADDRESS"
+    },
+    {
+      "field": "publication_date_13_2",
+      "model_field": "publication_date_13_2",
+      "excel_header": "13(2) Date of Publication",
+      "placeholder": "PUBLICATION_DATE_13_2"
+    },
+    {
+      "field": "publication_english_13_2",
+      "model_field": "publication_english_13_2",
+      "excel_header": "Publication Details : (Names of News Papers) & Language Name : (English)",
+      "placeholder": "PUBLICATION_ENGLISH_13_2"
+    },
+    {
+      "field": "publication_local_13_2",
+      "model_field": "publication_local_13_2",
+      "excel_header": "Publication Details : (Names of News Papers) & Vernacular Language Name : (Tamil,Hindi,malayalam,etc...)",
+      "placeholder": "PUBLICATION_LOCAL_13_2"
+    },
+    {
+      "field": "id",
+      "model_field": "id",
+      "excel_header": "Id",
+      "placeholder": "ID"
+    },
+    {
+      "field": "loan_account_no",
+      "model_field": "loan_account_no",
+      "excel_header": "Loan Account No",
+      "placeholder": "LOAN_ACCOUNT_NO"
+    },
+    {
+      "field": "report_source",
+      "model_field": "report_source",
+      "excel_header": "Report Source",
+      "placeholder": "REPORT_SOURCE"
+    },
+    {
+      "field": "has_document",
+      "model_field": "has_document",
+      "excel_header": "Has Document",
+      "placeholder": "HAS_DOCUMENT"
+    },
+    {
+      "field": "npa_date",
+      "model_field": "npa_date",
+      "excel_header": "Npa Date",
+      "placeholder": "NPA_DATE"
+    },
+    {
+      "field": "dpd",
+      "model_field": "dpd",
+      "excel_header": "Dpd",
+      "placeholder": "DPD"
+    },
+    {
+      "field": "instalment_overdue",
+      "model_field": "instalment_overdue",
+      "excel_header": "Instalment Overdue",
+      "placeholder": "INSTALMENT_OVERDUE"
+    },
+    {
+      "field": "notice_13_2_date",
+      "model_field": "notice_13_2_date",
+      "excel_header": "Notice 13 2 Date",
+      "placeholder": "NOTICE_13_2_DATE"
+    },
+    {
+      "field": "symbolic_possession_date_13_4",
+      "model_field": "symbolic_possession_date_13_4",
+      "excel_header": "Symbolic Possession Date 13 4",
+      "placeholder": "SYMBOLIC_POSSESSION_DATE_13_4"
+    },
+    {
+      "field": "symbolic_dispatch_date_13_4",
+      "model_field": "symbolic_dispatch_date_13_4",
+      "excel_header": "Symbolic Dispatch Date 13 4",
+      "placeholder": "SYMBOLIC_DISPATCH_DATE_13_4"
+    },
+    {
+      "field": "symbolic_delivery_status_13_4",
+      "model_field": "symbolic_delivery_status_13_4",
+      "excel_header": "Symbolic Delivery Status 13 4",
+      "placeholder": "SYMBOLIC_DELIVERY_STATUS_13_4"
+    },
+    {
+      "field": "symbolic_photo_13_4",
+      "model_field": "symbolic_photo_13_4",
+      "excel_header": "Symbolic Photo 13 4",
+      "placeholder": "SYMBOLIC_PHOTO_13_4"
+    },
+    {
+      "field": "symbolic_publication_date_13_4",
+      "model_field": "symbolic_publication_date_13_4",
+      "excel_header": "Symbolic Publication Date 13 4",
+      "placeholder": "SYMBOLIC_PUBLICATION_DATE_13_4"
+    },
+    {
+      "field": "symbolic_pub_english_13_4",
+      "model_field": "symbolic_pub_english_13_4",
+      "excel_header": "Symbolic Pub English 13 4",
+      "placeholder": "SYMBOLIC_PUB_ENGLISH_13_4"
+    },
+    {
+      "field": "symbolic_pub_local_13_4",
+      "model_field": "symbolic_pub_local_13_4",
+      "excel_header": "Symbolic Pub Local 13 4",
+      "placeholder": "SYMBOLIC_PUB_LOCAL_13_4"
+    },
+    {
+      "field": "cjm_filing_date",
+      "model_field": "cjm_filing_date",
+      "excel_header": "Cjm Filing Date",
+      "placeholder": "CJM_FILING_DATE"
+    },
+    {
+      "field": "court_name",
+      "model_field": "court_name",
+      "excel_header": "Court Name",
+      "placeholder": "COURT_NAME"
+    },
+    {
+      "field": "case_number",
+      "model_field": "case_number",
+      "excel_header": "Case Number",
+      "placeholder": "CASE_NUMBER"
+    },
+    {
+      "field": "crm_pl_date",
+      "model_field": "crm_pl_date",
+      "excel_header": "Crm Pl Date",
+      "placeholder": "CRM_PL_DATE"
+    },
+    {
+      "field": "crm_pl_no",
+      "model_field": "crm_pl_no",
+      "excel_header": "Crm Pl No",
+      "placeholder": "CRM_PL_NO"
+    },
+    {
+      "field": "next_hearing_date",
+      "model_field": "next_hearing_date",
+      "excel_header": "Next Hearing Date",
+      "placeholder": "NEXT_HEARING_DATE"
+    },
+    {
+      "field": "ov_date",
+      "model_field": "ov_date",
+      "excel_header": "Ov Date",
+      "placeholder": "OV_DATE"
+    },
+    {
+      "field": "order_date",
+      "model_field": "order_date",
+      "excel_header": "Order Date",
+      "placeholder": "ORDER_DATE"
+    },
+    {
+      "field": "court_ao_name",
+      "model_field": "court_ao_name",
+      "excel_header": "Court Ao Name",
+      "placeholder": "COURT_AO_NAME"
+    },
+    {
+      "field": "advocate_details",
+      "model_field": "advocate_details",
+      "excel_header": "Advocate Details",
+      "placeholder": "ADVOCATE_DETAILS"
+    },
+    {
+      "field": "adv_com_name",
+      "model_field": "adv_com_name",
+      "excel_header": "Adv Com Name",
+      "placeholder": "ADV_COM_NAME"
+    },
+    {
+      "field": "inventory_status",
+      "model_field": "inventory_status",
+      "excel_header": "Inventory Status",
+      "placeholder": "INVENTORY_STATUS"
+    },
+    {
+      "field": "physical_possession_date",
+      "model_field": "physical_possession_date",
+      "excel_header": "Physical Possession Date",
+      "placeholder": "PHYSICAL_POSSESSION_DATE"
+    },
+    {
+      "field": "physical_dispatch_date",
+      "model_field": "physical_dispatch_date",
+      "excel_header": "Physical Dispatch Date",
+      "placeholder": "PHYSICAL_DISPATCH_DATE"
+    },
+    {
+      "field": "physical_delivery_status",
+      "model_field": "physical_delivery_status",
+      "excel_header": "Physical Delivery Status",
+      "placeholder": "PHYSICAL_DELIVERY_STATUS"
+    },
+    {
+      "field": "physical_photo",
+      "model_field": "physical_photo",
+      "excel_header": "Physical Photo",
+      "placeholder": "PHYSICAL_PHOTO"
+    },
+    {
+      "field": "physical_publication_date",
+      "model_field": "physical_publication_date",
+      "excel_header": "Physical Publication Date",
+      "placeholder": "PHYSICAL_PUBLICATION_DATE"
+    },
+    {
+      "field": "physical_pub_english",
+      "model_field": "physical_pub_english",
+      "excel_header": "Physical Pub English",
+      "placeholder": "PHYSICAL_PUB_ENGLISH"
+    },
+    {
+      "field": "physical_pub_local",
+      "model_field": "physical_pub_local",
+      "excel_header": "Physical Pub Local",
+      "placeholder": "PHYSICAL_PUB_LOCAL"
+    },
+    {
+      "field": "auction_notice_date",
+      "model_field": "auction_notice_date",
+      "excel_header": "Auction Notice Date",
+      "placeholder": "AUCTION_NOTICE_DATE"
+    },
+    {
+      "field": "auction_date",
+      "model_field": "auction_date",
+      "excel_header": "Auction Date",
+      "placeholder": "AUCTION_DATE"
+    },
+    {
+      "field": "auction_publication_date",
+      "model_field": "auction_publication_date",
+      "excel_header": "Auction Publication Date",
+      "placeholder": "AUCTION_PUBLICATION_DATE"
+    },
+    {
+      "field": "auction_pub_english",
+      "model_field": "auction_pub_english",
+      "excel_header": "Auction Pub English",
+      "placeholder": "AUCTION_PUB_ENGLISH"
+    },
+    {
+      "field": "auction_pub_local",
+      "model_field": "auction_pub_local",
+      "excel_header": "Auction Pub Local",
+      "placeholder": "AUCTION_PUB_LOCAL"
+    },
+    {
+      "field": "reserve_price",
+      "model_field": "reserve_price",
+      "excel_header": "Reserve Price",
+      "placeholder": "RESERVE_PRICE"
+    },
+    {
+      "field": "sold_price",
+      "model_field": "sold_price",
+      "excel_header": "Sold Price",
+      "placeholder": "SOLD_PRICE"
+    },
+    {
+      "field": "auction_status",
+      "model_field": "auction_status",
+      "excel_header": "Auction Status",
+      "placeholder": "AUCTION_STATUS"
+    },
+    {
+      "field": "inspection_start",
+      "model_field": "inspection_start",
+      "excel_header": "Inspection Start",
+      "placeholder": "INSPECTION_START"
+    },
+    {
+      "field": "inspection_end",
+      "model_field": "inspection_end",
+      "excel_header": "Inspection End",
+      "placeholder": "INSPECTION_END"
+    },
+    {
+      "field": "emd_last_date",
+      "model_field": "emd_last_date",
+      "excel_header": "Emd Last Date",
+      "placeholder": "EMD_LAST_DATE"
+    },
+    {
+      "field": "auction_start",
+      "model_field": "auction_start",
+      "excel_header": "Auction Start",
+      "placeholder": "AUCTION_START"
+    },
+    {
+      "field": "auction_end",
+      "model_field": "auction_end",
+      "excel_header": "Auction End",
+      "placeholder": "AUCTION_END"
+    },
+    {
+      "field": "bid_extension_time",
+      "model_field": "bid_extension_time",
+      "excel_header": "Bid Extension Time",
+      "placeholder": "BID_EXTENSION_TIME"
+    },
+    {
+      "field": "total_extensions",
+      "model_field": "total_extensions",
+      "excel_header": "Total Extensions",
+      "placeholder": "TOTAL_EXTENSIONS"
+    },
+    {
+      "field": "emd_amount",
+      "model_field": "emd_amount",
+      "excel_header": "Emd Amount",
+      "placeholder": "EMD_AMOUNT"
+    },
+    {
+      "field": "bid_increment",
+      "model_field": "bid_increment",
+      "excel_header": "Bid Increment",
+      "placeholder": "BID_INCREMENT"
+    },
+    {
+      "field": "total_bid_count",
+      "model_field": "total_bid_count",
+      "excel_header": "Total Bid Count",
+      "placeholder": "TOTAL_BID_COUNT"
+    },
+    {
+      "field": "authorised_officer",
+      "model_field": "authorised_officer",
+      "excel_header": "Authorised Officer",
+      "placeholder": "AUTHORISED_OFFICER"
+    },
+    {
+      "field": "post_sale_notice",
+      "model_field": "post_sale_notice",
+      "excel_header": "Post Sale Notice",
+      "placeholder": "POST_SALE_NOTICE"
+    },
+    {
+      "field": "sale_confirmation_date",
+      "model_field": "sale_confirmation_date",
+      "excel_header": "Sale Confirmation Date",
+      "placeholder": "SALE_CONFIRMATION_DATE"
+    },
+    {
+      "field": "sale_certificate_date",
+      "model_field": "sale_certificate_date",
+      "excel_header": "Sale Certificate Date",
+      "placeholder": "SALE_CERTIFICATE_DATE"
+    },
+    {
+      "field": "available_documents",
+      "model_field": "available_documents",
+      "excel_header": "Available Documents",
+      "placeholder": "AVAILABLE_DOCUMENTS"
+    },
+    {
+      "field": "non_available_documents",
+      "model_field": "non_available_documents",
+      "excel_header": "Non Available Documents",
+      "placeholder": "NON_AVAILABLE_DOCUMENTS"
+    },
+    {
+      "field": "discrepancy_doc",
+      "model_field": "discrepancy_doc",
+      "excel_header": "Discrepancy Doc",
+      "placeholder": "DISCREPANCY_DOC"
+    },
+    {
+      "field": "discrepancy_reason",
+      "model_field": "discrepancy_reason",
+      "excel_header": "Discrepancy Reason",
+      "placeholder": "DISCREPANCY_REASON"
+    },
+    {
+      "field": "next_actionable_stage",
+      "model_field": "next_actionable_stage",
+      "excel_header": "Next Actionable Stage",
+      "placeholder": "NEXT_ACTIONABLE_STAGE"
+    },
+    {
+      "field": "next_step_recommended",
+      "model_field": "next_step_recommended",
+      "excel_header": "Next Step Recommended",
+      "placeholder": "NEXT_STEP_RECOMMENDED"
+    },
+    {
+      "field": "niyamtek_remarks",
+      "model_field": "niyamtek_remarks",
+      "excel_header": "Niyamtek Remarks",
+      "placeholder": "NIYAMTEK_REMARKS"
+    },
+    {
+      "field": "borrower_address_alt",
+      "model_field": "borrower_address_alt",
+      "excel_header": "",
+      "placeholder": "BORROWER_ADDRESS_ALT"
+    },
+    {
+      "field": "co_borrower_1_name",
+      "model_field": "co_borrower_1_name",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_1_NAME"
+    },
+    {
+      "field": "co_borrower_1_address",
+      "model_field": "co_borrower_1_address",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_1_ADDRESS"
+    },
+    {
+      "field": "co_borrower_1_address_alt",
+      "model_field": "co_borrower_1_address_alt",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_1_ADDRESS_ALT"
+    },
+    {
+      "field": "co_borrower_2_name",
+      "model_field": "co_borrower_2_name",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_2_NAME"
+    },
+    {
+      "field": "co_borrower_2_address",
+      "model_field": "co_borrower_2_address",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_2_ADDRESS"
+    },
+    {
+      "field": "co_borrower_2_address_alt",
+      "model_field": "co_borrower_2_address_alt",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_2_ADDRESS_ALT"
+    },
+    {
+      "field": "co_borrower_3_name",
+      "model_field": "co_borrower_3_name",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_3_NAME"
+    },
+    {
+      "field": "co_borrower_3_address",
+      "model_field": "co_borrower_3_address",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_3_ADDRESS"
+    },
+    {
+      "field": "co_borrower_3_address_alt",
+      "model_field": "co_borrower_3_address_alt",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_3_ADDRESS_ALT"
+    },
+    {
+      "field": "co_borrower_4_name",
+      "model_field": "co_borrower_4_name",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_4_NAME"
+    },
+    {
+      "field": "co_borrower_4_address",
+      "model_field": "co_borrower_4_address",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_4_ADDRESS"
+    },
+    {
+      "field": "co_borrower_4_address_alt",
+      "model_field": "co_borrower_4_address_alt",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_4_ADDRESS_ALT"
+    },
+    {
+      "field": "co_borrower_5_name",
+      "model_field": "co_borrower_5_name",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_5_NAME"
+    },
+    {
+      "field": "co_borrower_5_address",
+      "model_field": "co_borrower_5_address",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_5_ADDRESS"
+    },
+    {
+      "field": "co_borrower_5_address_alt",
+      "model_field": "co_borrower_5_address_alt",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_5_ADDRESS_ALT"
+    },
+    {
+      "field": "co_borrower_6_name",
+      "model_field": "co_borrower_6_name",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_6_NAME"
+    },
+    {
+      "field": "co_borrower_6_address",
+      "model_field": "co_borrower_6_address",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_6_ADDRESS"
+    },
+    {
+      "field": "co_borrower_1_address_also_at",
+      "model_field": "co_borrower_1_address_also_at",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_1_ADDRESS_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_2_address_also_at",
+      "model_field": "co_borrower_2_address_also_at",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_2_ADDRESS_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_3_address_also_at",
+      "model_field": "co_borrower_3_address_also_at",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_3_ADDRESS_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_4_address_also_at",
+      "model_field": "co_borrower_4_address_also_at",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_4_ADDRESS_ALSO_AT"
+    },
+    {
+      "field": "co_borrower_5_address_also_at",
+      "model_field": "co_borrower_5_address_also_at",
+      "excel_header": "",
+      "placeholder": "CO_BORROWER_5_ADDRESS_ALSO_AT"
+    },
+    {
+      "field": "location",
+      "model_field": "location",
+      "excel_header": "",
+      "placeholder": "LOCATION"
+    },
+    {
+      "field": "arc_name",
+      "model_field": "arc_name",
+      "excel_header": "",
+      "placeholder": "ARC_NAME"
+    },
+    {
+      "field": "description_of_schedule_property",
+      "model_field": "description_of_schedule_property",
+      "excel_header": "",
+      "placeholder": "DESCRIPTION_OF_SCHEDULE_PROPERTY"
+    },
+    {
+      "field": "schedule_property_descriptions",
+      "model_field": "schedule_property_descriptions",
+      "excel_header": "",
+      "placeholder": "SCHEDULE_PROPERTY_DESCRIPTIONS"
+    },
+    {
+      "field": "as_on_date",
+      "model_field": "as_on_date",
+      "excel_header": "",
+      "placeholder": "AS_ON_DATE"
+    },
+    {
+      "field": "status",
+      "model_field": "status",
+      "excel_header": "",
+      "placeholder": "STATUS"
+    },
+    {
+      "field": "is_report_overridden",
+      "model_field": "is_report_overridden",
+      "excel_header": "",
+      "placeholder": "IS_REPORT_OVERRIDDEN"
+    },
+    {
+    "field": "matured_date_13_4",
+    "model_field": "matured_date_13_4",
+    "excel_header": "Matured Date 13 4",
+    "placeholder": "MATURED_DATE_13_4"
+  },
+  {
+    "field": "vacation_notice_moveable",
+    "model_field": "vacation_notice_moveable",
+    "excel_header": "Vacation Notice Moveable",
+    "placeholder": "VACATION_NOTICE_MOVEABLE"
+  },
+  {
+    "field": "vacation_notice_immoveable",
+    "model_field": "vacation_notice_immoveable",
+    "excel_header": "Vacation Notice Immoveable",
+    "placeholder": "VACATION_NOTICE_IMMOVEABLE"
+  },
+  {
+    "field": "physical_vacation_notice_moveable",
+    "model_field": "physical_vacation_notice_moveable",
+    "excel_header": "Physical Vacation Notice Moveable",
+    "placeholder": "PHYSICAL_VACATION_NOTICE_MOVEABLE"
+  },
+  {
+    "field": "physical_vacation_notice_immoveable",
+    "model_field": "physical_vacation_notice_immoveable",
+    "excel_header": "Physical Vacation Notice Immoveable",
+    "placeholder": "PHYSICAL_VACATION_NOTICE_IMMOVEABLE"
+  },
+  {
+    "field": "physical_delivery_status_date",
+    "model_field": "physical_delivery_status_date",
+    "excel_header": "Physical Delivery Status Date",
+    "placeholder": "PHYSICAL_DELIVERY_STATUS_DATE"
+  },
+  {
+    "field": "symbolic_delivery_status_date_13_4",
+    "model_field": "symbolic_delivery_status_date_13_4",
+    "excel_header": "Symbolic Delivery Status Date 13 4",
+    "placeholder": "SYMBOLIC_DELIVERY_STATUS_DATE_13_4"
+  },
+  {
+    "field": "outstanding_amount",
+    "model_field": "outstanding_amount",
+    "excel_header": "Outstanding Amount",
+    "placeholder": "OUTSTANDING_AMOUNT"
+  },
+  {
+    "field": "sold_reg_date",
+    "model_field": "sold_reg_date",
+    "excel_header": "Sold Registration Date",
+    "placeholder": "SOLD_REG_DATE"
+  },
+  {
+    "field": "sarfaesi_category",
+    "model_field": "sarfaesi_category",
+    "excel_header": "Sarfaesi Category",
+    "placeholder": "SARFAESI_CATEGORY"
+  },
+  {
+    "field": "case_status",
+    "model_field": "case_status",
+    "excel_header": "Case Status",
+    "placeholder": "CASE_STATUS"
+  }
+  ],
+  "notice_template_aliases": [
+    {
+      "alias": "ADDRESS_OF_THE_BORROWER",
+      "target": "BORROWER_ADDRESS"
+    },
+    {
+      "alias": "ADDRESS_OF_BORROWER",
+      "target": "BORROWER_ADDRESS"
+    },
+    {
+      "alias": "BORROWER_ADDRESS",
+      "target": "BORROWER_ADDRESS"
+    },
+    {
+      "alias": "ADDRESS_OF_MORTGAGED_PROPERTY",
+      "target": "MORTGAGED_PROPERTY_ADDRESS"
+    },
+    {
+      "alias": "ADDRESS_OF_THE_MORTGAGED_PROPERTY",
+      "target": "MORTGAGED_PROPERTY_ADDRESS"
+    },
+    {
+      "alias": "BORROWER_NAME",
+      "target": "BORROWER_NAME"
+    },
+    {
+      "alias": "NAME_OF_THE_BORROWER",
+      "target": "BORROWER_NAME"
+    },
+    {
+      "alias": "CO_BORROWER_NAME",
+      "target": "CO_BORROWER_1_NAME"
+    },
+    {
+      "alias": "CO_BORROWER_ADDRESS",
+      "target": "CO_BORROWER_1_ADDRESS"
+    },
+    {
+      "alias": "CO_BORROWER_ADDRESS_ALSO_AT",
+      "target": "CO_BORROWER_1_ADDRESS_ALSO_AT"
+    },
+    {
+      "alias": "GUARANTOR_NAME",
+      "target": "GUARANTOR_1_NAME"
+    },
+    {
+      "alias": "GUARANTOR_ADDRESS",
+      "target": "GUARANTOR_1_ADDRESS"
+    },
+    {
+      "alias": "FCL_AMOUNT",
+      "target": "FCL_AMOUNT",
+      "source_fields": ["fcl_as_on_date"]
+    },
+    {
+      "alias": "FCL_AMOUNT_NUMERIC",
+      "target": "FCL_AMOUNT",
+      "source_fields": ["fcl_as_on_date"]
+    },
+    {
+      "alias": "NOTICE_DATE",
+      "target": "SEC_13_2_NOTICE_DATE",
+      "source_fields": ["notice_13_2_date"]
+    },
+    {
+      "alias": "LOAN_AMOUNT_NUMERIC",
+      "target": "LOAN_AMOUNT",
+      "source_fields": ["loan_amount"]
+    },
+    {
+      "alias": "LOAN_ACCOUNT_NUMBERS",
+      "target": "LOAN_ACCOUNT_NUMBER",
+      "source_fields": ["loan_account_no"]
+    },
+    {
+      "alias": "BORROWER_1_NAME",
+      "target": "BORROWER_NAME",
+      "source_fields": ["borrower_name"]
+    },
+    {
+      "alias": "BORROWER_1_ADDRESS",
+      "target": "BORROWER_ADDRESS",
+      "source_fields": ["borrower_address"]
+    },
+    {
+      "alias": "BORROWER_2_NAME",
+      "target": "BORROWER_NAME"
+    },
+    {
+      "alias": "BORROWER_2_ADDRESS",
+      "target": "BORROWER_ADDRESS"
+    },
+    {
+      "alias": "BORROWER_3_NAME",
+      "target": "BORROWER_NAME"
+    },
+    {
+      "alias": "BORROWER_3_ADDRESS",
+      "target": "BORROWER_ADDRESS"
+    },
+    {
+      "alias": "TOTAL_DISBURSED_AMOUNT_NUMERIC",
+      "target": "DISBURSAL_AMOUNT",
+      "source_fields": ["disbursal_amount"]
+    },
+    {
+      "alias": "TOTAL_DISBURSED_AMOUNT_WORDS",
+      "target": "LOAN_AMOUNT_WORDS",
+      "source_fields": ["loan_amount_words"]
+    },
+    {
+      "alias": "TRUST_NAME",
+      "target": "TRUST_NUMBER",
+      "source_fields": ["trust_number"]
+    },
+    {
+      "alias": "ASSIGNOR_NAME",
+      "target": "COMPANY_NAME",
+      "source_fields": ["company_name"]
+    },
+    {
+      "alias": "ASSIGNMENT_DATE",
+      "target": "ASSIGNMENT_AGREEMENT_DATE",
+      "source_fields": ["assignment_agreement_date"]
+    },
+    {
+      "alias": "CO_BORROWER_NAMES",
+      "target": "CO_BORROWER_NAME",
+      "source_fields": ["co_borrower_1_name"]
+    },
+    {
+      "alias": "FCL_DATE",
+      "target": "FCL_AMOUNT",
+      "source_fields": ["fcl_as_on_date"]
+    },
+    {
+      "alias": "OUTSTANDING_AS_ON_DATE",
+      "target": "AS_ON_DATE",
+      "source_fields": ["updated_at"]
+    },
+    {
+      "alias": "OUTSTANDING_AMOUNT_NUMERIC",
+      "target": "TOTAL_OUTSTANDING",
+      "source_fields": ["total_outstanding"]
+    },
+    {
+      "alias": "OUTSTANDING_AMOUNT_WORDS",
+      "target": "TOTAL_OUTSTANDING_WORDS",
+      "source_fields": ["total_outstanding_words"]
+    },
+    {
+      "alias": "DEMAND_AMOUNT_NUMERIC",
+      "target": "TOTAL_OUTSTANDING",
+      "source_fields": ["total_outstanding"]
+    },
+    {
+      "alias": "DEMAND_AMOUNT_WORDS",
+      "target": "TOTAL_OUTSTANDING_WORDS",
+      "source_fields": ["total_outstanding_words"]
+    },
+    {
+      "alias": "ORIGINAL_LENDER_NAME",
+      "target": "COMPANY_NAME",
+      "source_fields": ["company_name"]
+    },
+    {
+      "alias": "LOAN_PURPOSE",
+      "target": "DISBURSEMENT_TYPE",
+      "source_fields": ["disbursement_type"]
+    },
+    {
+      "alias": "LOAN_AGREEMENT_DATES",
+      "target": "LOAN_AGREEMENT_DATE",
+      "source_fields": ["loan_agreement_date"]
+    },
+    {
+      "alias": "SCHEDULE_1_PROPERTY_DETAILS",
+      "target": "DESCRIPTION_OF_SCHEDULE_PROPERTY",
+      "source_fields": ["property_description"]
+    },
+    {
+      "alias": "AO_SIGNATURE",
+      "target": "AO_SIGNATURE"
+    },
+    {
+      "alias": "AO_SIGNATURE_PATH",
+      "target": "AO_SIGNATURE"
+    },
+    {
+      "alias": "AO_SIGNATURE_URL",
+      "target": "AO_SIGNATURE"
+    },
+    {
+      "alias": "SIGNATURE_PATH",
+      "target": "AO_SIGNATURE"
+    }
+  ],
+  "notice_party_mappings": [
+    {
+      "name_placeholder": "BORROWER_1_NAME",
+      "address_placeholder": "BORROWER_1_ADDRESS",
+      "role": "Borrower"
+    },
+    {
+      "name_placeholder": "BORROWER_2_NAME",
+      "address_placeholder": "BORROWER_2_ADDRESS",
+      "role": "Borrower"
+    },
+    {
+      "name_placeholder": "BORROWER_3_NAME",
+      "address_placeholder": "BORROWER_3_ADDRESS",
+      "role": "Borrower"
+    },
+    {
+      "name_placeholder": "BORROWER_4_NAME",
+      "address_placeholder": "BORROWER_4_ADDRESS",
+      "role": "Borrower"
+    },
+    {
+      "name_placeholder": "BORROWER_5_NAME",
+      "address_placeholder": "BORROWER_5_ADDRESS",
+      "role": "Borrower"
+    },
+    {
+      "name_placeholder": "BORROWER_6_NAME",
+      "address_placeholder": "BORROWER_6_ADDRESS",
+      "role": "Borrower"
+    },
+    {
+      "name_placeholder": "CO_BORROWER_1_NAME",
+      "address_placeholder": "CO_BORROWER_1_ADDRESS",
+      "role": "Co-Borrower"
+    },
+    {
+      "name_placeholder": "CO_BORROWER_2_NAME",
+      "address_placeholder": "CO_BORROWER_2_ADDRESS",
+      "role": "Co-Borrower"
+    },
+    {
+      "name_placeholder": "CO_BORROWER_3_NAME",
+      "address_placeholder": "CO_BORROWER_3_ADDRESS",
+      "role": "Co-Borrower"
+    },
+    {
+      "name_placeholder": "CO_BORROWER_4_NAME",
+      "address_placeholder": "CO_BORROWER_4_ADDRESS",
+      "role": "Co-Borrower"
+    },
+    {
+      "name_placeholder": "CO_BORROWER_5_NAME",
+      "address_placeholder": "CO_BORROWER_5_ADDRESS",
+      "role": "Co-Borrower"
+    },
+    {
+      "name_placeholder": "CO_BORROWER_6_NAME",
+      "address_placeholder": "CO_BORROWER_6_ADDRESS",
+      "role": "Co-Borrower"
+    },
+    {
+      "name_placeholder": "GUARANTOR_1_NAME",
+      "address_placeholder": "GUARANTOR_1_ADDRESS",
+      "role": "Guarantor"
+    },
+    {
+      "name_placeholder": "GUARANTOR_2_NAME",
+      "address_placeholder": "GUARANTOR_2_ADDRESS",
+      "role": "Guarantor"
+    }
+  ]
+}

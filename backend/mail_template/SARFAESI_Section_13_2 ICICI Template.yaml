@@ -1,0 +1,206 @@
+document:
+  branding:
+    logo:
+      name: ICICI Bank
+      type: image
+      placement: header_left
+    header_line: true
+
+  meta:
+    document_type: "Legal Demand Notice"
+    act: "SARFAESI Act, 2002"
+    section: "Section 13(2)"
+    reference_number: "728905000297"
+    date: "22-05-2023"
+
+  bank_details:
+    name: "ICICI Bank Ltd."
+    registered_office: >
+      ICICI Bank Tower, Near Chakli Circle,
+      Old Padra Road, Vadodara – 390007, Gujarat
+    corporate_office: >
+      ICICI Bank Towers, Bandra Kurla Complex,
+      Mumbai – 400051, India
+    website: "www.icicibank.com"
+
+  parties:
+    applicants:
+      - name: "Inthiya Auto Gas Agency"
+        represented_by: "Partners A Mohamed Shariff Sate & A Farhana"
+        address: >
+          248/3 A2, Keelakkarai,
+          Ramanathapuram – 623504
+
+      - name: "Inthiya Auto Gas Agency"
+        address: >
+          Plot No.11, S.No.307/1b,
+          Pattanamathur Village,
+          Velipattinam SRO,
+          Ramanathapuram – 623501
+
+    guarantors:
+      - name: "A Farhana"
+        address: >
+          No.47/3, New No.4/92,
+          Bug Bazar Street, Devipattinam,
+          Ramanathapuram – 623514
+
+      - name: "A Mohamed Shariff Sate"
+        address: >
+          No.47/3, New No.4/92,
+          Bug Bazar Street, Devipattinam,
+          Ramanathapuram – 623514
+
+      - name: "Shiyed Ibrahim"
+        address: >
+          Door No.1/544, 5/4, 4th Street,
+          Bhoorthi Nagar,
+          Pattinamathur Village Panchayat,
+          Ramanathapuram – 623501
+
+    mortgagor:
+      name: "A Mohamed Shariff Sate"
+      address: >
+        No.47/3, New No.4/92,
+        Bug Bazar Street, Devipattinam,
+        Ramanathapuram – 623514
+
+  subject:
+    title: >
+      Notice under Section 13(2) of the Securitisation and Reconstruction
+      of Financial Assets and Enforcement of Security Interest Act, 2002
+    facility: "Over Draft Facility"
+    account_number: "728905000297"
+    sanctioned_amount: "₹80,00,000/-"
+
+  salutation: "Dear Sir / Madam,"
+
+  notice_body:
+    clauses:
+      - clause_no: 1
+        text: >
+          Under the provisions of the Securitisation and Reconstruction of
+          Financial Assets and Enforcement of Security Interest Act, 2002,
+          and the Authentication of ICICI Bank Limited appointed under the
+          provisions of the said Act, hereby issues legal notice to you
+          under Section 13(2) of the Act calling upon you to discharge
+          your financial assets and enforcement of security interest.
+
+      - clause_no: 2
+        text: >
+          You had approached the Bank and requested for granting a Credit
+          Overdraft Facility against the secured assets known as OVER DRAFT.
+          You have executed the loan agreement and other documents and
+          availed the said facility for your business/working capital
+          purpose based on representations made by you. Pursuant to the
+          said agreement, the Bank sanctioned a Credit Overdraft Facility
+          for a sum of ₹80,00,000/- and disbursed the same.
+
+      - clause_no: 3
+        text: >
+          You have committed defaults in repayment of the dues as per the
+          terms and conditions agreed. Despite repeated reminders,
+          requests and demands, you failed and neglected to regularize
+          the account. Hence, the loan account has been classified as
+          Non-Performing Asset (NPA) as per RBI guidelines.
+
+      - clause_no: 4
+        text: >
+          The entire outstanding liability is secured by way of mortgage
+          of the property more particularly mentioned in Annexure “A”
+          and the Bank has security interest over the said property.
+
+      - clause_no: 5
+        text: >
+          Your account has been classified as Non-Performing Asset (NPA)
+          on 28/03/2023 and you are liable to pay the total outstanding
+          amount of ₹82,62,850.60 as on 02/05/2023 together with further
+          interest, penal interest, costs and charges.
+
+      - clause_no: 6
+        text: >
+          You are hereby called upon to discharge in full your liabilities
+          to the Bank within sixty (60) days from the date of receipt of
+          this notice, failing which the Bank shall exercise all or any
+          of the rights under Section 13(4) of the SARFAESI Act.
+
+      - clause_no: 7
+        text: >
+          The Bank shall take possession of the secured assets including
+          the right to transfer by way of lease, assignment or sale for
+          realising the secured assets.
+
+      - clause_no: 8
+        text: >
+          The Bank may take over the management of the business of the
+          borrower and may appoint any person to manage the secured assets.
+
+      - clause_no: 9
+        text: >
+          The Bank may require any person who has acquired any of the
+          secured assets from the borrower and from whom any money is due
+          to the borrower to pay such amount to the Bank.
+
+      - clause_no: 10
+        text: >
+          You are hereby advised to comply with the demand under this
+          notice and avoid further action under the aforesaid Act, which
+          shall be at your cost and consequences.
+
+  annexure_a:
+    title: "ANNEXURE – A (PARTICULARS OF SECURED PROPERTY)"
+    property_schedule: >
+      Ramanathapuram Registration District,
+      Ramanathapuram Taluk,
+      Ramanathapuram Velipattinam Sub Registration Office,
+      Pattinamathur Group, Pattinamathur Village,
+      Patta No.739, Survey No.307/1,
+      to an extent of Acre 3.83 cents,
+      R.C.C terrace house ground floor 900 sq.ft,
+      first floor 900 sq.ft, second floor 200 sq.ft,
+      well, bathroom, septic tank,
+      EB Service connection with 2 HP motor.
+
+    boundaries:
+      north: "Plot No.10 land"
+      east: "14 feet width South-North common pathway"
+      south: "Sankareswari purchase Plot No.12 land"
+      west: "Vaithiyar Jeganathanpillai vagaiyara land"
+
+  annexure_b:
+    title: "ANNEXURE – B (PARTICULAR OF DEMAND)"
+    table:
+      currency: INR
+      as_on: "02-05-2023"
+      rows:
+        - field: "Loan Agreement Number"
+          value: "728905000297"
+        - field: "Amount Sanctioned"
+          value: "₹80,00,000.00"
+        - field: "Amount Disbursed"
+          value: "₹80,00,000.00"
+        - field: "Interest overdue and other charges"
+          value: "₹2,74,368.00"
+        - field: "Principal Outstanding"
+          value: "₹75,98,483.00"
+        - field: "Total Outstanding"
+          value: "₹82,62,850.60"
+        - field: "NPA Date"
+          value: "28-03-2023"
+        - field: "Applicable Normal Interest"
+          value: "10%"
+        - field: "Applicable Penal Interest"
+          value: "6%"
+
+  signature_block:
+    closing: "Yours faithfully,"
+    authorised_officer:
+      designation: "Authorized Officer"
+      bank: "ICICI Bank Ltd."
+    contact:
+      name: "Vignesh Selvaraj"
+      phone: "9025809066"
+      office_address: >
+        ICICI Bank Ltd.,
+        South Masi Street,
+        Madurai – 625001

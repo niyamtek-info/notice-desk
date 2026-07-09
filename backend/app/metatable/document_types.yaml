@@ -1,0 +1,2926 @@
+DocumentType:
+  - Name: sale deed
+    Fields:
+      - name: SalesDeed
+        type: object
+        llm_key: SalesDeed
+        required: true
+        properties:
+          - name: Vendor
+            type: object
+            llm_key: Vendor
+            required: true
+            properties:
+              - name: Vendor_name
+                type: string
+                llm_key: Name
+                required: true
+              - name: Relationship
+                type: string
+                llm_key: Relationship
+                required: true
+              - name: Relation_Name
+                type: string
+                llm_key: Relation_Name
+                required: true
+              - name: ID
+                type: Object
+                llm_key: ID
+                required: true
+                properties:
+                  - name: PAN
+                    type: alphanumeric
+                    llm_key: PAN
+                    required: true
+                  - name: AADHAR
+                    type: alphanumeric
+                    llm_key: AADHAR
+                    required: true
+              - name: Date_of_Birth_Age
+                type: Date
+                llm_key: Date_of_Birth_Age
+                required: true
+              - name: Gender
+                type: enum
+                llm_key: Gender
+                values: ["Male", "Female", "Other"]
+                required: true
+              - name: Address
+                type: string
+                llm_key: Address
+                required: true
+              - name: Representative_Details
+                type: Object
+                llm_key: Representative_Details
+                required: true
+                properties:
+                  - name: Representative_name
+                    type: string
+                    llm_key: Name
+                    required: true
+                  - name: Relationship
+                    type: string
+                    llm_key: Relationship
+                    required: true
+                  - name: Relation_Name
+                    type: string
+                    llm_key: Relations_Name
+                    required: true
+                  - name: Representation_Capacity
+                    type: string
+                    llm_key: Representation_Capacity
+                    required: False
+                  - name: Document_Reference
+                    type: string
+                    llm_key: Document_Reference
+                  - name: ID
+                    type: alphanumeric
+                    llm_key: ID
+                  - name: Date_of_Birth_Age
+                    type: Date
+                    llm_key: Date_of_Birth_Age
+                  - name: Gender
+                    type: enum
+                    llm_key: Gender
+                  - name: Address
+                    type: string
+                    llm_key: Address
+                  - name: Remarks
+                    type: string
+                    llm_key: Remarks
+              - name: Remarks
+                type: string
+                llm_key: Remarks
+          - name: Purchaser
+            type: object
+            llm_key: Purchaser
+            required: true
+            properties:
+              - name: Purchaser_name
+                type: string
+                llm_key: Name
+                required: true
+              - name: Relationship
+                type: string
+                llm_key: Relationship
+                required: true
+              - name: Relation_Name
+                type: string
+                llm_key: Relations_Name
+                required: true
+              - name: ID
+                type: Object
+                llm_key: ID
+                required: true
+                properties:
+                  - name: PAN
+                    type: alphanumeric
+                    llm_key: PAN
+                    required: true
+                  - name: AADHAR
+                    type: alphanumeric
+                    llm_key: AADHAR
+                    required: true
+              - name: Date_of_Birth_Age
+                type: Date
+                llm_key: Date_of_Birth_Age
+                required: true
+              - name: Gender
+                type: enum
+                llm_key: Gender
+                required: true
+                values: ["Male", "Female", "Other"]
+              - name: Address
+                type: string
+                llm_key: Address
+                required: true
+              - name: Representative_Details
+                type: Object
+                llm_key: Representative_Details
+                required: true
+                properties:
+                  - name: Representative_name
+                    type: string
+                    llm_key: Name
+                    required: true
+                  - name: Relationship
+                    type: string
+                    llm_key: Relationship
+                    required: true
+                  - name: Relation_Name
+                    type: string
+                    llm_key: Relations_Name
+                    required: true
+                  - name: Representation_Capacity
+                    type: string
+                    llm_key: Representation_Capacity
+                    required: true
+                  - name: Document_Reference
+                    type: string
+                    llm_key: Document_Reference
+                    required: true
+                  - name: ID
+                    type: alphanumeric
+                    llm_key: ID
+                    required: true
+                  - name: Date_of_Birth_Age
+                    type: Date
+                    llm_key: Date_of_Birth_Age
+                    required: true
+                  - name: Gender
+                    type: enum
+                    llm_key: Gender
+                    required: true
+                  - name: Address
+                    type: string
+                    llm_key: Address
+                    required: true
+                  - name: Remarks
+                    type: string
+                    llm_key: Remarks
+                    required: true
+              - name: Remarks
+                type: string
+                llm_key: Remarks
+                required: true
+          - name: Witness
+            type: object
+            llm_key: Witness
+            required: true
+            properties:
+              - name: Witness_name
+                type: string
+                llm_key: Name
+              - name: Relationship
+                type: string
+                llm_key: Relationship
+                required: true
+              - name: Relation_Name
+                type: string
+                llm_key: Relations_Name
+                required: true
+              - name: ID
+                type: Object
+                llm_key: ID
+                required: true
+                properties:
+                  - name: PAN
+                    type: alphanumeric
+                    llm_key: PAN
+                    required: true
+                  - name: AADHAR
+                    type: alphanumeric
+                    llm_key: AADHAR
+              - name: Date_of_Birth_Age
+                type: Date
+                llm_key: Date_of_Birth_Age
+              - name: Gender
+                type: enum
+                llm_key: Gender
+                values: ["Male", "Female", "Other"]
+              - name: Address
+                type: string
+                llm_key: Address
+                required: true
+              - name: Representative_Details
+                type: Object
+                llm_key: Representative_Details
+                properties:
+                  - name: Representative_name
+                    type: string
+                    llm_key: Name
+                    required: true
+                  - name: Relationship
+                    type: string
+                    llm_key: Relationship
+                    required: true
+                  - name: Relation_Name
+                    type: string
+                    llm_key: Relations_Name
+                    required: true
+                  - name: Representation_Capacity
+                    type: string
+                    llm_key: Representation_Capacity
+                    required: False
+                  - name: Document_Reference
+                    type: string
+                    llm_key: Document_Reference
+                  - name: ID
+                    type: alphanumeric
+                    llm_key: ID
+                  - name: Date_of_Birth_Age
+                    type: Date
+                    llm_key: Date_of_Birth_Age
+                  - name: Gender
+                    type: enum
+                    llm_key: Gender
+                  - name: Address
+                    type: string
+                    llm_key: Address
+                  - name: Remarks
+                    type: string
+                    llm_key: Remarks
+              - name: Remarks
+                type: string
+                llm_key: Remarks
+          - name: Authority
+            type: object
+            llm_key: Authority
+            required: true
+            properties:
+              - name: Designation
+                type: string
+                llm_key: Designation
+              - name: Sub_Registrar_Name
+                type: string
+                llm_key: Sub_Registrar_Name
+              - name: Sub_Registrar_Office
+                type: string
+                llm_key: Sub_Registrar_Office
+              - name: City
+                type: string
+                llm_key: City
+              - name: State
+                type: string
+                llm_key: State
+              - name: Remarks
+                type: string
+                llm_key: Remarks
+          - name: payment_Information
+            type: object
+            llm_key: Payment_Information
+            properties:
+              - name: market_value
+                type: string
+                llm_key: Market_Value
+              - name: Sale_Transaction_Value
+                type: string
+                llm_key: Sale_Transaction_Value
+              - name: Payment_Details
+                type: object
+                properties:
+                  - name: payment_Details_1
+                    type: string
+                    llm_key: Payment_Details_1
+                  - name: Transaction_1
+                    type: string
+                    llm_key: Transaction_1
+          - name: Remarks
+            type: string
+            llm_key: Remarks
+
+    PromptTemplate: |
+      You are an AI expert in Indian legal documents, especially property registration and real estate title deeds.
+      DO NOT invent, assume, imagine, or guess any value.
+      DO NOT fill missing data using interpretation or personal judgment.
+      DO NOT add example values, labels, placeholders, or summaries.
+      If a value is not clearly present or cannot be accurately determined from the OCR text, leave it as null.
+      Any deviation will cause a backend failure. Be extremely careful.
+      DO NOT wrap your output in triple backticks (```json)
+      DO NOT add any text before or after the JSON.
+      Output must be only raw JSON starting with `{` and ending with `}`
+
+      OCR TEXT:
+      {{ocr_text}}
+
+      SCHEDULE EXTRACTION (CRITICAL):
+      - Extract EVERY schedule section present in the deed (e.g., Schedule_A, Schedule_B, Schedule_C, Schedule_D, or numbered variants).
+      - `SalesDeed.Schedule_Information` must include one object per schedule found in OCR.
+      - Keep schedule keys exactly as seen when possible (for common labels, prefer Schedule_A / Schedule_B / Schedule_C / Schedule_D).
+      - If only one schedule exists, return only that one.
+      - Do NOT fabricate missing schedules.
+      CRITICAL FOR SALES DEED - FULL PROPERTY DESCRIPTION EXTRACTION:
+      - `SalesDeed.description` must be a single, COMPLETE, VERBATIM copy of everything 
+        that describes the property in this document.
+      - This is a RAW TEXT DUMP — not a summary, not structured data.
+      - Extraction START: The very first character of the property description section.
+        Look for openers like: "Schedule", "All that piece and parcel", a survey number,
+        plot/flat/door number, village name introducing the property, or any equivalent 
+        section header in any Indian language (Tamil, Telugu, Gujarati, Hindi, Kannada, 
+        Malayalam, etc.).
+      - Extraction END: The character immediately BEFORE the Witness section begins.
+        Stop ONLY when you encounter: "Witness", "Signed by", "In witness whereof", 
+        "In the presence of", "சாட்சி", "साक्षी", "સાક્ષી", or any equivalent 
+        witness/execution clause in any language.
+      - MANDATORY — The description field MUST contain ALL of the following 
+        if they appear anywhere between the START and END points:
+            * Every schedule header (Schedule A, Schedule B, Schedule C, etc.)
+            * Every survey number, sub-survey number, re-survey number, TS number, 
+              plot number, flat number, door number
+            * Every individual extent entry (hectares, acres, cents, taru, guntha, 
+              sq.ft — whatever unit is used)
+            * Every total extent calculation
+            * Every share fraction mentioned (1/2, 4/8, 2/3, etc.)
+            * Every deduction mentioned ("excluding X cents sold previously", etc.)
+            * Every net extent after share/deduction
+            * Every village name, taluk, district, registration district reference
+            * Every land type classification (dry land, wet land, garden land, etc.)
+            * Every recital, easement, right, encumbrance, or condition clause 
+              within the property section
+            * Every annexure or sub-schedule reference
+      - Do NOT summarize. Do NOT paraphrase. Do NOT rewrite. Do NOT shorten.
+      - Do NOT translate. Copy the text EXACTLY as it appears in the OCR — preserve 
+        the original language (Tamil, Gujarati, Hindi, Telugu, English, or mixed).
+      - Preserve paragraph structure — join line breaks with a single space.
+      - If multiple schedules exist, concatenate ALL schedule texts in order into 
+        one continuous string in `description`.
+      - If no property description section exists in the document, set to null.
+
+      MULTI-PROPERTY RAW TEXT — Property_Raw_Text (CRITICAL):
+      - `SalesDeed.Property_Raw_Text` is an array where each element is the complete 
+        verbatim raw text for one distinct property.
+      - Apply the SAME extraction rules as `description` above.
+      - For each property, capture EVERYTHING from START to END:
+            * All survey numbers and sub-survey numbers
+            * ALL individual extents per survey number
+            * ALL total extents and net extents
+            * ALL share calculations and deductions
+            * All village/taluk/district references
+            * All land type references
+            * All recitals and conditions within the property section
+      - Do NOT include: Vendor details, Purchaser details, consideration/payment 
+        terms, or Witness text.
+      - One array element per distinct property. If only one property, array has 
+        exactly one element.
+      - Concatenate multi-paragraph text into one continuous string per property.
+      - Preserve original language exactly — do NOT translate.
+      instruction: |
+      Extract in JSON format. Do not return a list. 
+
+      {
+        "SalesDeed": {
+          "Vendor": [
+            {
+              "Name": "",
+              "Relationship": "",
+              "Relation_Name": "",
+              "ID": {
+                "PAN": "",
+                "AADHAR": ""
+              },
+              "Date_of_Birth_Age": "",
+              "Gender": "",
+              "Address": "",
+              "Signature_Biometric_Photo": "",
+              "Representative_Details": {
+                "Name": "",
+                "Relationship": "",
+                "Relations_Name": "",
+                "Representation_Capacity": "",
+                "Document_Reference": "",
+                "ID": "",
+                "Date_of_Birth_Age": "",
+                "Gender": "",
+                "Address": "",
+                "Signature_Biometric_Photo": "",
+                "Remarks": ""
+              },
+              "Remarks": ""
+            }
+          ],
+          "Purchaser": [
+            {
+              "Name": "",
+              "Relationship": "",
+              "Relations_Name": "",
+              "ID": {
+                "PAN": ""
+              },
+              "Date_of_Birth_Age": "",
+              "Gender": "",
+              "Address": "",
+              "Signature_Biometric_Photo": "",
+              "Representative_Details": {
+                "Name": "",
+                "Relationship": "",
+                "Relations_Name": "",
+                "Representation_Capacity": "",
+                "Document_Reference": "",
+                "ID": "",
+                "Date_of_Birth_Age": "",
+                "Gender": "",
+                "Address": "",
+                "Signature_Biometric_Photo": "",
+                "Remarks": ""
+              },
+              "Remarks": ""
+            }
+          ],
+          "Witness": [
+            {
+              "Name": "",
+              "Relationship": "",
+              "Relations_Name": "",
+              "ID": {
+                "PAN": "",
+                "AADHAR": ""
+              },
+              "Date_of_Birth_Age": "",
+              "Gender": "",
+              "Address": "",
+              "Signature_Biometric_Photo": "",
+              "Representative_Details": {
+                "Name": "",
+                "Relationship": "",
+                "Relations_Name": "",
+                "Representation_Capacity": "",
+                "Document_Reference": "",
+                "ID": "",
+                "Date_of_Birth_Age": "",
+                "Gender": "",
+                "Address": "",
+                "Signature_Biometric_Photo": "",
+                "Remarks": ""
+              },
+              "Remarks": ""
+            }
+          ],
+          "Authority": {
+            "Designation": "",
+            "Sub_Registrar_Name": "",
+            "Sub_Registrar_Signature": "",
+            "Sub_Registrar_Office": "",
+            "City": "",
+            "State": "",
+            "Remarks": ""
+          },
+          "Payment_Information": {
+            "Market_Value": "",
+            "Sale_Transaction_Value": "",
+            "Payment_Details": [
+              {
+                "Payment_Details_1": {
+                  "Transaction_1": ""
+                }
+              }
+            ],
+            "Remarks": ""
+          },
+          "Document_Information": {
+            "Document_Category": "",
+            "Document_Sub_Category": "",
+            "Document_Number": "",
+            "Book_Number": "",
+            "Document_Execution_Date": "",
+            "Document_Execution_Location": "",
+            "State": "",
+            "Number_of_Pages": "",
+            "Sub_Registrar_Office": "",
+            "Remarks": ""
+          },
+          "Schedule_Information": {
+            "Schedule_A": {
+              "Property_Extent": "",
+              "Property_Extent_Unit": "",
+              "Plot_Dimension": "",
+              "Survey_Number": "",
+              "Old_Survey_Number": "",
+              "TS_Number": "",
+              "Property_Address": {
+                "Plot_Number": "",
+                "Village_Street_Name": "",
+                "Jurisdiction": "",
+                "Remarks": ""
+              },
+              "Property_Boundary_Definition": {
+                "East": "",
+                "West": "",
+                "North": "",
+                "South": ""
+              }
+            },
+            "Schedule_B": {
+              "Property_Extent": "",
+              "Property_Extent_Unit": "",
+              "Plot_Dimension": "",
+              "Survey_Number": "",
+              "Old_Survey_Number": "",
+              "TS_Number": "",
+              "Property_Address": {
+                "Plot_Number": "",
+                "Village_Street_Name": "",
+                "Jurisdiction": "",
+                "Remarks": ""
+              },
+              "Property_Boundary_Definition": {
+                "East": "",
+                "West": "",
+                "North": "",
+                "South": ""
+              }
+            },
+            "Schedule_C": {}
+          },
+          "Property_Raw_Text": [
+            "Full verbatim raw paragraph(s) for Property 1, from the start of its description up to (but not including) the Witness section.",
+            "Full verbatim raw paragraph(s) for Property 2, from the start of its description up to (but not including) the Witness section."
+          ],
+          "description": "",
+          "Property_Info": {
+            "Property_Address": "",
+            "Geographic_Coordinates": {
+              "Latitude": "",
+              "Longitude": ""
+            }
+          },
+          "Parent_Document_Details": {
+            "Flow": ["Flow_1", "Flow_2", "Flow_3", "Flow_4", "Flow_5", "Flow_6"]
+          },
+          "Terms_and_Conditions": {
+            "Text": ["Text_1", "Text_2", "Text_3", "Text_4", "Text_5"]
+          }
+        }
+      }
+
+  - Name: Sanction_Letter
+    Fields:
+      - name: SanctionLetterDOM
+        type: object
+        llm_key: SanctionLetterDOM
+        required: true
+        properties:
+          - name: loanAccountNumber
+            type: string
+            llm_key: loanAccountNumber
+            required: false
+
+          - name: borrowerName
+            type: string
+            llm_key: borrowerName
+            required: true
+
+          - name: borrowerAddress
+            type: string
+            llm_key: borrowerAddress
+            required: false
+
+          - name: borrowerPan
+            type: string
+            llm_key: borrowerPan
+            required: false
+
+          - name: coBorrowers
+            type: array
+            llm_key: coBorrowers
+            required: false
+            items:
+              type: object
+              properties:
+                - name: coBorrowerName
+                  type: string
+                  llm_key: coBorrowerName
+                  required: false
+                - name: coBorrowerAddress
+                  type: string
+                  llm_key: coBorrowerAddress
+                  required: false
+                - name: coBorrowerPan
+                  type: string
+                  llm_key: coBorrowerPan
+                  required: false
+
+          - name: sanctionDate
+            type: string
+            llm_key: sanctionDate
+            required: false
+
+          - name: sanctionAmount
+            type: string
+            llm_key: sanctionAmount
+            required: true
+
+          - name: loanAmount
+            type: string
+            llm_key: loanAmount
+            required: true
+
+          - name: loanTenure
+            type: string
+            llm_key: loanTenure
+            required: false
+
+          - name: interestRate
+            type: string
+            llm_key: interestRate
+            required: false
+
+          - name: emiAmount
+            type: string
+            llm_key: emiAmount
+            required: false
+
+          - name: repaymentFrequency
+            type: string
+            llm_key: repaymentFrequency
+            required: false
+
+          # ── NEW FIELD ──────────────────────────────────────────
+          - name: scheduleProperty
+            type: object
+            llm_key: scheduleProperty
+            required: false
+            properties:
+              - name: description
+                type: string
+                llm_key: description
+                required: false
+
+              - name: surveyNumber
+                type: string
+                llm_key: surveyNumber
+                required: false
+
+              - name: plotNumber
+                type: string
+                llm_key: plotNumber
+                required: false
+
+              - name: propertyAddress
+                type: string
+                llm_key: propertyAddress
+                required: false
+
+              - name: boundaries
+                type: object
+                llm_key: boundaries
+                required: false
+                properties:
+                  - name: north
+                    type: string
+                    llm_key: north
+                    required: false
+
+                  - name: south
+                    type: string
+                    llm_key: south
+                    required: false
+
+                  - name: east
+                    type: string
+                    llm_key: east
+                    required: false
+
+                  - name: west
+                    type: string
+                    llm_key: west
+                    required: false
+          # ── END NEW FIELD ──────────────────────────────────────
+
+    PromptTemplate: |
+      You are an expert in extracting Indian Loan Sanction Letters.
+
+      STRICT RULES:
+      - Do NOT assume or infer values.
+      - Extract only what is explicitly present.
+      - Missing values must be null.
+      - Output ONLY valid raw JSON.
+      - No extra text, no markdown.
+
+      FIELD HINTS:
+        - loanAccountNumber → Look for "Subject:", "Loan Account No", "Ref No", alphanumeric strings like "LGFL..."
+        - borrowerName → "Main Applicant", "Borrower", "Applicant Name"
+        - borrowerAddress → "Main Applicant Address", "Address", "Applicant Address"
+        - coBorrowers → "Co-borrower", "Guarantor", "Name of Guarantor(s)", listed names after the borrower block
+        - sanctionDate → Look for "Date:" label (often handwritten near top of letter), or "Sanction Date", or "Date of Sanction".
+                        Accept formats: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YY, DD.MM.YYYY. Convert to DD/MM/YYYY on output.
+        - sanctionAmount → "Loan Amount Sanctioned", "Amount Sanctioned", "Sanctioned Amount".
+                          May be formatted as Indian numbering (e.g., 5,65,649). Extract as-is including "Rs." prefix.
+        - loanAmount → Same as sanctionAmount if only one amount is present; otherwise the disbursed amount
+        - loanTenure → "Tenure of the Loan", "Tenure", expressed in months or years
+        - interestRate → Any value followed by "% p.a" or "per annum", prefer the final applicable rate
+        - emiAmount → "Installment Amount", "EMI", "Graded Installments", amount followed by "for a period of"
+        - repaymentFrequency → "Frequency of repayment", "Interest Payable"
+      IMPORTANT DATE EXTRACTION:
+        - The sanction date is often handwritten near the top of the document next to the label "Date:"
+        - OCR may render it with dots or dashes, e.g. "29.10.23" means 29/10/2023
+        - Always expand 2-digit years: YY → 20YY
+        - If date appears as garbled text near "Date:" at top of letter, attempt to parse it
+
+      IMPORTANT AMOUNT EXTRACTION:
+        - Indian numeric format uses commas differently: 5,65,649 = 565649
+        - Always include the "Rs." prefix and original formatting in output
+        - Do not convert or reformat the number
+
+      ─────────────────────────────────────────
+      PROPERTY / SECURITY EXTRACTION — CRITICAL INSTRUCTIONS
+      ─────────────────────────────────────────
+
+      Look for a section titled any of the following (OCR may vary):
+        "Details of Security", "Security Details", "Details of Secured Property",
+        "Secured Property", "Schedule of Property", "Property Details",
+        "Details of Mortgaged Property", "Particulars of Security"
+
+      This section typically appears near the bottom of the sanction letter or as an annexed schedule.
+
+      Extract the following sub-fields:
+
+      1. propertyAddress:
+        - Collect the COMPLETE address of the secured/mortgaged property.
+        - Labels to look for: "Property Address", "Address of Property",
+          "Situated at", "Located at", "Property situated at",
+          "Property Details", or any address block under the security section.
+        - Include all lines: door/flat number, street, locality, city, pin code.
+        - Do NOT truncate. Capture the full multi-line address as a single string,
+          joining lines with ", " where needed.
+        - If OCR splits the address across multiple lines, reconstruct it into one string.
+
+      2. description:
+        - General property description, e.g. "Residential flat", "Plot of land",
+          "Agricultural land", "Commercial premises".
+        - Labels: "Nature of Property", "Type of Property", "Description of Property",
+          "Details of Property".
+
+      3. surveyNumber:
+        - Labels: "Survey No.", "S.No.", "Milkat No.", "Khasra No.", "Sy. No."
+        - Extract the full value including any sub-division (e.g., "123/4A").
+
+      4. plotNumber:
+        - Labels: "Plot No.", "Plot Number", "Flat No.", "Door No.", "House No.",
+          "Unit No.", "Site No."
+        - Extract as-is.
+
+      5. boundaries (North / South / East / West):
+        - Labels: "Bounded by", "Boundaries", "Four Boundaries",
+          "North:", "South:", "East:", "West:"
+        - OCR may render as a table or list; extract each direction separately.
+        - If a direction is not mentioned, return null for that key.
+
+      PROPERTY EXTRACTION RULES:
+        - Extract ALL text under the security/property section — do NOT truncate mid-sentence.
+        - If the property address spans a table row, collect all cells in that row.
+        - If boundaries appear in a table, read each row's direction label and value.
+        - If no security/property section is present, return null for the entire scheduleProperty object.
+        - Do NOT confuse the borrower's residential address with the secured property address.
+
+      OCR TEXT:
+      {{ocr_text}}
+
+      Instruction:
+        Extract in JSON format.
+        Do not return a list.
+
+        {
+          "SanctionLetterDOM": {
+            "loanAccountNumber": "",
+            "borrowerName": "",
+            "borrowerAddress": "",
+            "coBorrowers": [
+              {
+                "coBorrowerName": "",
+                "coBorrowerAddress": ""
+              }
+            ],
+            "sanctionDate": "DD/MM/YYYY",
+            "sanctionAmount": "",
+            "loanAmount": "",
+            "loanTenure": "",
+            "interestRate": "",
+            "emiAmount": "",
+            "repaymentFrequency": "",
+            "scheduleProperty": {
+              "description": null,
+              "surveyNumber": null,
+              "plotNumber": null,
+              "propertyAddress": null,
+              "boundaries": {
+                "north": null,
+                "south": null,
+                "east": null,
+                "west": null
+              }
+            }
+          }
+        }
+
+  - Name: Loan_Agreement
+    Fields:
+      - name: LoanAgreementDOM
+        type: object
+        llm_key: LoanAgreementDOM
+        required: true
+        properties:
+          - name: loanAgreementDate
+            type: string
+            llm_key: loanAgreementDate
+            required: false
+          - name: sanctionDate
+            type: string
+            llm_key: sanctionDate
+            required: false
+          - name: loanAmount
+            type: string
+            llm_key: loanAmount
+            required: false
+          - name: loanAmountInWords
+            type: string
+            llm_key: loanAmountInWords
+            required: false
+          - name: borrowerName
+            type: string
+            llm_key: borrowerName
+            required: true
+
+          - name: borrowerAddress
+            type: string
+            llm_key: borrowerAddress
+            required: false
+
+          - name: borrowerPan
+            type: string
+            llm_key: borrowerPan
+            required: false
+
+          - name: coBorrowers
+            type: array
+            llm_key: coBorrowers
+            required: false
+            items:
+              type: object
+              properties:
+                - name: name
+                  type: string
+                  llm_key: name
+                  required: true
+
+                - name: address
+                  type: string
+                  llm_key: address
+                  required: false
+
+                - name: pan
+                  type: string
+                  llm_key: pan
+                  required: false
+
+          - name: scheduleProperty
+            type: object
+            llm_key: scheduleProperty
+            required: false
+            properties:
+              - name: description
+                type: string
+                llm_key: description
+                required: false
+
+              - name: surveyNumber
+                type: string
+                llm_key: surveyNumber
+                required: false
+
+              - name: plotNumber
+                type: string
+                llm_key: plotNumber
+                required: false
+
+              - name: propertyAddress
+                type: string
+                llm_key: propertyAddress
+                required: false
+
+              - name: boundaries
+                type: object
+                llm_key: boundaries
+                required: false
+                properties:
+                  - name: north
+                    type: string
+                    llm_key: north
+                    required: false
+
+                  - name: south
+                    type: string
+                    llm_key: south
+                    required: false
+
+                  - name: east
+                    type: string
+                    llm_key: east
+                    required: false
+
+                  - name: west
+                    type: string
+                    llm_key: west
+                    required: false
+
+    PromptTemplate: |
+      You are an expert in extracting Indian Loan Agreements for regulated financial systems.
+
+      STRICT RULES:
+      - DO NOT infer, guess, or hallucinate values.
+      - DO NOT merge multiple persons into one.
+      - DO NOT assume Aadhaar holder is a borrower unless explicitly stated.
+      - If a value is missing or not clearly stated, return null.
+      - Output ONLY valid raw JSON.
+      - Follow the schema EXACTLY.
+      ─────────────────────────────────────────
+      DATE EXTRACTION — CRITICAL INSTRUCTIONS
+      ─────────────────────────────────────────
+
+      This document contains TWO distinct dates. You MUST extract BOTH separately.
+      Never use the same date for both fields. Never swap them.
+
+      1. loanAgreementDate:
+        - Source: Look ONLY in "Schedule" or "Schedule 1" section
+        - Label: "Date of Agreement" (usually handwritten near top of Schedule page)
+        - Format example: 29-10-23 means 29/10/2023
+        - Convert all formats (DD-MM-YY, DD.MM.YY, DD/MM/YY) → DD/MM/YYYY
+        - Expand 2-digit years: YY → 20YY
+
+      2. sanctionDate:
+        - PRIMARY source ONLY: The Schedule table row labeled "Sanction Letter"
+          This row is found in the section titled "Details of Loan/Credit Facility"
+          within the Schedule pages of the Loan Agreement.
+          OCR may render it as: "Sanction Letter   DD/MM/YY" or "Sanction Letter | DD-MM-YY"
+          Extract the date value from THIS ROW ONLY as sanctionDate.
+
+        - STRICT PRIORITY RULE: The Schedule table "Sanction Letter" row is the
+          ONLY authoritative source for sanctionDate.
+          Do NOT use dates from any other document or section.
+
+        - FALLBACK sources — use ONLY if the Schedule table row is completely
+          absent or fully illegible (not just hard to read):
+          * "Sanction Letter dated __" in Letter of Continuity
+          * "Sanction Letter dated __" in End-Use Undertaking
+          * "Sanction Letter dated __" in Interest Bearing Letter
+
+        - CRITICAL WARNING: Fallback documents may contain a date that differs
+          from the Schedule table due to document errors or amendments.
+          When a conflict exists between the Schedule table and any fallback
+          source, ALWAYS trust the Schedule table date.
+
+        - CONSISTENCY CHECK: After extracting both dates, verify:
+          * If sanctionDate differs significantly from loanAgreementDate,
+            re-verify sanctionDate against the Schedule table before finalizing.
+          * Do not finalize a sanctionDate sourced from a fallback document
+            if the Schedule table contains any readable date in the
+            "Sanction Letter" row, even if partially legible.
+
+        - Convert all formats (DD-MM-YY, DD.MM.YY, DD/MM/YY, DD-MM-YYYY) → DD/MM/YYYY
+        - Expand 2-digit years: YY → 20YY
+      ─────────────────────────────────────────
+      BORROWER EXTRACTION — CRITICAL INSTRUCTIONS
+      ─────────────────────────────────────────
+
+      - Borrower details MUST be extracted from "Schedule 1" / "Schedule" table if present.
+      - The Schedule table has multiple "Borrower Details" blocks — read ALL of them.
+      - The block where "Type of Borrower" = "Main Applicant" → extract as primary borrower.
+      - All blocks where "Type of Borrower" = "Co-applicant" or "Co-App" → extract into coBorrowers array.
+      - Use the "Unique Identity Number (PAN/CIN/Reg. No)" field for PAN.
+      - DO NOT use names from Aadhaar cards, PAN cards, or other KYC docs as borrower names.
+      - DO NOT merge co-borrowers into one entry.
+
+      ─────────────────────────────────────────
+      PROPERTY / SECURITY EXTRACTION — CRITICAL INSTRUCTIONS
+      ─────────────────────────────────────────
+
+      Look for a section titled any of the following (OCR may vary):
+        "Details of Security", "Security Details", "Details of Secured Property",
+        "Secured Property", "Schedule of Property", "Schedule 2",
+        "Details of Mortgaged Property", "Particulars of Security",
+        "Schedule of Mortgaged Property"
+
+      This section typically appears in Schedule 2 or the "Details of Security"
+      table within the agreement body.
+
+      Extract the following sub-fields:
+
+      1. propertyAddress:
+        - Collect the COMPLETE address of the secured/mortgaged property.
+        - Labels to look for: "Property Address", "Address of Property",
+          "Situated at", "Located at", "Property situated at",
+          "Property Details", or any address block under the security section.
+        - Include all lines: door/flat number, street, locality, city, pin code.
+        - Do NOT truncate. Capture the full multi-line address as a single string,
+          joining lines with ", " where needed.
+        - If OCR splits the address across multiple lines, reconstruct it as one string.
+        - CRITICAL: Do NOT confuse the borrower's residential address with
+          the secured property address. They are different fields in different sections.
+
+      2. description:
+        - General property description, e.g. "Residential flat", "Plot of land",
+          "Agricultural land", "Commercial premises".
+        - Labels: "Nature of Property", "Type of Property", "Description of Property".
+
+      3. surveyNumber:
+        - Labels: "Survey No.", "S.No.", "Milkat No.", "Khasra No.", "Sy. No."
+        - Extract the full value including any sub-division (e.g., "123/4A").
+
+      4. plotNumber:
+        - Labels: "Plot No.", "Plot Number", "Flat No.", "Door No.", "House No.",
+          "Unit No.", "Site No."
+
+      5. boundaries (North / South / East / West):
+        - Labels: "Bounded by", "Boundaries", "Four Boundaries",
+          "North:", "South:", "East:", "West:"
+        - OCR may render as a table or list; extract each direction separately.
+        - If a direction is not mentioned, return null for that key.
+
+      PROPERTY EXTRACTION RULES:
+        - Extract ALL text under the security/property section — do NOT truncate mid-sentence.
+        - If the property address spans a table row, collect all cells in that row.
+        - If boundaries appear in a table, read each row's direction label and value.
+        - If no security/property section is present, return null for the entire scheduleProperty object.
+
+      ─────────────────────────────────────────
+      OTHER FIELD HINTS
+      ─────────────────────────────────────────
+
+      - loanAmount → "Loan Amount / Credit Facility", "Amount in Figures", "Facility Amount"
+        Indian number format: 5,65,649 — extract as-is including "Rs." prefix
+      - loanAmountInWords → "Amount in Words", "Loan Amount in Words", "Rupees in Words"
+        Extract and translate to English if in a regional language.
+        Normalize to: "Rupees [amount in words] Only"
+        If absent or illegible, return null.
+
+      OCR TEXT:
+      {{ocr_text}}
+
+      Return JSON ONLY in the following format:
+
+      {
+        "LoanAgreementDOM": {
+          "loanAgreementDate": "DD/MM/YYYY",
+          "sanctionDate": "DD/MM/YYYY",
+          "loanAmount": null,
+          "loanAmountInWords": null,
+          "borrowerName": null,
+          "borrowerAddress": null,
+          "borrowerPan": null,
+          "coBorrowers": [
+            {
+              "name": null,
+              "address": null,
+              "pan": null
+            }
+          ],
+          "scheduleProperty": {
+            "description": null,
+            "surveyNumber": null,
+            "plotNumber": null,
+            "propertyAddress": null,
+            "boundaries": {
+              "north": null,
+              "south": null,
+              "east": null,
+              "west": null
+            }
+          }
+        }
+      }
+
+  - Name: Memorandum_of_Deposit_of_Title_Deeds
+    Fields:
+      - name: MODT_DocumentDOM
+        type: object
+        llm_key: MODT_DocumentDOM
+        required: true
+        properties:
+          - name: documentInfo
+            type: object
+            llm_key: documentInfo
+            required: true
+            properties:
+              - name: documentType
+                type: string
+                llm_key: documentType
+                required: true
+
+              - name: executionDate
+                type: string
+                llm_key: executionDate
+                required: false
+
+              - name: registrationDate
+                type: string
+                llm_key: registrationDate
+                required: false
+
+              - name: documentNumber
+                type: string
+                llm_key: documentNumber
+                required: false
+
+              - name: bookNumber
+                type: string
+                llm_key: bookNumber
+                required: false
+
+              - name: subRegistrarOffice
+                type: string
+                llm_key: subRegistrarOffice
+                required: false
+
+          - name: parties
+            type: object
+            llm_key: parties
+            required: true
+            properties:
+              - name: depositorName
+                type: string
+                llm_key: depositorName
+                required: true
+
+              - name: depositorAddress
+                type: string
+                llm_key: depositorAddress
+                required: false
+
+              - name: depositeeName
+                type: string
+                llm_key: depositeeName
+                required: true
+
+              - name: depositeeAddress
+                type: string
+                llm_key: depositeeAddress
+                required: false
+
+          - name: loanDetails
+            type: object
+            llm_key: loanDetails
+            required: true
+            properties:
+              - name: loanAmount
+                type: string
+                llm_key: loanAmount
+                required: true
+
+              - name: loanAmountInWords
+                type: string
+                llm_key: loanAmountInWords
+                required: false
+
+              - name: loanTenure
+                type: string
+                llm_key: loanTenure
+                required: false
+
+          - name: scheduleProperties
+            type: array
+            llm_key: scheduleProperties
+            required: true
+            items:
+              type: object
+              properties:
+                - name: scheduleKey
+                  type: string
+                  llm_key: scheduleKey
+                  required: false
+
+                - name: propertyDescription
+                  type: string
+                  llm_key: propertyDescription
+                  required: false
+
+                - name: rawPropertyText
+                  type: string
+                  llm_key: rawPropertyText
+                  required: false
+
+                - name: surveyNumbers
+                  type: string
+                  llm_key: surveyNumbers
+                  required: false
+
+                - name: plotNumber
+                  type: string
+                  llm_key: plotNumber
+                  required: false
+
+                - name: extent
+                  type: string
+                  llm_key: extent
+                  required: false
+
+                - name: extentUnit
+                  type: string
+                  llm_key: extentUnit
+                  required: false
+
+                - name: village
+                  type: string
+                  llm_key: village
+                  required: false
+
+                - name: talukaOrMandal
+                  type: string
+                  llm_key: talukaOrMandal
+                  required: false
+
+                - name: district
+                  type: string
+                  llm_key: district
+                  required: false
+
+                - name: boundaryNorth
+                  type: string
+                  llm_key: boundaryNorth
+                  required: false
+
+                - name: boundarySouth
+                  type: string
+                  llm_key: boundarySouth
+                  required: false
+
+                - name: boundaryEast
+                  type: string
+                  llm_key: boundaryEast
+                  required: false
+
+                - name: boundaryWest
+                  type: string
+                  llm_key: boundaryWest
+                  required: false
+
+          - name: depositedDocuments
+            type: array
+            llm_key: depositedDocuments
+            required: false
+            items:
+              type: object
+              properties:
+                - name: documentDate
+                  type: string
+                  llm_key: documentDate
+                  required: false
+
+                - name: documentDescription
+                  type: string
+                  llm_key: documentDescription
+                  required: false
+
+                - name: originalOrCopy
+                  type: string
+                  llm_key: originalOrCopy
+                  required: false
+
+          - name: stampAndFees
+            type: object
+            llm_key: stampAndFees
+            required: false
+            properties:
+              - name: stampDuty
+                type: string
+                llm_key: stampDuty
+                required: false
+
+              - name: registrationFee
+                type: string
+                llm_key: registrationFee
+                required: false
+
+              - name: totalCharges
+                type: string
+                llm_key: totalCharges
+                required: false
+
+    PromptTemplate: |
+      You are an expert in processing Indian property security documents,
+      specifically Memorandum of Deposit of Title Deeds (MODT) and Mortgage Deeds.
+
+      STRICT EXTRACTION RULES:
+      - DO NOT assume, infer, or normalize values.
+      - DO NOT merge multiple fields or multiple properties into one.
+      - Extract values only if explicitly present in the OCR text.
+      - If a value is missing or unclear, return it as null.
+      - DO NOT add examples, explanations, or summaries.
+      - Output ONLY raw valid JSON. No markdown, no code fences.
+      - DO NOT wrap output in triple backticks.
+
+      ─────────────────────────────────────────
+      PROPERTY EXTRACTION — CRITICAL INSTRUCTIONS
+      ─────────────────────────────────────────
+
+      The scheduleProperties array must contain ONE entry per DISTINCT physical
+      property described in the document. Follow these rules strictly:
+
+      STEP 1 — IDENTIFY ALL PROPERTY SECTIONS:
+      Scan the entire document for ALL sections that describe properties.
+      These sections may appear under any of these headings:
+        * "THE SCHEDULE-I ABOVE REFERRED TO"
+        * "THE SCHEDULE-II ABOVE REFERRED TO"
+        * "SCHEDULE - I", "SCHEDULE - II", "SCHEDULE - III" (any Roman numeral)
+        * "DESCRIPTION OF THE MORTGAGED PROPERTIES"
+        * "DESCRIPTION OF THE MORTGAGED PROPERTY"
+        * "Schedule of the Property"
+        * "Details of Security"
+        * "List of Properties"
+        * Any section beginning with "All that Piece and parcel of land..."
+        * Any section beginning with "All that piece and parcel..."
+        * Property described inline within the deed body
+
+      STEP 2 — DEDUPLICATE:
+      The SAME property may appear multiple times under different headings
+      (e.g., once under "Schedule I" and again under "Description of Mortgaged
+      Properties"). Do NOT create duplicate entries.
+      A property is the SAME if it shares the same survey/house number AND
+      the same village/location. Merge such duplicates into a single entry.
+
+      STEP 3 — MULTIPLE DISTINCT PROPERTIES:
+      If the document describes TWO or more physically distinct properties
+      (different survey numbers, different villages, or different locations),
+      create a SEPARATE entry in scheduleProperties for EACH distinct property.
+      Do NOT merge different properties into one entry.
+
+      STEP 4 — MULTIPLE SCHEDULES FOR ONE PROPERTY:
+      A single property may be described across multiple schedules
+      (e.g., Schedule I describes the land, Schedule II describes the building
+      on the same land). In this case:
+        * Create ONE entry in scheduleProperties for that property.
+        * Populate scheduleKey with all applicable schedule references
+          (e.g., "Schedule I, Schedule II").
+        * Combine all relevant details into that single entry.
+
+      STEP 5 — rawPropertyText:
+      Always populate rawPropertyText with the COMPLETE verbatim text of the
+      property description as it appears in the document, including all
+      survey numbers, measurements, village names, and boundary details.
+      This is the most important field — do not truncate or summarize it.
+
+      ─────────────────────────────────────────
+      FIELD EXTRACTION HINTS
+      ─────────────────────────────────────────
+
+      - documentType → "Memorandum of Deposit of Title Deeds", "Mortgage Deed",
+        "Simple Mortgage Deed" — extract exactly as written in the document
+      - executionDate → "made and executed on", "Dated", "made at ___ on Dated",
+        "executed on", "this deed is made on" — look for date near the top of
+        the main deed document. Convert all formats to DD/MM/YYYY.
+        Accept: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY, DD Month YYYY.
+        Expand 2-digit years: YY → 20YY.
+      - registrationDate → Date on the registration receipt, challan, or
+        endorsement page. Look for registrar's signature date, "Date", "તારીખ",
+        "तारीख", or any regional equivalent. Convert to DD/MM/YYYY.
+      - documentNumber → Document/serial number on the registration receipt,
+        JSD stamp number, "Registered as document no", "દસ્તાવેજ નંબર",
+        "दस्तावेज़ नंबर", or regional equivalent numeric identifier.
+      - bookNumber → "Book No", "નંબરની બૂકના", "पुस्तक संख्या", "Pustak",
+        "Bahi" or equivalent in any regional language — numeric book reference.
+      - subRegistrarOffice → "Sub Registrar", "S.R.O.", office name near
+        registrar seal or signature, regional equivalent like "સબ રજીસ્ટ્રાર",
+        "उप पंजीयक", "সাব-রেজিস্ট্রার", or any regional script equivalent.
+      - depositorName → "Mortgagor", "Depositor", "Borrower" — the person
+        creating the mortgage or depositing title deeds.
+      - depositorAddress → Address of the Mortgagor/Depositor as stated in deed.
+      - depositeeName → "Mortgagee", "Depositee", "Lender" — the financial
+        institution or person receiving the mortgage/deposit.
+      - depositeeAddress → Registered office address of the Mortgagee/Lender.
+      - loanAmount → Amount near "Rs.", "loan", "Loan", "facility for an amount",
+        "loan to the extent of Rs.", "aggregate amount". Include "Rs." prefix
+        and original Indian number formatting (e.g., Rs. 5,65,649).
+      - loanAmountInWords → Amount in words near the loan amount figure.
+        Extract exactly as written (e.g., "Rupees Five Lakh Sixty Five Thousand
+        Six Hundred And Forty Nine Only").
+        If the document shows only the numeric loan amount, convert that amount
+        to words in the same JSON response instead of leaving this field null.
+      - loanTenure → Tenure or period of the loan if explicitly mentioned.
+      - surveyNumbers → "Survey No.", "S.No.", "Milkat No.", "House No.",
+        "Property/House No.", "Khasra No.", "Sy. No." — extract the complete
+        number including any suffix (e.g., "638/1", "123/A").
+      - plotNumber → "Plot No." — extract only if explicitly distinct from
+        the survey number.
+      - extent → Numeric measurement of the property area only (e.g., "167.22").
+      - extentUnit → Unit of measurement: "Sq. mtrs", "Sq. ft", "Acres",
+        "Guntha", "Sq. yards", "Cents", "Bigha", "Dismil", or as written.
+      - village → Village, locality, Gram Panchayat, or area name of the property.
+      - talukaOrMandal → "Taluka", "Mandal", "Tehsil", "Hobli" — administrative
+        subdivision where the property is located.
+      - district → District name where the property is located.
+      - boundaryNorth/South/East/West → Extract from the boundary table or
+        boundary description in the schedule. Look for "North", "South",
+        "East", "West", "Uttar", "Dakshina", "Purva", "Paschim", or any
+        regional language equivalent boundary labels.
+      - stampDuty → Stamp Duty amount from e-Challan, registration receipt,
+        or endorsement. Look for "Stamp Duty", "Mudrank Shulk", "Stamp Shulka",
+        "Mudranka Shulkam", "ஸ்டாம்ப் கட்டணம்", or regional equivalent.
+      - registrationFee → Registration Fee from e-Challan or receipt. Look for
+        "Registration Fee", "Nondani Fee", "Panjiyan Shulk", "Nondavni Fee",
+        "பதிவுக் கட்டணம்", or regional equivalent.
+      - totalCharges → Total amount at bottom of fee table on challan or receipt.
+
+      ─────────────────────────────────────────
+      REGIONAL LANGUAGE PAGES — CRITICAL
+      ─────────────────────────────────────────
+
+      Registration receipts, endorsements, and challan pages may be in ANY
+      Indian regional language including but not limited to:
+      Gujarati, Hindi, Marathi, Tamil, Telugu, Kannada, Malayalam, Bengali,
+      Odia, Punjabi, Assamese, Urdu, or any other scheduled language of India.
+
+      Rules for regional language pages:
+      - DO NOT skip any page because it is in a regional language.
+      - Extract ALL numerical values visible on the page regardless of language.
+      - Extract recognizable proper nouns (names, place names, office names)
+        even if surrounding text is in a regional language.
+      - Dates may appear in regional script numerals or regional month names —
+        attempt to parse and convert to DD/MM/YYYY format.
+      - Registration details (document number, book number, registration date,
+        sub-registrar office name, stamp duty, registration fee, total charges)
+        are commonly found on these pages — always attempt extraction from them.
+      - If a value cannot be reliably read due to script or OCR quality,
+        return null rather than guessing.
+
+      COMMON PATTERNS ACROSS REGIONAL LANGUAGES:
+      - Document/Serial number → typically a numeric value near the top
+      - Book number → numeric value near "Book", "Pustak", "Bahi", "Granth",
+        "Pothi", or regional script equivalent
+      - Registration date → numeric date near registrar signature or stamp
+      - Sub-Registrar office → office name near registrar seal or signature
+      - Stamp Duty → numeric amount near "Stamp Duty", "Mudrank Shulk",
+        "Stamp Shulka", "Mudranka", "Stamps", or regional equivalent term
+      - Registration Fee → numeric amount near "Registration Fee",
+        "Nondani Fee", "Panjiyan Shulk", "Nondavni Shulk", or regional term
+      - Total charges → total numeric amount at bottom of fee table
+
+      OCR TEXT:
+      {{ocr_text}}
+
+      instruction: |
+        {
+          "MODT_DocumentDOM": {
+            "documentInfo": {
+              "documentType": "string",
+              "executionDate": "DD/MM/YYYY",
+              "registrationDate": "DD/MM/YYYY",
+              "documentNumber": "string",
+              "bookNumber": "string",
+              "subRegistrarOffice": "string"
+            },
+            "parties": {
+              "depositorName": "string",
+              "depositorAddress": "string",
+              "depositeeName": "string",
+              "depositeeAddress": "string"
+            },
+            "loanDetails": {
+              "loanAmount": "string",
+              "loanAmountInWords": "string",
+              "loanTenure": "string"
+            },
+            "scheduleProperties": [
+              {
+                "scheduleKey": "string",
+                "propertyDescription": "string",
+                "rawPropertyText": "string",
+                "surveyNumbers": "string",
+                "plotNumber": "string",
+                "extent": "string",
+                "extentUnit": "string",
+                "village": "string",
+                "talukaOrMandal": "string",
+                "district": "string",
+                "boundaryNorth": "string",
+                "boundarySouth": "string",
+                "boundaryEast": "string",
+                "boundaryWest": "string"
+              }
+            ],
+            "depositedDocuments": [
+              {
+                "documentDate": "DD/MM/YYYY",
+                "documentDescription": "string",
+                "originalOrCopy": "string"
+              }
+            ],
+            "stampAndFees": {
+              "stampDuty": "string",
+              "registrationFee": "string",
+              "totalCharges": "string"
+            }
+          }
+        }
+  - Name: Foreclosure_Statement
+    Fields:
+      - name: ForeclosureStatement
+        type: object
+        llm_key: ForeclosureStatement
+        required: true
+        properties:
+          - name: Document_Information
+            type: object
+            llm_key: Document_Information
+            required: true
+            properties:
+              - name: Bank_Name
+                type: string
+                llm_key: Bank_Name
+              - name: Document_Category
+                type: string
+                llm_key: Document_Category
+              - name: Document_Sub_Category
+                type: string
+                llm_key: Document_Sub_Category
+              - name: Document_Date
+                type: string
+                llm_key: Document_Date
+              - name: Loan_Account_Number
+                type: string
+                llm_key: Loan_Account_Number
+              - name: Loan_Type
+                type: string
+                llm_key: Loan_Type
+              - name: Issuing_Branch
+                type: string
+                llm_key: Issuing_Branch
+              - name: State
+                type: string
+                llm_key: State
+              - name: Remarks
+                type: string
+                llm_key: Remarks
+
+          - name: Borrower_Details
+            type: object
+            llm_key: Borrower_Details
+            required: true
+            properties:
+              - name: Borrower_Name
+                type: string
+                llm_key: Borrower_Name
+              - name: Co_Applicants
+                type: array
+                llm_key: Co_Applicants
+                items:
+                  type: string
+              - name: Address
+                type: string
+                llm_key: Address
+
+          - name: Loan_Details
+            type: object
+            llm_key: Loan_Details
+            required: true
+            properties:
+              - name: Loan_Sanction_Date
+                type: string
+                llm_key: Loan_Sanction_Date
+              - name: Foreclosure_Request_Date
+                type: string
+                llm_key: Foreclosure_Request_Date
+              - name: Foreclosure_Calculation_Date
+                type: string
+                llm_key: Foreclosure_Calculation_Date
+              - name: Outstanding_Principal
+                type: string
+                llm_key: Outstanding_Principal
+              - name: Pending_Installments
+                type: string
+                llm_key: Pending_Installments
+              - name: Principal_Outstanding_Overdue
+                type: string
+                llm_key: Principal_Outstanding_Overdue
+              - name: instalment_overdue_amount_interest_overview
+                type: string
+                llm_key: instalment_overdue_amount_interest_overview
+              - name: Interest_Till_Date
+                type: string
+                llm_key: Interest_Till_Date
+              - name: Additional_Interest
+                type: string
+                llm_key: Additional_Interest
+              - name: Per_Day_Interest
+                type: string
+                llm_key: Per_Day_Interest
+
+          - name: Charges_Breakup
+            type: object
+            llm_key: Charges_Breakup
+            required: true
+            properties:
+              - name: Foreclosure_Charges
+                type: string
+                llm_key: Foreclosure_Charges
+              - name: Prepayment_Charges
+                type: string
+                llm_key: Prepayment_Charges
+              - name: Late_Payment_Fee
+                type: string
+                llm_key: Late_Payment_Fee
+              - name: Late_Payment_Interest
+                type: string
+                llm_key: Late_Payment_Interest
+              - name: Cheque_Bounce_Charges
+                type: string
+                llm_key: Cheque_Bounce_Charges
+              - name: Retrieval_Other_Charges
+                type: string
+                llm_key: Retrieval_Other_Charges
+              - name: Other_Amount_Charges
+                type: string
+                llm_key: Other_Amount_Charges
+              - name: GST
+                type: string
+                llm_key: GST
+              - name: Refund_If_Any
+                type: string
+                llm_key: Refund_If_Any
+              - name: Waiver_Amount
+                type: string
+                llm_key: Waiver_Amount
+
+          - name: Total_Amount_Payable
+            type: string
+            llm_key: Total_Amount_Payable
+
+          - name: Validity_And_Conditions
+            type: object
+            llm_key: Validity_And_Conditions
+            required: true
+            properties:
+              - name: Valid_Upto_Date
+                type: string
+                llm_key: Valid_Upto_Date
+              - name: Notes
+                type: array
+                llm_key: Notes
+                items:
+                  type: string
+
+    PromptTemplate: |
+      You are an AI expert in extracting data from Indian Loan Foreclosure Statements
+      issued by Banks and NBFCs (ICICI, HDFC, SBI, Axis, LIC Housing, Tata Capital, etc.).
+
+      The OCR text may be:
+      - Multi-page
+      - Poor quality
+      - Scanned PDFs
+      - Mixed formatting
+      - Tables + paragraphs
+      - English or Indian English
+
+      --------------------------------------------------
+      ABSOLUTE EXTRACTION RULES (NON-NEGOTIABLE)
+      --------------------------------------------------
+
+      1. NO HALLUCINATION
+      - Do NOT guess values
+      - Do NOT calculate totals
+      - Do NOT derive values
+      - Extract ONLY if explicitly visible
+      - If not present → return ""
+
+      2. SCHEMA LOCK (CRITICAL)
+      - JSON keys MUST exactly match the schema
+      - Do NOT add new keys
+      - Do NOT rename keys
+      - All objects MUST exist even if empty
+      - Arrays MUST remain arrays
+
+      3. LANGUAGE & FORMAT
+      - OCR may be in English or Indian languages
+      - Final output MUST be in ENGLISH
+      - Dates → DD/MM/YYYY (only if clearly printed)
+      - Amounts → extract exactly as printed (do NOT normalize)
+
+      --------------------------------------------------
+      DOCUMENT IDENTIFICATION RULES
+      --------------------------------------------------
+
+      This document may be titled as:
+      - Foreclosure Statement
+      - Pre-Closure Statement
+      - Loan Closure Letter
+      - Outstanding Dues Statement
+
+      --------------------------------------------------
+      FIELD IDENTIFICATION HINTS
+      --------------------------------------------------
+
+      Bank Name:
+      - Header / Logo / Footer
+
+      Loan Account Number:
+      - "Loan A/c No"
+      - "Account Number"
+      - "LAN"
+
+      Borrower:
+      - "Borrower"
+      - "Applicant"
+      - "Customer Name"
+
+      Outstanding Principal:
+      - "Principal Outstanding"
+      - "Outstanding Principal Balance"
+
+      Interest Till Date:
+      - "Interest till"
+      - "Accrued Interest"
+
+      Charges:
+      - Foreclosure Charges
+      - Prepayment Charges
+      - Penal Charges
+      - Late Payment Fee
+      - Bounce Charges
+      - GST / Taxes
+
+      Total Amount Payable:
+      - "Total Amount Payable"
+      - "Total Dues"
+      - "Amount Payable for Closure"
+
+      Validity:
+      - "Valid up to"
+      - "This statement is valid till"
+
+      --------------------------------------------------
+      MULTI-LINE & TABLE RULES
+      --------------------------------------------------
+
+      - Charges may appear in tables
+      - Notes / conditions may be bullet points
+      - Extract Notes line by line into array
+
+      --------------------------------------------------
+      FINAL OUTPUT RULES
+      --------------------------------------------------
+
+      - Output ONLY valid JSON
+      - JSON must start with { and end with }
+      - No explanations
+      - No markdown
+      - Missing values → ""
+      - Arrays → []
+      - Objects → {}
+
+      OCR TEXT:
+      {{ocr_text}}
+
+      OUTPUT FORMAT:
+
+      {
+        "ForeclosureStatement": {
+          "Document_Information": {
+            "Bank_Name": "",
+            "Document_Category": "",
+            "Document_Sub_Category": "",
+            "Document_Date": "",
+            "Loan_Account_Number": "",
+            "Loan_Type": "",
+            "Issuing_Branch": "",
+            "State": "",
+            "Remarks": ""
+          },
+          "Borrower_Details": {
+            "Borrower_Name": "",
+            "Co_Applicants": [],
+            "Address": ""
+          },
+          "Loan_Details": {
+            "Loan_Sanction_Date": "",
+            "Foreclosure_Request_Date": "",
+            "Foreclosure_Calculation_Date": "",
+            "Outstanding_Principal": "",
+            "Pending_Installments": "",
+            "Principal_Outstanding_Overdue": "",
+            "instalment_overdue_amount_interest_overview": "",
+            "Interest_Till_Date": "",
+            "Additional_Interest": "",
+            "Per_Day_Interest": ""
+          },
+          "Charges_Breakup": {
+            "Foreclosure_Charges": "",
+            "Prepayment_Charges": "",
+            "Late_Payment_Fee": "",
+            "Late_Payment_Interest": "",
+            "Cheque_Bounce_Charges": "",
+            "Retrieval_Other_Charges": "",
+            "Other_Amount_Charges": "",
+            "GST": "",
+            "Refund_If_Any": "",
+            "Waiver_Amount": ""
+          },
+          "Total_Amount_Payable": "",
+          "Validity_And_Conditions": {
+            "Valid_Upto_Date": "",
+            "Notes": []
+          }
+        }
+      }
+
+  - Name: Statement_of_Accounts
+    Fields:
+      - name: StatementOfAccounts
+        type: object
+        llm_key: StatementOfAccounts
+        required: true
+        properties:
+          - name: Document_Information
+            type: object
+            llm_key: Document_Information
+            required: true
+            properties:
+              - name: Bank_Name
+                type: string
+                llm_key: Bank_Name
+              - name: Document_Category
+                type: string
+                llm_key: Document_Category
+              - name: Document_Sub_Category
+                type: string
+                llm_key: Document_Sub_Category
+              - name: Statement_As_On_Date
+                type: string
+                llm_key: Statement_As_On_Date
+              - name: Loan_Account_Number
+                type: string
+                llm_key: Loan_Account_Number
+              - name: Branch
+                type: string
+                llm_key: Branch
+              - name: Currency
+                type: string
+                llm_key: Currency
+
+          - name: Borrower_Details
+            type: object
+            llm_key: Borrower_Details
+            required: true
+            properties:
+              - name: Borrower_Name
+                type: string
+                llm_key: Borrower_Name
+              - name: Co_Applicant_Name
+                type: string
+                llm_key: Co_Applicant_Name
+              - name: Address
+                type: string
+                llm_key: Address
+              - name: PAN_Number
+                type: string
+                llm_key: PAN_Number
+              - name: Contact_Details
+                type: string
+                llm_key: Contact_Details
+
+          - name: Loan_Details
+            type: object
+            llm_key: Loan_Details
+            required: true
+            properties:
+              - name: Loan_Type
+                type: string
+                llm_key: Loan_Type
+              - name: Sanction_Date
+                type: string
+                llm_key: Sanction_Date
+              - name: Sanction_Amount
+                type: string
+                llm_key: Sanction_Amount
+              - name: Disbursed_Amount
+                type: string
+                llm_key: Disbursed_Amount
+              - name: Tenure_Months
+                type: string
+                llm_key: Tenure_Months
+              - name: Interest_Rate
+                type: string
+                llm_key: Interest_Rate
+              - name: Interest_Type
+                type: string
+                llm_key: Interest_Type
+              - name: EMI_Amount
+                type: string
+                llm_key: EMI_Amount
+              - name: Repayment_Frequency
+                type: string
+                llm_key: Repayment_Frequency
+              - name: Repayment_Mode
+                type: string
+                llm_key: Repayment_Mode
+              - name: Loan_Status
+                type: string
+                llm_key: Loan_Status
+
+          - name: Transaction_Details
+            type: array
+            llm_key: Transaction_Details
+            required: true
+            items:
+              type: object
+              properties:
+                - name: Transaction_Date
+                  type: string
+                  llm_key: Transaction_Date
+                - name: Value_Date
+                  type: string
+                  llm_key: Value_Date
+                - name: Transaction_Type
+                  type: string
+                  llm_key: Transaction_Type
+                - name: Description
+                  type: string
+                  llm_key: Description
+                - name: Debit_Amount
+                  type: string
+                  llm_key: Debit_Amount
+                - name: Credit_Amount
+                  type: string
+                  llm_key: Credit_Amount
+                - name: Balance
+                  type: string
+                  llm_key: Balance
+
+    PromptTemplate: |
+      You are an AI expert in extracting structured data from
+       Indian Bank Loan Statements of Accounts.
+
+       The document may be issued by ANY bank or NBFC
+       (ICICI, HDFC, SBI, Axis, PNB, Tata Capital, Bajaj, etc.).
+
+       The OCR text may:
+       - Span multiple pages
+       - Contain tables, headers, footers
+       - Have repeated headings
+       - Be partially duplicated
+       - Be in English or mixed Indian formatting
+
+       --------------------------------------------------
+       ABSOLUTE EXTRACTION RULES (NON-NEGOTIABLE)
+       --------------------------------------------------
+
+       1. NO HALLUCINATION
+       - Extract ONLY what is explicitly present
+       - Do NOT calculate totals
+       - Do NOT infer balances
+       - If unclear or missing → ""
+
+       2. SCHEMA LOCK (CRITICAL)
+       - JSON keys MUST exactly match schema
+       - Do NOT rename keys
+       - Do NOT add new keys
+       - All objects and arrays MUST exist
+
+       3. MULTI-PAGE & TABLE RULES
+       - OCR may span multiple pages
+       - Extract ALL transaction rows across ALL pages
+       - Preserve transaction order exactly as printed
+       - Debit, Credit, Balance must NEVER be swapped
+
+       4. LANGUAGE & FORMAT
+       - Final output MUST be in ENGLISH
+       - Dates → DD/MM/YYYY (only if clearly identifiable)
+       - Amounts → extract AS-IS (no normalization)
+
+       --------------------------------------------------
+       DOCUMENT IDENTIFICATION
+       --------------------------------------------------
+
+       This document may be titled as:
+       - Loan Account Statement
+       - Statement of Accounts
+       - Loan Ledger Statement
+       - Account Statement
+
+       --------------------------------------------------
+       FIELD IDENTIFICATION HINTS
+       --------------------------------------------------
+
+       Borrower:
+       - "Borrower Name"
+       - "Customer Name"
+
+       Loan Details:
+       - Loan Type
+       - Sanction Date
+       - Sanction Amount
+       - EMI Amount
+       - Interest Rate
+
+       Transactions:
+       - EMI
+       - Interest Debit
+       - Principal Debit
+       - Bounce Charges
+       - Penal Interest
+       - Waivers
+       - Adjustments
+
+       --------------------------------------------------
+       TRANSACTION RULES (CRITICAL)
+       --------------------------------------------------
+
+       - Extract ALL rows
+       - Narration / Description must be AS-IS
+       - Do NOT merge rows
+       - Do NOT skip pages
+
+       --------------------------------------------------
+       FINAL OUTPUT RULES
+       --------------------------------------------------
+
+       - Output ONLY valid JSON
+       - JSON must start with { and end with }
+       - No explanation
+       - No markdown
+       - Missing values → ""
+       - Arrays → []
+       - Objects → {}
+
+       OCR TEXT:
+       {{ocr_text}}
+
+       OUTPUT FORMAT:
+       {
+         "StatementOfAccounts": {
+           "Document_Information": {
+             "Bank_Name": "",
+             "Document_Category": "",
+             "Document_Sub_Category": "",
+             "Statement_As_On_Date": "",
+             "Loan_Account_Number": "",
+             "Branch": "",
+             "Currency": ""
+           },
+           "Borrower_Details": {
+             "Borrower_Name": "",
+             "Co_Applicant_Name": "",
+             "Address": "",
+             "PAN_Number": "",
+             "Contact_Details": ""
+           },
+           "Loan_Details": {
+             "Loan_Type": "",
+             "Sanction_Date": "",
+             "Sanction_Amount": "",
+             "Disbursed_Amount": "",
+             "Tenure_Months": "",
+             "Interest_Rate": "",
+             "Interest_Type": "",
+             "EMI_Amount": "",
+             "Repayment_Frequency": "",
+             "Repayment_Mode": "",
+             "Loan_Status": ""
+           },
+           "Transaction_Details": [
+             {
+               "Transaction_Date": "",
+               "Value_Date": "",
+               "Transaction_Type": "",
+               "Description": "",
+               "Debit_Amount": "",
+               "Credit_Amount": "",
+               "Balance": ""
+             }
+           ]
+         }
+       }
+  - Name: LegalReport
+    Fields:
+      - name: LegalReport
+        type: object
+        llm_key: LegalReport
+        required: true
+        properties:
+          - name: Document_Information
+            type: object
+            llm_key: Document_Information
+            required: true
+            properties:
+              - name: Report_Title
+                type: string
+                llm_key: Report_Title
+              - name: Law_Firm_Name
+                type: string
+                llm_key: Law_Firm_Name
+              - name: Advocate_Name
+                type: string
+                llm_key: Advocate_Name
+              - name: Document_Category
+                type: string
+                llm_key: Document_Category
+              - name: Document_Sub_Category
+                type: string
+                llm_key: Document_Sub_Category
+              - name: Reference_Number
+                type: string
+                llm_key: Reference_Number
+              - name: Report_Date
+                type: string
+                llm_key: Report_Date
+              - name: Proposal_Number
+                type: string
+                llm_key: Proposal_Number
+              - name: State
+                type: string
+                llm_key: State
+              - name: Issuing_Office_Address
+                type: string
+                llm_key: Issuing_Office_Address
+              - name: Remarks
+                type: string
+                llm_key: Remarks
+
+          - name: Lender_Details
+            type: object
+            llm_key: Lender_Details
+            required: true
+            properties:
+              - name: Bank_Or_NBFC_Name
+                type: string
+                llm_key: Bank_Or_NBFC_Name
+              - name: Branch_Name
+                type: string
+                llm_key: Branch_Name
+              - name: Addressed_To
+                type: string
+                llm_key: Addressed_To
+
+          - name: Borrower_Details
+            type: object
+            llm_key: Borrower_Details
+            required: true
+            properties:
+              - name: Primary_Borrower_Name
+                type: string
+                llm_key: Primary_Borrower_Name
+              - name: Co_Borrowers
+                type: array
+                llm_key: Co_Borrowers
+                items:
+                  type: string
+              - name: Borrower_Full_Name_And_Address
+                type: string
+                llm_key: Borrower_Full_Name_And_Address
+              - name: Constitution_Of_Owner
+                type: string
+                llm_key: Constitution_Of_Owner
+
+          - name: Property_Owner_Details
+            type: object
+            llm_key: Property_Owner_Details
+            required: true
+            properties:
+              - name: Owner_Name
+                type: string
+                llm_key: Owner_Name
+              - name: Co_Owners
+                type: array
+                llm_key: Co_Owners
+                items:
+                  type: string
+              - name: Owner_Address
+                type: string
+                llm_key: Owner_Address
+              - name: Owner_Constitution
+                type: string
+                llm_key: Owner_Constitution
+
+          - name: Loan_Details
+            type: object
+            llm_key: Loan_Details
+            required: true
+            properties:
+              - name: Loan_Account_Number
+                type: string
+                llm_key: Loan_Account_Number
+              - name: Loan_Type
+                type: string
+                llm_key: Loan_Type
+              - name: Product_Type
+                type: string
+                llm_key: Product_Type
+
+          - name: Property_Details
+            type: object
+            llm_key: Property_Details
+            required: true
+            properties:
+              - name: Property_Address
+                type: string
+                llm_key: Property_Address
+              - name: Property_Type
+                type: string
+                llm_key: Property_Type
+              - name: Village_Or_Town
+                type: string
+                llm_key: Village_Or_Town
+              - name: Taluk_Or_Circle
+                type: string
+                llm_key: Taluk_Or_Circle
+              - name: District
+                type: string
+                llm_key: District
+              - name: State
+                type: string
+                llm_key: State
+              - name: Registration_District
+                type: string
+                llm_key: Registration_District
+              - name: Sub_Registration_District
+                type: string
+                llm_key: Sub_Registration_District
+              - name: Survey_Number
+                type: string
+                llm_key: Survey_Number
+              - name: Re_Survey_Number
+                type: string
+                llm_key: Re_Survey_Number
+              - name: Plot_Or_Site_Number
+                type: string
+                llm_key: Plot_Or_Site_Number
+              - name: Block_Number
+                type: string
+                llm_key: Block_Number
+              - name: Layout_Name
+                type: string
+                llm_key: Layout_Name
+              - name: Total_Extent_Hectares
+                type: string
+                llm_key: Total_Extent_Hectares
+              - name: Total_Extent_Acres
+                type: string
+                llm_key: Total_Extent_Acres
+              - name: Total_Extent_Sqft
+                type: string
+                llm_key: Total_Extent_Sqft
+              - name: Total_Extent_SqMeter
+                type: string
+                llm_key: Total_Extent_SqMeter
+              - name: Land_Use_Type
+                type: string
+                llm_key: Land_Use_Type
+              - name: Properties_List
+                type: array
+                llm_key: Properties_List
+                items:
+                  type: object
+                  properties:
+                    - name: Property_Number
+                      type: string
+                      llm_key: Property_Number
+                    - name: Document_Number
+                      type: string
+                      llm_key: Document_Number
+                    - name: Description
+                      type: string
+                      llm_key: Description
+                    - name: Extent
+                      type: string
+                      llm_key: Extent
+                    - name: Boundaries
+                      type: object
+                      llm_key: Boundaries
+                      properties:
+                        - name: North
+                          type: string
+                          llm_key: North
+                        - name: South
+                          type: string
+                          llm_key: South
+                        - name: East
+                          type: string
+                          llm_key: East
+                        - name: West
+                          type: string
+                          llm_key: West
+
+          - name: Documents_Scrutinized
+            type: array
+            llm_key: Documents_Scrutinized
+            items:
+              type: object
+              properties:
+                - name: Serial_Number
+                  type: string
+                  llm_key: Serial_Number
+                - name: Document_Date
+                  type: string
+                  llm_key: Document_Date
+                - name: Document_Number
+                  type: string
+                  llm_key: Document_Number
+                - name: Document_Type
+                  type: string
+                  llm_key: Document_Type
+                - name: Particulars
+                  type: string
+                  llm_key: Particulars
+                - name: Executant
+                  type: string
+                  llm_key: Executant
+                - name: Beneficiary
+                  type: string
+                  llm_key: Beneficiary
+                - name: Nature
+                  type: string
+                  llm_key: Nature
+
+          - name: Documents_To_Be_Obtained
+            type: array
+            llm_key: Documents_To_Be_Obtained
+            items:
+              type: object
+              properties:
+                - name: Serial_Number
+                  type: string
+                  llm_key: Serial_Number
+                - name: Document_Date
+                  type: string
+                  llm_key: Document_Date
+                - name: Document_Number
+                  type: string
+                  llm_key: Document_Number
+                - name: Document_Type
+                  type: string
+                  llm_key: Document_Type
+                - name: Particulars
+                  type: string
+                  llm_key: Particulars
+                - name: Nature
+                  type: string
+                  llm_key: Nature
+
+          - name: Title_Tracing
+            type: object
+            llm_key: Title_Tracing
+            required: true
+            properties:
+              - name: Original_Title_Holder
+                type: string
+                llm_key: Original_Title_Holder
+              - name: Chain_Of_Title_Summary
+                type: string
+                llm_key: Chain_Of_Title_Summary
+              - name: Current_Title_Holder
+                type: string
+                llm_key: Current_Title_Holder
+              - name: Mode_Of_Acquisition
+                type: string
+                llm_key: Mode_Of_Acquisition
+              - name: Title_Tracing_Period_From
+                type: string
+                llm_key: Title_Tracing_Period_From
+              - name: Title_Tracing_Period_To
+                type: string
+                llm_key: Title_Tracing_Period_To
+
+          - name: Encumbrance_Details
+            type: object
+            llm_key: Encumbrance_Details
+            required: true
+            properties:
+              - name: Encumbrance_Certificate_Number
+                type: string
+                llm_key: Encumbrance_Certificate_Number
+              - name: EC_Period_From
+                type: string
+                llm_key: EC_Period_From
+              - name: EC_Period_To
+                type: string
+                llm_key: EC_Period_To
+              - name: Charges_Registered
+                type: string
+                llm_key: Charges_Registered
+              - name: Existing_Mortgage_Or_Encumbrance
+                type: string
+                llm_key: Existing_Mortgage_Or_Encumbrance
+              - name: MODT_Details
+                type: string
+                llm_key: MODT_Details
+
+          - name: Legal_Verification_Checklist
+            type: object
+            llm_key: Legal_Verification_Checklist
+            required: true
+            properties:
+              - name: Is_Title_Clear_And_Marketable
+                type: string
+                llm_key: Is_Title_Clear_And_Marketable
+              - name: Is_Property_Free_Of_Encumbrance
+                type: string
+                llm_key: Is_Property_Free_Of_Encumbrance
+              - name: Is_Original_Title_Document_In_Order
+                type: string
+                llm_key: Is_Original_Title_Document_In_Order
+              - name: Is_Property_Within_Municipal_Limits
+                type: string
+                llm_key: Is_Property_Within_Municipal_Limits
+              - name: Is_Property_Agricultural_Or_NonAgricultural
+                type: string
+                llm_key: Is_Property_Agricultural_Or_NonAgricultural
+              - name: Is_Property_Leasehold
+                type: string
+                llm_key: Is_Property_Leasehold
+              - name: Lis_Pendens_Status
+                type: string
+                llm_key: Lis_Pendens_Status
+              - name: Minors_Interest
+                type: string
+                llm_key: Minors_Interest
+              - name: Power_Of_Attorney_Status
+                type: string
+                llm_key: Power_Of_Attorney_Status
+              - name: NOC_From_Society_Or_Builder
+                type: string
+                llm_key: NOC_From_Society_Or_Builder
+              - name: SARFAESI_Applicability
+                type: string
+                llm_key: SARFAESI_Applicability
+              - name: Urban_Land_Ceiling_Act_Applicable
+                type: string
+                llm_key: Urban_Land_Ceiling_Act_Applicable
+              - name: Tenancy_Laws_Applicable
+                type: string
+                llm_key: Tenancy_Laws_Applicable
+              - name: Site_Inspection_Done
+                type: string
+                llm_key: Site_Inspection_Done
+              - name: Additional_Document_Required
+                type: string
+                llm_key: Additional_Document_Required
+              - name: Municipal_Tax_Paid_Status
+                type: string
+                llm_key: Municipal_Tax_Paid_Status
+              - name: Municipal_Tax_Assessed_In_Name_Of
+                type: string
+                llm_key: Municipal_Tax_Assessed_In_Name_Of
+              - name: Construction_As_Per_Sanction_Plan
+                type: string
+                llm_key: Construction_As_Per_Sanction_Plan
+
+          - name: Tax_And_Revenue_Details
+            type: object
+            llm_key: Tax_And_Revenue_Details
+            required: true
+            properties:
+              - name: Patta_Number
+                type: string
+                llm_key: Patta_Number
+              - name: Property_Tax_Receipt_Number
+                type: string
+                llm_key: Property_Tax_Receipt_Number
+              - name: Assessment_Number
+                type: string
+                llm_key: Assessment_Number
+              - name: Tax_Assessed_In_Name_Of
+                type: string
+                llm_key: Tax_Assessed_In_Name_Of
+              - name: Tax_Receipt_Date
+                type: string
+                llm_key: Tax_Receipt_Date
+
+          - name: Title_Certification
+            type: object
+            llm_key: Title_Certification
+            required: true
+            properties:
+              - name: Title_Certification_Opinion
+                type: string
+                llm_key: Title_Certification_Opinion
+              - name: Safeguards_To_Be_Observed
+                type: string
+                llm_key: Safeguards_To_Be_Observed
+              - name: Observation_Remarks
+                type: string
+                llm_key: Observation_Remarks
+              - name: Certifying_Advocate_Name
+                type: string
+                llm_key: Certifying_Advocate_Name
+              - name: Certification_Date
+                type: string
+                llm_key: Certification_Date
+              - name: Certification_Place
+                type: string
+                llm_key: Certification_Place
+              - name: Notes_And_Conditions
+                type: array
+                llm_key: Notes_And_Conditions
+                items:
+                  type: string
+
+    PromptTemplate: |
+      You are an AI expert in extracting structured data from Indian Legal Title Investigation Reports
+      issued by Advocates and Law Firms on behalf of Banks and NBFCs
+      (UGRO Capital, ICICI, HDFC, SBI, Axis, LIC Housing, Tata Capital, Manapuram Finance, etc.).
+
+      The OCR text may be:
+      - Multi-page (5–15+ pages)
+      - Poor quality or scanned
+      - Mixed formatting (tables + paragraphs)
+      - Complex legal language
+      - English or Indian English with regional terms
+
+      ==================================================
+      ⚠️  MANDATORY FIELDS — EXTRACT THESE FIRST (HIGHEST PRIORITY)
+      ==================================================
+
+      The following 6 fields are NON-NEGOTIABLE. You MUST attempt extraction for each one
+      before processing any other field. If any of these fields cannot be found, you MUST
+      return "NOT FOUND IN DOCUMENT" (never return "" for these fields).
+
+      ──────────────────────────────────────────────────
+      MANDATORY FIELD 1 — Full Name & Address (Borrower)
+      ──────────────────────────────────────────────────
+      JSON Path: LegalReport.Borrower_Details.Borrower_Full_Name_And_Address
+
+      Scan for any of these labels:
+        - "Full Name and Address", "Name and Address of Borrower"
+        - "Applicant Name and Address", "Customer Name and Address"
+        - "Name of the Borrower(s)" followed by an address block
+        - Any paragraph block combining borrower name + door no / street / city / pin
+
+      Rules:
+        - Extract the COMPLETE name and full postal address as printed
+        - Include door number, street, area, city, state, PIN if visible
+        - Do NOT split into separate fields here — capture the full block as one string
+        - If name and address appear separately, concatenate them with a comma
+
+      ──────────────────────────────────────────────────
+      MANDATORY FIELD 2 — All Borrowers & Co-Borrowers Names
+      ──────────────────────────────────────────────────
+      JSON Paths:
+        - LegalReport.Borrower_Details.Primary_Borrower_Name   ← Main applicant
+        - LegalReport.Borrower_Details.Co_Borrowers            ← Array of all co-borrowers
+
+      Scan for any of these labels:
+        - "Name of the Borrower(s)", "Borrower Name", "Applicant Name", "Customer Name"
+        - "Co-Borrower", "Co-Applicant", "Joint Applicant", "Joint Borrower"
+        - Numbered lists: "1. [Name]  2. [Name]  3. [Name]"
+        - Slash-separated names: "A / B / C"
+
+      Rules:
+        - The FIRST name listed is Primary_Borrower_Name
+        - ALL remaining names go into Co_Borrowers as an array
+        - Extract FULL names exactly as printed (do not abbreviate)
+        - If only one borrower exists, Co_Borrowers = []
+        - If Co_Borrowers array is empty, still return [] — never omit the key
+
+      ──────────────────────────────────────────────────
+      MANDATORY FIELD 3 — Loan Account Number
+      ──────────────────────────────────────────────────
+      JSON Path: LegalReport.Loan_Details.Loan_Account_Number
+
+      Scan for any of these labels:
+        - "Loan A/c No", "Loan Account Number", "Loan Account No"
+        - "LAN", "LAN No", "LAN Number"
+        - "Account No", "File No", "Application No", "Proposal No"
+        - Any alphanumeric string following the above labels
+
+      Rules:
+        - Extract the value EXACTLY as printed (preserve all letters, digits, slashes, hyphens)
+        - Do NOT normalize or reformat the number
+        - If multiple numbers appear (e.g., LAN + Proposal No), prefer the one labeled "Loan A/c No" or "LAN"
+
+      ──────────────────────────────────────────────────
+      MANDATORY FIELD 4 — Property Address
+      ──────────────────────────────────────────────────
+      JSON Path: LegalReport.Property_Details.Property_Address
+
+      Scan for any of these labels:
+        - "Property Address", "Address of Property", "Property situated at"
+        - "Full Description of the property", "Schedule of Property", "Schedule-A"
+        - "Mortagaged Property", "Subject Property"
+        - Address block following survey/plot/site number references
+
+      Rules:
+        - Extract the COMPLETE property address as printed
+        - Include door no / plot no / survey no / street / village / taluk / district / state / pin
+        - If the address spans multiple lines or paragraphs, concatenate them into one string
+        - Do NOT truncate or summarize
+
+      ──────────────────────────────────────────────────
+      MANDATORY FIELD 5 — Description of Property Details
+      ──────────────────────────────────────────────────
+      JSON Paths (ALL sub-fields below are mandatory):
+        - LegalReport.Property_Details.Survey_Number
+        - LegalReport.Property_Details.Re_Survey_Number
+        - LegalReport.Property_Details.Plot_Or_Site_Number
+        - LegalReport.Property_Details.Block_Number
+        - LegalReport.Property_Details.Layout_Name
+        - LegalReport.Property_Details.Total_Extent_Sqft
+        - LegalReport.Property_Details.Total_Extent_Acres
+        - LegalReport.Property_Details.Total_Extent_Hectares
+        - LegalReport.Property_Details.Total_Extent_SqMeter
+        - LegalReport.Property_Details.Village_Or_Town
+        - LegalReport.Property_Details.Taluk_Or_Circle
+        - LegalReport.Property_Details.District
+        - LegalReport.Property_Details.State
+        - LegalReport.Property_Details.Properties_List (array — each property as one object)
+
+      Scan for any of these labels:
+        - "S.F.No", "Survey No", "Old S.F.No", "Re S.F.No", "R.S. No", "T.S. No"
+        - "Plot No", "Site No", "House Site No", "Block No"
+        - "Layout", "Scheme", "Nagar", "Garden"
+        - "Extent", "Area", "Total Extent", "Sq.ft", "Acres", "Hectares", "Sq.Mtr"
+        - "Bounded on", "North of", "South of", "East of", "West of"
+
+      Rules:
+        - For Properties_List: each distinct property/plot/site listed = one object in array
+        - Each object MUST include: Property_Number, Document_Number, Description, Extent, Boundaries
+        - Boundaries MUST have: North, South, East, West (extract directional text exactly)
+        - Extent values: extract as printed with units (e.g., "1200 Sq.ft", "0.25 Acres")
+        - If a sub-field is genuinely absent, return "" — but make every effort to find it
+
+      ──────────────────────────────────────────────────
+      MANDATORY FIELD 6 — Property Type
+      ──────────────────────────────────────────────────
+      JSON Path: LegalReport.Property_Details.Property_Type
+
+      Scan for any of these labels:
+        - "Type of Property", "Property Type", "Nature of Property"
+        - "Agricultural Land", "Non-Agricultural Land"
+        - "Residential", "Commercial", "Industrial"
+        - "Building", "Flat", "Apartment", "House Site", "Plot", "Villa", "Office"
+        - "Land & Building", "Vacant Land", "Open Plot"
+
+      Rules:
+        - Extract the EXACT type as printed in the document
+        - If multiple types appear (e.g., "Non-Agricultural – Residential"), extract the full phrase
+        - Also populate: LegalReport.Property_Details.Land_Use_Type with the same or related value
+
+      ==================================================
+      ABSOLUTE EXTRACTION RULES (NON-NEGOTIABLE)
+      ==================================================
+
+      1. NO HALLUCINATION
+        - Do NOT guess or infer values
+        - Do NOT calculate or derive data
+        - Extract ONLY what is explicitly visible in the text
+        - For non-mandatory fields: missing value → ""
+        - For non-mandatory arrays with no items → []
+        - For MANDATORY fields: missing value → "NOT FOUND IN DOCUMENT"
+
+      2. SCHEMA LOCK (CRITICAL)
+        - JSON keys MUST exactly match the schema
+        - Do NOT add new keys
+        - Do NOT rename keys
+        - All objects MUST exist even if empty
+        - Arrays MUST remain arrays
+
+      3. LANGUAGE & FORMAT
+        - Final output MUST be in ENGLISH
+        - Dates → DD/MM/YYYY (only if clearly printed)
+        - Extract amounts/numbers exactly as printed (do NOT normalize)
+
+      ==================================================
+      DOCUMENT IDENTIFICATION RULES
+      ==================================================
+
+      This document may be titled as:
+      - Title Investigation Report
+      - Legal Opinion Report
+      - Property Search Report
+      - Title Certificate
+      - Advocate's Legal Report
+
+      ==================================================
+      FIELD IDENTIFICATION HINTS (SECONDARY FIELDS)
+      ==================================================
+
+      Law Firm / Advocate:
+      - Header / Letterhead / Footer / Signature Block
+
+      Reference Number:
+      - "Ref No", "Reference No", "Report No"
+
+      Proposal Number:
+      - "Proposal No", "LAN", "File No"
+
+      Documents Scrutinized:
+      - "List of Documents Scrutinized"
+      - Numbered list: S.No, Date, Particulars, Nature
+
+      Documents To Be Obtained:
+      - "Documents to be Obtained"
+
+      Title Tracing:
+      - "Tracing of Title to the Property"
+      - Chain of ownership from original holders to current owner
+
+      Encumbrance Certificate:
+      - "EC No", "Period from … to …"
+
+      MODT:
+      - "Memorandum of Deposit of Title Deed"
+
+      SARFAESI:
+      - "SARFAESI Act Applicable"
+
+      Lis Pendens:
+      - "Lis pendens", "Court case pending"
+
+      Municipal Tax:
+      - "Property Tax Receipt", "Assessment No"
+      - "Municipal Taxes assessed in name of"
+
+      Patta:
+      - "Joint Patta No", "Patta stands in name of"
+
+      Title Certification:
+      - "I certify that", "I hereby opine"
+
+      ==================================================
+      MULTI-LINE & TABLE RULES
+      ==================================================
+
+      - Documents lists appear in tables — extract each row as one object in the array
+      - Boundaries may appear as directional labels — extract each direction
+      - Properties listed as Property No 01, Property No 02 — extract each separately
+      - Notes / conditions may be bullet points — extract each as a separate array item
+      - Chain of title tracing may span paragraphs — summarize coherently
+
+      ==================================================
+      FINAL OUTPUT RULES
+      ==================================================
+
+      - Output ONLY valid JSON
+      - JSON must start with { and end with }
+      - No explanations, no markdown, no commentary
+      - Non-mandatory missing values → ""
+      - Non-mandatory arrays with no data → []
+      - MANDATORY missing values → "NOT FOUND IN DOCUMENT"
+
+      OCR TEXT:
+      {{ocr_text}}
+
+      OUTPUT FORMAT:
+
+      {
+        "LegalReport": {
+          "Document_Information": {
+            "Report_Title": "",
+            "Law_Firm_Name": "",
+            "Advocate_Name": "",
+            "Document_Category": "",
+            "Document_Sub_Category": "",
+            "Reference_Number": "",
+            "Report_Date": "",
+            "Proposal_Number": "",
+            "State": "",
+            "Issuing_Office_Address": "",
+            "Remarks": ""
+          },
+          "Lender_Details": {
+            "Bank_Or_NBFC_Name": "",
+            "Branch_Name": "",
+            "Addressed_To": ""
+          },
+          "Borrower_Details": {
+            "Primary_Borrower_Name": "",
+            "Co_Borrowers": [],
+            "Borrower_Full_Name_And_Address": "",
+            "Constitution_Of_Owner": ""
+          },
+          "Property_Owner_Details": {
+            "Owner_Name": "",
+            "Co_Owners": [],
+            "Owner_Address": "",
+            "Owner_Constitution": ""
+          },
+          "Loan_Details": {
+            "Loan_Account_Number": "",
+            "Loan_Type": "",
+            "Product_Type": ""
+          },
+          "Property_Details": {
+            "Property_Address": "",
+            "Property_Type": "",
+            "Village_Or_Town": "",
+            "Taluk_Or_Circle": "",
+            "District": "",
+            "State": "",
+            "Registration_District": "",
+            "Sub_Registration_District": "",
+            "Survey_Number": "",
+            "Re_Survey_Number": "",
+            "Plot_Or_Site_Number": "",
+            "Block_Number": "",
+            "Layout_Name": "",
+            "Total_Extent_Hectares": "",
+            "Total_Extent_Acres": "",
+            "Total_Extent_Sqft": "",
+            "Total_Extent_SqMeter": "",
+            "Land_Use_Type": "",
+            "Properties_List": [
+              {
+                "Property_Number": "",
+                "Document_Number": "",
+                "Description": "",
+                "Extent": "",
+                "Boundaries": {
+                  "North": "",
+                  "South": "",
+                  "East": "",
+                  "West": ""
+                }
+              }
+            ]
+          },
+          "Documents_Scrutinized": [
+            {
+              "Serial_Number": "",
+              "Document_Date": "",
+              "Document_Number": "",
+              "Document_Type": "",
+              "Particulars": "",
+              "Executant": "",
+              "Beneficiary": "",
+              "Nature": ""
+            }
+          ],
+          "Documents_To_Be_Obtained": [
+            {
+              "Serial_Number": "",
+              "Document_Date": "",
+              "Document_Number": "",
+              "Document_Type": "",
+              "Particulars": "",
+              "Nature": ""
+            }
+          ],
+          "Title_Tracing": {
+            "Original_Title_Holder": "",
+            "Chain_Of_Title_Summary": "",
+            "Current_Title_Holder": "",
+            "Mode_Of_Acquisition": "",
+            "Title_Tracing_Period_From": "",
+            "Title_Tracing_Period_To": ""
+          },
+          "Encumbrance_Details": {
+            "Encumbrance_Certificate_Number": "",
+            "EC_Period_From": "",
+            "EC_Period_To": "",
+            "Charges_Registered": "",
+            "Existing_Mortgage_Or_Encumbrance": "",
+            "MODT_Details": ""
+          },
+          "Legal_Verification_Checklist": {
+            "Is_Title_Clear_And_Marketable": "",
+            "Is_Property_Free_Of_Encumbrance": "",
+            "Is_Original_Title_Document_In_Order": "",
+            "Is_Property_Within_Municipal_Limits": "",
+            "Is_Property_Agricultural_Or_NonAgricultural": "",
+            "Is_Property_Leasehold": "",
+            "Lis_Pendens_Status": "",
+            "Minors_Interest": "",
+            "Power_Of_Attorney_Status": "",
+            "NOC_From_Society_Or_Builder": "",
+            "SARFAESI_Applicability": "",
+            "Urban_Land_Ceiling_Act_Applicable": "",
+            "Tenancy_Laws_Applicable": "",
+            "Site_Inspection_Done": "",
+            "Additional_Document_Required": "",
+            "Municipal_Tax_Paid_Status": "",
+            "Municipal_Tax_Assessed_In_Name_Of": "",
+            "Construction_As_Per_Sanction_Plan": ""
+          },
+          "Tax_And_Revenue_Details": {
+            "Patta_Number": "",
+            "Property_Tax_Receipt_Number": "",
+            "Assessment_Number": "",
+            "Tax_Assessed_In_Name_Of": "",
+            "Tax_Receipt_Date": ""
+          },
+          "Title_Certification": {
+            "Title_Certification_Opinion": "",
+            "Safeguards_To_Be_Observed": "",
+            "Observation_Remarks": "",
+            "Certifying_Advocate_Name": "",
+            "Certification_Date": "",
+            "Certification_Place": "",
+            "Notes_And_Conditions": []
+          }
+        }
+      }

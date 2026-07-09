@@ -1,0 +1,235 @@
+templates:
+  task:
+    subject: "Task Assignment: Application {{APPLICATION_NUMBER}}"
+    body: |
+      Dear {{BORROWER_NAME}},
+
+      You have been assigned a new task for Application {{APPLICATION_NUMBER}}.
+
+      Borrower Details:
+      Name: {{BORROWER_NAME}}
+      Address: {{BORROWER_ADDRESS}}
+
+      Co-Borrower 1: {{CO_BORROWER_1_NAME}}
+      Address: {{CO_BORROWER_1_ADDRESS}}
+
+      Co-Borrower 2: {{CO_BORROWER_2_NAME}}
+      Address: {{CO_BORROWER_2_ADDRESS}}
+
+      Co-Borrower 3: {{CO_BORROWER_3_NAME}}
+      Address: {{CO_BORROWER_3_ADDRESS}}
+
+      Loan Details:
+      Loan Account No: {{LOAN_ACCOUNT_NUMBER}}
+      Amount: {{LOAN_AMOUNT_NUMERIC}} ({{LOAN_AMOUNT_WORDS}})
+
+      Please review the details and proceed accordingly.
+
+      Best regards,
+      Property Loan Management Team
+
+  13_2_notice_template:
+    subject: "NOTICE OF DEMAND UNDER SECTION 13(2) OF THE SARFAESI ACT, 2002"
+    body: |
+      Date: {{NOTICE_DATE}}
+
+      To,
+      1. {{BORROWER_1_NAME}}
+         {{BORROWER_1_ADDRESS}}
+         Mortgaged Property: {{MORTGAGED_PROPERTY_ADDRESS}}
+
+      2. {{BORROWER_2_NAME}}
+         {{BORROWER_2_ADDRESS}}
+         Mortgaged Property: {{MORTGAGED_PROPERTY_ADDRESS}}
+
+      3. {{BORROWER_3_NAME}}
+         {{BORROWER_3_ADDRESS}}
+         Mortgaged Property: {{MORTGAGED_PROPERTY_ADDRESS}}
+
+      (hereinafter collectively referred to as the "Borrowers")
+
+      Dear Sir/Madam,
+
+      Sub: NOTICE OF DEMAND UNDER SECTION 13(2) OF THE SECURITISATION AND RECONSTRUCTION OF FINANCIAL ASSETS AND ENFORCEMENT OF SECURITY INTEREST ACT, 2002 READ WITH SECURITY INTEREST (ENFORCEMENT) RULES, 2002 AS AMENDED.
+
+      Ref: Loan facility of Rs. {{TOTAL_DISBURSED_AMOUNT_NUMERIC}}/- (Rupees {{TOTAL_DISBURSED_AMOUNT_WORDS}} )
+
+      Prudent ARC Limited (Assignee), a Company incorporated under the Companies Act, 1956 and registered with Reserve Bank of India under Section 3 of the SARFAESI Act, 2002 as Securitization and Asset Reconstruction Company, having its registered office at 611, D-Mall, Plot No. A-1, Netaji Subhash Place, Pitampura, New Delhi – 110034 in its capacity as Trustee of Prudent Trust {{TRUST_NAME}}.
+
+      Prudent ARC Limited has acquired the secured debt of the borrower and its Co-borrower/Mortgagors/Guarantors with underlying securities from the original lender {{ASSIGNOR_NAME}} (Assignor) under the provisions of Section 5 of the SARFAESI Act, 2002 vide Assignment Agreement dated {{ASSIGNMENT_DATE}}.
+
+      I, undersigned being Authorized Officer under the provision of the Securitization and Reconstruction of Financial Assets and Enforcement of Security Interest Act, 2002, of Prudent ARC Limited (Prudent Trust {{TRUST_NAME}}) do hereby serve upon you with the following effect:
+
+      1. That {{BORROWER_NAME}} and {{CO_BORROWER_NAMES}} has availed Loan vide Loan Agreement(s) bearing Loan Account No(s). {{LOAN_ACCOUNT_NUMBERS}} having a loan amount of Rs. {{LOAN_AMOUNT_NUMERIC}}/- (Rupees {{LOAN_AMOUNT_WORDS}} only) dated {{LOAN_AGREEMENT_DATES}} (hereinafter referred to as “Facility Agreements”) which were executed by you in the capacity of borrower and co-borrower with the original lender {{ORIGINAL_LENDER_NAME}}, whereby financial assistance was availed for the purpose of {{LOAN_PURPOSE}} and agreed to abide by the terms and conditions governing the said loan.
+
+      2. That in terms of the Facility Agreements, you had created mortgage in respect of the property described in Schedule–I hereunder and deposited certain documents including title deeds and mortgage deed in respect of the said property, thereby securing the said facility.
+
+      3. We hereby inform you that you (Borrower and Co-borrower) have committed breach of the terms and conditions of the Facility Agreement by inter-alia defaulting in payment of equated monthly installments and interest thereon and further failed and neglected to clear the outstanding amount despite various reminders.
+
+      4. As the interest and/or installment of principal has remained overdue for a period of more than 90 days, your loan account has been classified as a Non-Performing Asset (NPA) on {{NPA_DATE}} in accordance with the Master Circular/Guidelines issued by the Reserve Bank of India.
+
+      5. We hereby inform you that we are the secured creditor and the debt owing to us is a secured debt on the above said property which is a secured asset of Prudent Trust {{TRUST_NAME}}. As per the statement of account maintained in ordinary course of business as on {{OUTSTANDING_AS_ON_DATE}}, there is a total balance outstanding amount of Rs. {{OUTSTANDING_AMOUNT_NUMERIC}}/- (Rupees {{OUTSTANDING_AMOUNT_WORDS}} only) which is due and payable by you. In addition to the said outstanding dues, you are also liable to pay interest and other charges accruing to the loan account.
+
+      6. In view of the above, on behalf of Prudent Trust {{TRUST_NAME}}, we hereby call upon you to make payment of the above outstanding amount of Rs. {{DEMAND_AMOUNT_NUMERIC}}/- (Rupees {{DEMAND_AMOUNT_WORDS}} only) within a period of 60 days from the date of this notice failing which Prudent Trust {{TRUST_NAME}} shall be constrained to exercise all or any of the rights as mentioned in sub-section (4) of Section 13 of the SARFAESI Act, 2002 including taking possession of the secured asset.
+
+      7. Please note that this notice is issued under Section 13(2) of the SARFAESI Act, 2002 and upon failure on your part to comply with the demand contained herein, the secured creditor shall be entitled to exercise all rights under Section 13(4) of the said Act.
+
+      8. You are restrained from disposing of or dealing with the secured assets or transferring the same by way of sale, lease or otherwise without prior written consent of Prudent Trust {{TRUST_NAME}}. Any non-compliance shall be punishable under Section 29 of the Act.
+
+      9. This notice is without prejudice to the rights and remedies available to Prudent Trust {{TRUST_NAME}} under law including initiation of appropriate legal proceedings before competent courts or tribunals.
+
+      You are therefore advised to comply with the demand made herein along with applicable interest till the date of payment within 60 (Sixty) days from the date of this notice, failing which further action under the SARFAESI Act, 2002 shall be initiated at your risk as to cost and consequences.
+
+      Yours faithfully,
+      For Prudent ARC Limited
+      Prudent Trust {{TRUST_NAME}}
+      Authorized Officer
+
+      Schedule–I
+      Details of Security / Mortgaged Property
+      {{SCHEDULE_1_PROPERTY_DETAILS}}
+
+  icici_13_2_notice_template:
+    render_mode: "advanced"
+    subject: "Notice under Section 13(2) of the SARFAESI Act, 2002 - Account No. {{LOAN_ACCOUNT_NUMBERS}}"
+    body: |
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+      <div style="text-align: left; margin-bottom: 20px;">
+        <img src="/logo/icici-bank-logo-vector.png" alt="ICICI Bank" style="height: 50px;">
+        <hr style="border: 1px solid #f07e13;">
+      </div>
+
+      <p style="text-align: right;"><strong>Date:</strong> {{NOTICE_DATE}}</p>
+
+      <p><strong>To,</strong></p>
+      <div style="margin-left: 20px;">
+        <p><strong>1. {{BORROWER_1_NAME}}</strong><br>{{BORROWER_1_ADDRESS}}</p>
+        <p><strong>2. {{BORROWER_2_NAME}}</strong><br>{{BORROWER_2_ADDRESS}}</p>
+        <p><strong>3. {{BORROWER_3_NAME}}</strong><br>{{BORROWER_3_ADDRESS}}</p>
+      </div>
+
+      <p><strong>Dear Sir / Madam,</strong></p>
+
+      <div style="text-align: center; margin: 20px 0;">
+        <h3 style="text-decoration: underline;">Sub: Notice under Section 13(2) of the Securitisation and Reconstruction of Financial Assets and Enforcement of Security Interest Act, 2002</h3>
+        <p><strong>Facility:</strong> Over Draft / Loan Facility<br>
+        <strong>Account Number:</strong> {{LOAN_ACCOUNT_NUMBERS}}<br>
+        <strong>Sanctioned Amount:</strong> {{LOAN_AMOUNT_NUMERIC}}/- (Rupees {{LOAN_AMOUNT_WORDS}})</p>
+      </div>
+
+      <p>1. Under the provisions of the Securitisation and Reconstruction of Financial Assets and Enforcement of Security Interest Act, 2002, and the Authentication of ICICI Bank Limited appointed under the provisions of the said Act, hereby issues legal notice to you under Section 13(2) of the Act calling upon you to discharge your financial assets and enforcement of security interest.</p>
+
+      <p>2. You had approached the Bank and requested for granting a Credit Facility against the secured assets. You have executed the loan agreement and other documents and availed the said facility for your business/working capital purpose based on representations made by you. Pursuant to the said agreement, the Bank sanctioned a facility for a sum of {{LOAN_AMOUNT_NUMERIC}}/- and disbursed the same.</p>
+
+      <p>3. You have committed defaults in repayment of the dues as per the terms and conditions agreed. Despite repeated reminders, requests and demands, you failed and neglected to regularize the account. Hence, the loan account has been classified as Non-Performing Asset (NPA) as per RBI guidelines.</p>
+
+      <p>4. The entire outstanding liability is secured by way of mortgage of the property more particularly mentioned in Annexure “A” and the Bank has security interest over the said property.</p>
+
+      <p>5. Your account has been classified as Non-Performing Asset (NPA) on {{NPA_DATE}} and you are liable to pay the total outstanding amount of {{OUTSTANDING_AMOUNT_NUMERIC}}/- as on {{NOTICE_DATE}} together with further interest, penal interest, costs and charges as detailed in Annexure "B".</p>
+
+      <p>6. You are hereby called upon to discharge in full your liabilities to the Bank within sixty (60) days from the date of receipt of this notice, failing which the Bank shall exercise all or any of the rights under Section 13(4) of the SARFAESI Act.</p>
+
+      <p>7. The Bank shall take possession of the secured assets including the right to transfer by way of lease, assignment or sale for realising the secured assets.</p>
+
+      <p>8. The Bank may take over the management of the business of the borrower and may appoint any person to manage the secured assets.</p>
+
+      <p>9. The Bank may require any person who has acquired any of the secured assets from the borrower and from whom any money is due to the borrower to pay such amount to the Bank.</p>
+
+      <p>10. You are hereby advised to comply with the demand under this notice and avoid further action under the aforesaid Act, which shall be at your cost and consequences.</p>
+
+      <p>Yours faithfully,<br><br>
+      <strong>Authorized Officer</strong><br>
+      ICICI Bank Ltd.<br>
+      {{SENDER}}</p>
+
+      <hr style="margin-top: 40px;">
+
+      <div style="page-break-before: always;">
+        <h3 style="text-align: center; text-decoration: underline;">ANNEXURE – A (PARTICULARS OF SECURED PROPERTY)</h3>
+        <p><strong>Property Schedule:</strong></p>
+        <p>{{SCHEDULE_1_PROPERTY_DETAILS}}</p>
+        
+        <p><strong>Boundaries:</strong></p>
+        <p>{{MORTGAGED_PROPERTY_ADDRESS}}</p>
+      </div>
+
+      <div style="page-break-before: always; margin-top: 40px;">
+        <h3 style="text-align: center; text-decoration: underline;">ANNEXURE – B (PARTICULAR OF DEMAND)</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border: 1px solid black;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="border: 1px solid black; padding: 8px; text-align: left;">Field</th>
+              <th style="border: 1px solid black; padding: 8px; text-align: left;">Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border: 1px solid black; padding: 8px;">Loan Account Number</td>
+              <td style="border: 1px solid black; padding: 8px;">{{LOAN_ACCOUNT_NUMBERS}}</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid black; padding: 8px;">Amount Sanctioned</td>
+              <td style="border: 1px solid black; padding: 8px;">{{LOAN_AMOUNT_NUMERIC}}/-</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid black; padding: 8px;">Total Disbursed</td>
+              <td style="border: 1px solid black; padding: 8px;">{{TOTAL_DISBURSED_AMOUNT_NUMERIC}}/-</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid black; padding: 8px;">NPA Date</td>
+              <td style="border: 1px solid black; padding: 8px;">{{NPA_DATE}}</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid black; padding: 8px;">Total Outstanding (as on {{NOTICE_DATE}})</td>
+              <td style="border: 1px solid black; padding: 8px;">{{OUTSTANDING_AMOUNT_NUMERIC}}/-</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid black; padding: 8px;">Demand Amount in Words</td>
+              <td style="border: 1px solid black; padding: 8px;">Rupees {{OUTSTANDING_AMOUNT_WORDS}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+      </div>
+
+  prudent_13_2_word_draft:
+    render_mode: "word"
+    word_template_path: "Draft of 13(2) Notice.docx"
+    subject: "NOTICE OF DEMAND UNDER SECTION 13(2) OF THE SARFAESI ACT, 2002"
+
+
+banks:
+
+  PRUDENT ARC LIMITED:
+
+    headers:
+
+      header_style_1:
+        logo_path: "logos/prudent.png"
+        entity_name: "Prudent ARC Limited"
+        trust_line: "As Trustee of Prudent Trust 123/25"
+        address: "611, D-Mall, Netaji Subhash Place, New Delhi – 110034"
+
+    footers:
+
+      footer_style_1:
+        text: "Authorised Officer | Prudent ARC Limited"
+        contact: "info@prudentarc.com"
+        round_seal_path: "seals/round_seal .png"
+
+    seals:
+      seal_1:
+        name: "Aqib Azad"
+        designation: "Authorised Officer"
+        signature_path: "seals/signature_aqib_azad.png"
+
+      seal_2:
+        name: "Dharmender Kumar Mishra"
+        designation: "Authorised Officer"
+        signature_path: "seals/signature_dharmender_kumar.png"
+
+      seal_3:
+        name: "Kalyan"
+        designation: "Authorised Officer"
+        signature_path: "seals/signature_kalyan.png"

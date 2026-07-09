@@ -1,0 +1,114 @@
+{
+  "lawyers": [
+    {
+      "id": "L001",
+      "key": "L001",
+      "firstName": "John",
+      "lastName": "Smith",
+      "dob": "1985-06-15",
+      "contact": "+91-9876543210",
+      "email": "john.smith@lawfirm.com",
+      "address": "123 Legal Street, Mumbai, Maharashtra",
+      "barCouncilCode": "MH/2010/12345",
+      "barCouncilState": "Maharashtra",
+      "empanelmentDate": "2015-03-20",
+      "empanelmentStatus": "active",
+      "empaneledBranch": "Mumbai Central",
+      "regionalOffice": "Western Region",
+      "zonalOffice": "Zone 1"
+    },
+    {
+      "id": "L002",
+      "key": "L002",
+      "firstName": "Priya",
+      "lastName": "Sharma",
+      "dob": "1988-09-22",
+      "contact": "+91-9876543211",
+      "email": "priya.sharma@advocates.com",
+      "address": "456 Court Road, Delhi",
+      "barCouncilCode": "DL/2012/67890",
+      "barCouncilState": "Delhi",
+      "empanelmentDate": "2017-07-15",
+      "empanelmentStatus": "active",
+      "empaneledBranch": "Delhi High Court",
+      "regionalOffice": "Northern Region",
+      "zonalOffice": "Zone 2"
+    }
+  ],
+  "valuers": [
+    {
+      "id": "V001",
+      "key": "V001",
+      "firstName": "Rajesh",
+      "lastName": "Kumar",
+      "authorizationDate": "2018-04-10",
+      "authorizationBranch": "Chennai Branch",
+      "registrationDetails": "REG/2018/CV001",
+      "empanelStatus": "active",
+      "empaneledBranch": "Chennai Central",
+      "regionalOffice": "Southern Region",
+      "zonalOffice": "Zone 3",
+      "contact": "+91-9876543212",
+      "email": "rajesh.kumar@valuers.com",
+      "address": "789 Valuation Plaza, Chennai, Tamil Nadu"
+    },
+    {
+      "id": "V002",
+      "key": "V002",
+      "firstName": "Meera",
+      "lastName": "Patel",
+      "authorizationDate": "2019-11-25",
+      "authorizationBranch": "Ahmedabad Branch",
+      "registrationDetails": "REG/2019/CV002",
+      "empanelStatus": "active",
+      "empaneledBranch": "Ahmedabad West",
+      "regionalOffice": "Western Region",
+      "zonalOffice": "Zone 1",
+      "contact": "+91-9876543213",
+      "email": "meera.patel@propertyval.com",
+      "address": "321 Assessment Avenue, Ahmedabad, Gujarat"
+    }
+  ],
+  "cas": [
+    {
+      "id": "C001",
+      "key": "C001",
+      "firstName": "Amit",
+      "lastName": "Agarwal",
+      "contact": "+91-9876543214",
+      "email": "amit.agarwal@caoffice.com",
+      "address": "654 Accountant Street, Bangalore, Karnataka",
+      "caRegNumber": "ICAI123456"
+    },
+    {
+      "id": "C002",
+      "key": "C002",
+      "firstName": "Sunita",
+      "lastName": "Verma",
+      "contact": "+91-9876543215",
+      "email": "sunita.verma@auditfirm.com",
+      "address": "987 Finance Tower, Pune, Maharashtra",
+      "caRegNumber": "ICAI789012"
+    },
+    {
+      "key": "1757921865265",
+      "firstName": "Mathan",
+      "lastName": "R",
+      "contact": "9876543210",
+      "email": "mathan@ca.co.in",
+      "address": "TN Park no. 1",
+      "caRegNumber": "ICAI123456",
+      "id": "C530"
+    },
+    {
+      "key": "1757923300832",
+      "firstName": "Ramesh",
+      "lastName": "E",
+      "contact": "9876543210",
+      "email": "test2@gmail.com",
+      "address": "TN Park no. 1",
+      "caRegNumber": "ICAI123489",
+      "id": "C112"
+    }
+  ]
+}

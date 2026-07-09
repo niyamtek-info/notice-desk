@@ -1,0 +1,108 @@
+report_fields:
+  id: ""
+
+  record_id: ""
+  application_number: ""
+
+  status: ""
+  is_report_overridden: ""
+  rerun_report: ""
+
+  loan_account_number: ""
+  borrower_name: ""
+  location: ""
+  arc_name: ""
+
+  borrower_address: ""
+  borrower_address_also_at: ""
+
+  co_borrower_1_name: ""
+  co_borrower_1_address: ""
+  co_borrower_1_address_also_at: ""
+
+  co_borrower_2_name: ""
+  co_borrower_2_address: ""
+  co_borrower_2_address_also_at: ""
+
+  co_borrower_3_name: ""
+  co_borrower_3_address: ""
+  co_borrower_3_address_also_at: ""
+
+  co_borrower_4_name: ""
+  co_borrower_4_address: ""
+  co_borrower_4_address_also_at: ""
+
+  co_borrower_5_name: ""
+  co_borrower_5_address: ""
+  co_borrower_5_address_also_at: ""
+
+  co_borrower_6_name: ""
+  co_borrower_6_address: ""
+  co_borrower_6_address_also_at: ""
+
+  guarantor_1_name: ""
+  guarantor_1_address: ""
+  guarantor_2_name: ""
+  guarantor_2_address: ""
+
+  description_of_schedule_property: ""
+  schedule_property_descriptions: ""
+  survey_no: ""
+  plot_number: ""
+  door_number: ""
+  property_street: ""
+  property_locality: ""
+  property_town: ""
+  taluk: ""
+  village: ""
+  district: ""
+  pincode: ""
+
+  date_of_npa: ""
+  dpd_as_on_notice: ""
+  sec_13_2_notice_date: ""
+
+  loan_amount: ""
+  loan_amount_words: ""
+  loan_agreement_date: ""
+
+  disbursal_date: ""
+  disbursal_amount: ""
+
+  future_principal: ""
+
+  principal_outstanding: ""
+  instalment_overdue_amount: ""
+  interest_on_termination: ""
+  late_payment_penalty: ""
+  cheque_bounce_charges: ""
+  other_amount: ""
+  foreclosure_charges: ""
+
+  total_outstanding: ""
+  total_outstanding_words: ""
+  as_on_date: ""
+
+  soa_bank_name: ""
+  soa_loan_account_number: ""
+  soa_sanction_date: ""
+  soa_sanction_amount: ""
+  soa_disbursed_amount: ""
+  soa_interest_rate: ""
+  soa_loan_status: ""
+
+  foreclosure_bank_name: ""
+  foreclosure_loan_account_number: ""
+  foreclosure_outstanding_principal: ""
+  foreclosure_total_amount_payable: ""
+  foreclosure_valid_upto_date: ""
+
+  created_at: ""
+  created_by: ""
+  updated_at: ""
+  updated_by: ""
+  version: ""
+  effective_date: ""
+  end_date: ""
+  is_active: ""
+  is_deleted: ""
