@@ -42,12 +42,14 @@ class Client(Base):
     aos = relationship(
         "AOInformation",
         primaryjoin=lambda: and_(
-            Client.id == AOInformation.client_id,
+            Client.client_code == AOInformation.client_code,
             AOInformation.end_date == OPEN_END_DATE,
             AOInformation.is_deleted == False,
-            AOInformation.is_active == True, 
+            AOInformation.is_active == True,
         ),
+        foreign_keys="[AOInformation.client_code]",
         back_populates="client",
+        viewonly=True,
     )
 
     # -------------------------------------------------
@@ -55,8 +57,8 @@ class Client(Base):
     # -------------------------------------------------
     all_aos = relationship(
         "AOInformation",
-        primaryjoin="Client.id == AOInformation.client_id",
-
+        primaryjoin="Client.client_code == AOInformation.client_code",
+        foreign_keys="[AOInformation.client_code]",
         viewonly=True
     )
 
@@ -113,7 +115,13 @@ class AOInformation(Base):
     )
 
     # Relationship
-    client = relationship("Client", back_populates="aos")
+    client = relationship(
+        "Client",
+        primaryjoin="Client.client_code == AOInformation.client_code",
+        foreign_keys="[AOInformation.client_code]",
+        back_populates="aos",
+        viewonly=True,
+    )
 
 class TemplateType(Base):
     __tablename__ = "template_types"

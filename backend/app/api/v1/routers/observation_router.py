@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from starlette.concurrency import run_in_threadpool
 from typing import Dict, Any
 from app.services.observation_service import ObservationService
 from app.api.v1.controllers.observation_controller import ObservationController
@@ -17,7 +18,7 @@ async def get_observations(
     """
     Fetches the generated observations from the filesystem.
     """
-    return controller.get_observations(application_number)
+    return await run_in_threadpool(controller.get_observations, application_number)
 
 @router.put("/{application_number}")
 async def update_observations(
@@ -28,4 +29,4 @@ async def update_observations(
     """
     Updates the observations manually.
     """
-    return controller.update_observations(application_number, payload)
+    return await run_in_threadpool(controller.update_observations, application_number, payload)

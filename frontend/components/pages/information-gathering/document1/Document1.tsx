@@ -584,9 +584,20 @@ export default function Document1({ token, setDocData, setTriggerReport }: Docum
       });
 
       setAnalysisData(record.json);
+      setAnalysisLoading(false);
       form.setFieldsValue(flatData);
     } else {
       setAnalysisData(null);
+      // Extraction may still be running (queued/processing) rather than
+      // genuinely mismatched - show a progress state instead of a false
+      // "Document mismatch" error while OCR is still in flight.
+      const stillExtracting =
+        !record.error &&
+        !record.error_message &&
+        ["queued", "processing", "pending"].includes(
+          (record.status || "").toLowerCase(),
+        );
+      setAnalysisLoading(stillExtracting);
     }
 
     setModalVisible(true);
@@ -879,8 +890,8 @@ export default function Document1({ token, setDocData, setTriggerReport }: Docum
       {contextHolder}
       <div className="grid grid-cols-12 grid-rows-1 gap-4">
         <div className="col-span-12 shadow-md border border-gray-100 rounded-lg bg-white min-h-[80vh]">
-          <div className="p-4">
-            <div className="flex justify-between items-center mb-6">
+          <div className="p-4 pt-0">
+            <div className="sticky top-0 bg-white z-20 flex justify-between items-center rounded-t-lg h-[72px] mb-4">
               <h1 className="text-[20px] font-bold text-stone-800 mb-0">
                 Documents Table
               </h1>
@@ -902,6 +913,7 @@ export default function Document1({ token, setDocData, setTriggerReport }: Docum
                 scroll={{ x: "max-content" }}
                 bordered
                 rowKey="id"
+                sticky={{ offsetHeader: 72 }}
               />
             </div>
           </div>
@@ -924,7 +936,12 @@ export default function Document1({ token, setDocData, setTriggerReport }: Docum
         footer={null}
         width={isPreviewExpanded ? "98%" : "80%"}
         style={isPreviewExpanded ? { top: 10, maxWidth: "100%" } : {}}
-        styles={{ body: isPreviewExpanded ? { height: "85vh" } : {} }}
+        styles={{
+          body: {
+            height: isPreviewExpanded ? "85vh" : "80vh",
+            overflow: "hidden",
+          },
+        }}
         centered={!isPreviewExpanded}
       >
         <UploadForm

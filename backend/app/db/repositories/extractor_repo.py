@@ -2493,11 +2493,32 @@ class ExtractorRepository:
                     "Remarks": rep.remarks,
                 }
 
-            def vendor_obj(v):
-                rep = self.db.query(ExtractedSalesDeedVendorRepresentative).filter(
-                    ExtractedSalesDeedVendorRepresentative.vendor_id == v.id,
+            vendor_reps_by_vendor_id = {}
+            if vendors:
+                for rep in self.db.query(ExtractedSalesDeedVendorRepresentative).filter(
+                    ExtractedSalesDeedVendorRepresentative.vendor_id.in_([v.id for v in vendors]),
                     *live_filter(ExtractedSalesDeedVendorRepresentative),
-                ).first()
+                ).all():
+                    vendor_reps_by_vendor_id.setdefault(rep.vendor_id, rep)
+
+            purchaser_reps_by_purchaser_id = {}
+            if purchasers:
+                for rep in self.db.query(ExtractedSalesDeedPurchaserRepresentative).filter(
+                    ExtractedSalesDeedPurchaserRepresentative.purchaser_id.in_([v.id for v in purchasers]),
+                    *live_filter(ExtractedSalesDeedPurchaserRepresentative),
+                ).all():
+                    purchaser_reps_by_purchaser_id.setdefault(rep.purchaser_id, rep)
+
+            witness_reps_by_witness_id = {}
+            if witnesses:
+                for rep in self.db.query(ExtractedSalesDeedWitnessRepresentative).filter(
+                    ExtractedSalesDeedWitnessRepresentative.witness_id.in_([v.id for v in witnesses]),
+                    *live_filter(ExtractedSalesDeedWitnessRepresentative),
+                ).all():
+                    witness_reps_by_witness_id.setdefault(rep.witness_id, rep)
+
+            def vendor_obj(v):
+                rep = vendor_reps_by_vendor_id.get(v.id)
                 out = {
                     "Name": v.name,
                     "Relationship": v.relationship_text,
@@ -2515,10 +2536,7 @@ class ExtractorRepository:
                 return out
 
             def purchaser_obj(v):
-                rep = self.db.query(ExtractedSalesDeedPurchaserRepresentative).filter(
-                    ExtractedSalesDeedPurchaserRepresentative.purchaser_id == v.id,
-                    *live_filter(ExtractedSalesDeedPurchaserRepresentative),
-                ).first()
+                rep = purchaser_reps_by_purchaser_id.get(v.id)
                 out = {
                     "Name": v.name,
                     "Relationship": v.relationship_text,
@@ -2536,10 +2554,7 @@ class ExtractorRepository:
                 return out
 
             def witness_obj(v):
-                rep = self.db.query(ExtractedSalesDeedWitnessRepresentative).filter(
-                    ExtractedSalesDeedWitnessRepresentative.witness_id == v.id,
-                    *live_filter(ExtractedSalesDeedWitnessRepresentative),
-                ).first()
+                rep = witness_reps_by_witness_id.get(v.id)
                 out = {
                     "Name": v.name,
                     "Relationship": v.relationship_text,

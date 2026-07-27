@@ -286,8 +286,20 @@ const renderRoot = (
   form: FormInstance,
   editMode: boolean,
   selectedDoc: any,
-  analysisData: Record<string, unknown> | null
+  analysisData: Record<string, unknown> | null,
+  analysisLoading?: boolean,
 ): React.ReactNode => {
+  if (!analysisData && analysisLoading) {
+    return (
+      <div className="h-full min-h-[500px] flex flex-col items-center justify-center gap-3 p-6">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="text-gray-600 text-sm">
+          Extracting document data, please wait...
+        </span>
+      </div>
+    );
+  }
+
   if (!analysisData) {
     return (
       <div className="h-full min-h-[500px] flex items-center justify-center p-6">
@@ -889,7 +901,7 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
         destroyOnHidden
         open={open}
         onCancel={handleCancel}
-        width={1100}
+        width={1300}
         title={`Analysis for ${selectedDoc?.filetype || "Document"}`}
         styles={{
           body: { background: "#fff", overflow: "hidden" },
@@ -986,7 +998,7 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
                 style={{ width: "100%" }}
               >
                 <div className="mb-5">
-                  {renderRoot(analysisValue, form, editMode, selectedDoc, analysisData)}
+                  {renderRoot(analysisValue, form, editMode, selectedDoc, analysisData, analysisLoading)}
                 </div>
               </Form>
 

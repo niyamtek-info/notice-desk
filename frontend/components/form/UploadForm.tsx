@@ -8,6 +8,7 @@ import { RiUploadCloud2Line } from "react-icons/ri";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { addLog } from "@/src/utils/log";
 import axios from "axios";
+import { apiClient } from "@/src/services/apiClient";
 import { logoutUser } from "@/src/utils/auth";
 import { useAppContext } from "@/context/GlobalContext";
 import { BiCollapse } from "react-icons/bi";
@@ -172,6 +173,7 @@ export default function UploadForm({
   const { applicationNumber } = useAppNoContext();
 
   const [fileError, setFileError] = useState("");
+  const [pageRangeError, setPageRangeError] = useState("");
   const [loading, setLoading] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewTitle, setPreviewTitle] = useState<string>("");
@@ -363,6 +365,7 @@ export default function UploadForm({
   };
 
   const handleTagChange = (newValues: string[]) => {
+    setPageRangeError("");
     const formattedValues = newValues.map(val => {
       const trimmed = val.trim();
       if (!trimmed) return "";
@@ -407,9 +410,9 @@ export default function UploadForm({
     }
     setFileError("");
     setLoading(true);
+    const file = fileList[0].originFileObj as File;
 
     try {
-      const file = fileList[0].originFileObj as File;
       let fileToSend = file;
 
       // Extract specific pages if PDF and Select Pages is enabled
@@ -420,10 +423,11 @@ export default function UploadForm({
         }
 
         if (pagesToExtract.length === 0) {
-          message.error("Please enter a valid page range.");
+          setPageRangeError("Please enter a valid page range.");
           setLoading(false);
           return;
         }
+        setPageRangeError("");
 
         try {
           const arrayBuffer = await file.arrayBuffer();
@@ -438,10 +442,11 @@ export default function UploadForm({
             .filter((idx) => idx >= 0 && idx < srcDoc.getPageCount());
 
           if (indices.length === 0) {
-            message.error("Selected pages are out of bounds.");
+            setPageRangeError("Selected pages are out of bounds.");
             setLoading(false);
             return;
           }
+          setPageRangeError("");
 
           const copiedPages = await dstDoc.copyPages(srcDoc, indices);
           copiedPages.forEach((page) => dstDoc.addPage(page));
@@ -507,6 +512,7 @@ export default function UploadForm({
         setCustomPageRange("");
         setCustomPageTags([]);
         setPageSelectionMode("all");
+        setPageRangeError("");
         // Add log to backend
         // await addLog(
         //   applicationNumber,
@@ -537,6 +543,31 @@ export default function UploadForm({
           return;
         }
         msg = err.response.data?.detail || err.message;
+      } else if (axios.isAxiosError(err) && !err.response) {
+        // No HTTP response reached the client (dropped connection, proxy
+        // hiccup, etc). The backend may have already accepted and queued
+        // the upload, so confirm before telling the user it failed -
+        // otherwise they retry and we get a duplicate document row.
+        const wasActuallyQueued = await confirmUploadReachedServer(
+          values.docName,
+          values.docType,
+        );
+        if (wasActuallyQueued) {
+          onUploadSuccess(file);
+          message.success(
+            "File uploaded successfully. Extraction in progress...",
+          );
+          formUpload.resetFields();
+          setFileList([]);
+          setCanSubmit(false);
+          setTotalPages(null);
+          setCustomPageRange("");
+          setCustomPageTags([]);
+          setPageSelectionMode("all");
+          setPageRangeError("");
+          setOpen(true);
+          return;
+        }
       }
 
       message.error(msg);
@@ -546,11 +577,33 @@ export default function UploadForm({
     }
   };
 
+  // After a connection-level error, check whether the upload actually made
+  // it to the server (it responds immediately after queueing, so a recent
+  // matching active/queued extraction means the request succeeded server-side
+  // even though the response never reached the browser).
+  const confirmUploadReachedServer = async (
+    docName?: string,
+    docType?: string,
+  ): Promise<boolean> => {
+    try {
+      const activeDocs = await apiClient.get<Record<string, any>>(
+        `/extract/active/${applicationNumber}`,
+      );
+      return Object.values(activeDocs || {}).some(
+        (doc: any) =>
+          doc?.doc_type === docType &&
+          (!docName || doc?.document_name === docName || doc?.filename?.includes(docName)),
+      );
+    } catch {
+      return false;
+    }
+  };
+
   return (
-    <div className="grid grid-cols-12 gap-4">
+    <div className="grid grid-cols-12 gap-4 h-full">
       {/* Preview Section */}
-      <div className={isPreviewExpanded ? "col-span-12" : "col-span-6"}>
-        <div className="border border-gray-200 rounded-lg p-4">
+      <div className={isPreviewExpanded ? "col-span-12 h-full" : "col-span-6 h-full"}>
+        <div className="border border-gray-200 rounded-lg p-4 h-full flex flex-col">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold mb-0">Document Preview</h3>
             {previewVisible && previewUrl && (
@@ -566,7 +619,7 @@ export default function UploadForm({
 
           </div>
           {previewVisible && previewUrl ? (
-            <div style={{ height: isPreviewExpanded ? "70vh" : "500px", overflow: "auto" }}>
+            <div className="flex-1 min-h-0 w-full">
               {previewType === "application/pdf" ? (
                 <iframe
                   src={`${previewUrl}#toolbar=1`}
@@ -582,25 +635,24 @@ export default function UploadForm({
                   alt="Document Preview"
                   style={{
                     width: "100%",
-                    height: "auto",
-                    maxHeight: isPreviewExpanded ? "70vh" : "500px",
+                    height: "100%",
                     objectFit: "contain",
                   }}
                 />
               )}
             </div>
           ) : (
-            <div className={`flex items-center justify-center bg-gray-100 rounded ${isPreviewExpanded ? "h-[70vh]" : "h-[450px]"}`}>
+            <div className="flex-1 min-h-0 bg-gray-100 rounded flex items-center justify-center">
               <p className="text-gray-500">No document preview available</p>
             </div>
           )}
         </div>
       </div>
       {!isPreviewExpanded && (
-        <div className="col-span-6">
+        <div className="col-span-6 h-full flex flex-col overflow-hidden">
           <Form
             form={formUpload}
-            className="doc_upload"
+            className="doc_upload flex flex-col h-full"
             layout="vertical"
             onFinish={handleSubmit}
             onValuesChange={handleValuesChange}
@@ -611,224 +663,196 @@ export default function UploadForm({
               docType: "",
             }}
           >
-            {/* File Upload */}
-            <Form.Item
-              label="File Upload"
-              required
-              validateStatus={fileError ? "error" : ""}
-              help={fileError || ""}
-              valuePropName="fileList"
-              getValueFromEvent={(e) => e && e.fileList}
-              className="!mt-4"
-            >
-              <Dragger
-                name="file"
-                accept="application/pdf,image/*"
-                multiple={false}
-                beforeUpload={beforeUpload}
-                onChange={handleUploadChange}
-                fileList={fileList}
-                onRemove={() => {
-                  setFileList([]);
-                  checkCanSubmit(formUpload.getFieldsValue(), []);
-                }}
-                showUploadList={false}
-                style={{
-                  padding: 0,
-                  background: "transparent",
-                  borderRadius: "7px",
-                }}
+            {/* Scrollable Container for inputs */}
+            <div className="flex-1 overflow-y-auto pr-1 min-h-0">
+              {/* File Upload */}
+              <Form.Item
+                label="File Upload"
+                required
+                validateStatus={fileError ? "error" : ""}
+                help={fileError || ""}
+                valuePropName="fileList"
+                getValueFromEvent={(e) => e && e.fileList}
+                className="!mt-2 !mb-3"
               >
-                <div className="py-1.5">
-                  {fileList.length > 0 ? (
-                    <>
-                      <p className="mb-4 flex justify-center">
-                        <FaRegCheckCircle className="text-green-500 text-[60px]" />
-                      </p>
-                      <p className="text-lg font-medium text-gray-700 mb-1">
-                        {fileList[0].name}
-                      </p>
-                      <p className="text-sm text-green-600 mb-3">
-                        File selected and ready to process
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="mb-2 flex justify-center">
-                        <RiUploadCloud2Line className="text-primary-500 text-[40px]" />
-                      </p>
-                      <p className="text-md mb-2">
-                        Click or drag file to this area to upload
-                      </p>
-                      <p className="text-xs">
-                        Support for a single PDF or image upload. No company data
-                        or banned files.
-                      </p>
-                    </>
+                <Dragger
+                  name="file"
+                  accept="application/pdf,image/*"
+                  multiple={false}
+                  beforeUpload={beforeUpload}
+                  onChange={handleUploadChange}
+                  fileList={fileList}
+                  onRemove={() => {
+                    setFileList([]);
+                    checkCanSubmit(formUpload.getFieldsValue(), []);
+                  }}
+                  showUploadList={false}
+                  style={{
+                    padding: 0,
+                    background: "transparent",
+                    borderRadius: "7px",
+                  }}
+                >
+                  <div className="py-1.5">
+                    {fileList.length > 0 ? (
+                      <>
+                        <p className="mb-2 flex justify-center">
+                          <FaRegCheckCircle className="text-green-500 text-[32px]" />
+                        </p>
+                        <p className="text-sm font-semibold text-gray-700 mb-0.5">
+                          {fileList[0].name}
+                        </p>
+                        <p className="text-[11px] text-green-600 mb-1">
+                          File selected and ready to process
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="mb-1 flex justify-center">
+                          <RiUploadCloud2Line className="text-primary-500 text-[28px]" />
+                        </p>
+                        <p className="text-xs font-semibold text-gray-700 mb-1">
+                          Click or drag file to this area to upload
+                        </p>
+                        <p className="text-[10px] text-gray-400">
+                          Support for a single PDF or image upload (max 50MB)
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </Dragger>
+              </Form.Item>
+
+
+              {/* Page Selection Controls */}
+              {fileList.length > 0 && previewType === "application/pdf" && (
+                <div className="bg-gray-50/50 rounded-lg p-1 mb-4">
+                  <Form.Item
+                    label="Pages to Process"
+                    required
+                    rules={[
+                      { required: true, message: "Please choose page selection" },
+                    ]}
+                    className="!mb-2 font-medium"
+                  >
+                    <Radio.Group
+                      value={pageSelectionMode}
+                      onChange={(e) => {
+                        setPageSelectionMode(e.target.value);
+                        setPageRangeError("");
+                      }}
+                      className="w-full flex"
+                    >
+                      <Radio.Button value="all" className="flex-1 text-center">
+                        All Pages {totalPages ? `(${totalPages})` : ""}
+                      </Radio.Button>
+                      <Radio.Button value="select" className="flex-1 text-center">
+                        Select Pages
+                      </Radio.Button>
+                    </Radio.Group>
+                  </Form.Item>
+
+                  {pageSelectionMode === "select" && (
+                    <div className="mt-3 space-y-3">
+                      <Form.Item
+                        label="Custom Page Range / Numbers"
+                        help={pageRangeError || "Enter specific pages or range (e.g. 1, 2, 5 or 1-3)"}
+                        validateStatus={pageRangeError ? "error" : ""}
+                        className="!mb-0"
+                      >
+                        <Select
+                          mode="tags"
+                          tokenSeparators={[","]}
+                          placeholder="e.g. 1, 3, 5-8"
+                          value={customPageTags}
+                          onChange={handleTagChange}
+                          className="w-full custom-form-field"
+                          style={{ minHeight: "40px" }}
+                          dropdownStyle={{ display: "none" }}
+                          open={false}
+                          suffixIcon={null}
+                        />
+                      </Form.Item>
+                    </div>
                   )}
                 </div>
-              </Dragger>
-            </Form.Item>
-
-
-            {/* Page Selection Controls */}
-            {fileList.length > 0 && previewType === "application/pdf" && (
-              <div className="bg-gray-50/50 rounded-lg p-1 mb-4">
-                <Form.Item
-                  label="Pages to Process"
-                  required
-                  rules={[
-                    { required: true, message: "Please choose page selection" },
-                  ]}
-                  className="!mb-2 font-medium"
-                >
-                  <Radio.Group
-                    value={pageSelectionMode}
-                    onChange={(e) => setPageSelectionMode(e.target.value)}
-                    className="w-full flex"
-                  >
-                    <Radio.Button value="all" className="flex-1 text-center">
-                      All Pages {totalPages ? `(${totalPages})` : ""}
-                    </Radio.Button>
-                    <Radio.Button value="select" className="flex-1 text-center">
-                      Select Pages
-                    </Radio.Button>
-                  </Radio.Group>
-                </Form.Item>
-
-                {pageSelectionMode === "select" && (
-                  <div className="mt-3 space-y-3">
-                    <Form.Item
-                      label="Custom Page Range / Numbers"
-                      help="Enter specific pages or range (e.g. 1, 2, 5 or 1-3)"
-                      className="!mb-0"
-                    >
-                      <Select
-                        mode="tags"
-                        tokenSeparators={[","]}
-                        placeholder="e.g. 1, 3, 5-8"
-                        value={customPageTags}
-                        onChange={handleTagChange}
-                        className="w-full custom-form-field"
-                        style={{ minHeight: "40px" }}
-                        dropdownStyle={{ display: "none" }}
-                        open={false}
-                        suffixIcon={null}
-                      />
-                    </Form.Item>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <Form.Item
-              label="Document Name"
-              name="docName"
-              rules={[
-                { required: true, message: "Please enter a document name" },
-              ]}
-            >
-              <Input
-                placeholder="Enter Document Name"
-                className="h-[40px] rounded-md"
-              />
-            </Form.Item>
-
-            {/* Document Type */}
-            <Form.Item
-              label="Document Type"
-              name="docType"
-              rules={[
-                { required: true, message: "Please select a document type" },
-              ]}
-            >
-              {initialDocType ? (
-                <Select disabled className="custom-form-field">
-                  {docTypeOptions.map((opt) => (
-                    <Option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </Option>
-                  ))}
-                </Select>
-              ) : (
-                <Select
-                  placeholder="Select Document Type"
-                  allowClear
-                  className="custom-form-field"
-                >
-                  {docTypeOptions.map((opt) => (
-                    <Option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </Option>
-                  ))}
-                </Select>
               )}
-            </Form.Item>
 
+              <Form.Item
+                label="Document Name"
+                name="docName"
+                rules={[
+                  { required: true, message: "Please enter a document name" },
+                ]}
+                className="!mb-3"
+              >
+                <Input
+                  placeholder="Enter Document Name"
+                  className="h-[40px] rounded-md"
+                />
+              </Form.Item>
 
-            {/* Document Language */}
-            {/* <Form.Item
-            label="Document Language"
-            name="docLang"
-            rules={[{ required: true, message: "Please select a language" }]}
-          >
-            <Select
-              placeholder="Select Document Language"
-              allowClear
-              className="custom-form-field"
-            >
-              {LANGUAGES.map((lang) => (
-                <Option key={lang.value} value={lang.value}>
-                  {lang.label}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item> */}
+              {/* Document Type */}
+              <Form.Item
+                label="Document Type"
+                name="docType"
+                rules={[
+                  { required: true, message: "Please select a document type" },
+                ]}
+                className="!mb-3"
+              >
+                {initialDocType ? (
+                  <Select disabled className="custom-form-field">
+                    {docTypeOptions.map((opt) => (
+                      <Option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </Option>
+                    ))}
+                  </Select>
+                ) : (
+                  <Select
+                    placeholder="Select Document Type"
+                    allowClear
+                    className="custom-form-field"
+                  >
+                    {docTypeOptions.map((opt) => (
+                      <Option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+              </Form.Item>
 
-            {/* Document Format */}
-            {/* <Form.Item
-            label="Document Format"
-            name="docFormat"
-            rules={[
-              { required: true, message: "Please select a document format" },
-            ]}
-          >
-            <Select
-              placeholder="Select Document Format"
-              allowClear
-              className="custom-form-field"
-            >
-              <Option value="Typed">Typed</Option>
-              <Option value="Handwritten">Handwritten</Option>
-            </Select>
-          </Form.Item> */}
-
-            <div>
-              <p className="mb-[5px] text-gray-600 font-semibold">
-                <span className="font-bold">Note: </span>Accept both printed and
-                handwritten documents.
-              </p>
+              <div>
+                <p className="mb-[5px] text-gray-600 font-semibold">
+                  <span className="font-bold">Note: </span>Accept both printed and
+                  handwritten documents.
+                </p>
+              </div>
             </div>
 
-            {/* Submit Button */}
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                block
-                loading={loading}
-                disabled={loading}
-                style={{
-                  backgroundColor: "var(--color-primary-500)",
-                  borderRadius: "7px",
-                  height: "40px",
-                  color: "#fff",
-                  opacity: loading ? 0.5 : 1,
-                }}
-              >
-                {loading ? "Processing..." : "Upload"}
-              </Button>
-            </Form.Item>
+            {/* Sticky Submit Button */}
+            <div className="border-t border-gray-100 pt-3 bg-white z-10">
+              <Form.Item className="!mb-0">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  loading={loading}
+                  disabled={loading}
+                  style={{
+                    backgroundColor: "var(--color-primary-500)",
+                    borderRadius: "7px",
+                    height: "40px",
+                    color: "#fff",
+                    opacity: loading ? 0.5 : 1,
+                  }}
+                >
+                  {loading ? "Processing..." : "Upload"}
+                </Button>
+              </Form.Item>
+            </div>
           </Form>
         </div>
       )}

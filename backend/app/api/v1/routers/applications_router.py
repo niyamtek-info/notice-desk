@@ -49,6 +49,10 @@ def list_records(
     type_of_work: Optional[str] = None,  # ✅ ADD
     assigned_from: Optional[datetime] = Query(None),
     assigned_to: Optional[datetime] = Query(None),
+    # Optional pagination - left unset (None) by default so existing callers
+    # keep getting the full list; only applied when explicitly requested.
+    skip: Optional[int] = Query(None),
+    limit: Optional[int] = Query(None),
     audit_user: AuditUser = Depends(get_current_audit_user),
 ):
 
@@ -61,7 +65,9 @@ def list_records(
         location=location,
         type_of_work=type_of_work,
         assigned_from=assigned_from,
-        assigned_to=assigned_to
+        assigned_to=assigned_to,
+        skip=skip,
+        limit=limit,
     )
 
     return {

@@ -74,8 +74,14 @@ async def create_client(
 # GET ALL CLIENTS
 # ====================================================
 @router.get("/", response_model=List[ClientResponse])
-def get_all_clients(db: Session = Depends(get_db)):
-    return ClientService(db).get_all_clients()
+def get_all_clients(
+    # Optional pagination - left unset (None) by default so existing callers
+    # keep getting the full list; only applied when explicitly requested.
+    skip: Optional[int] = None,
+    limit: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    return ClientService(db).get_all_clients(skip=skip, limit=limit)
 
 
 # ====================================================
@@ -115,8 +121,11 @@ def create_aos(
 
 # GET ALL AOs
 @router.get("/aos", response_model=List[AOResponse])
-def get_all_aos(db: Session = Depends(get_db)):
-    return ClientService(db).get_all_aos()
+def get_all_aos(
+    client_name: Optional[str] = None,
+    db: Session = Depends(get_db),
+):
+    return ClientService(db).get_all_aos(client_name=client_name)
 
 
 # GET AOs BY CLIENT

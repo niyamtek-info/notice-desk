@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.db.repositories.translation_repo import TranslationRepository
 from app.db.repositories.extractor_repo import ExtractorRepository
+from app.db.versioning import live_filter
 from app.utils.gemini import call_gemini_ai, repair_json_with_llm
 
 class TranslationService:
@@ -39,7 +40,9 @@ class TranslationService:
 
         # 2. Get document object for DB relations
         from app.db.models.document_extraction import Document
-        doc_obj = self.db.query(Document).filter(Document.file_id == record_id).first()
+        doc_obj = self.db.query(Document).filter(
+            Document.file_id == record_id, *live_filter(Document)
+        ).first()
         if not doc_obj:
             raise ValueError(f"Document object for file_id {record_id} not found in DB.")
 
@@ -79,7 +82,9 @@ class TranslationService:
 
         from app.db.models.document_extraction import Document
 
-        doc_obj = self.db.query(Document).filter(Document.file_id == record_id).first()
+        doc_obj = self.db.query(Document).filter(
+            Document.file_id == record_id, *live_filter(Document)
+        ).first()
         if not doc_obj:
             raise ValueError(f"Document object for file_id {record_id} not found in DB.")
 
@@ -329,7 +334,9 @@ class TranslationService:
         """
         # 1. Get document object
         from app.db.models.document_extraction import Document
-        doc_obj = self.db.query(Document).filter(Document.file_id == record_id).first()
+        doc_obj = self.db.query(Document).filter(
+            Document.file_id == record_id, *live_filter(Document)
+        ).first()
         if not doc_obj:
             raise ValueError(f"Document object for file_id {record_id} not found in DB.")
 

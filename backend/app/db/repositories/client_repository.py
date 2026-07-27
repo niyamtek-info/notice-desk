@@ -19,11 +19,38 @@ class ClientRepository:
         self.db.refresh(client)
         return client
 
-    def get_all(self):
+    def get_all(self, skip: int | None = None, limit: int | None = None):
+        # NOTE: can't apply .offset()/.limit() directly to a query using
+        # joinedload() on a to-many relationship (all_aos) - that limits the
+        # joined ROWS, not the number of clients. Page the client IDs first,
+        # then eager-load AOs only for that page.
+        if skip is None and limit is None:
+            return (
+                self.db.query(Client)
+                .options(joinedload(Client.all_aos))
+                .filter(*live_filter(Client))
+                .order_by(Client.id.desc())
+                .all()
+            )
+
+        id_query = (
+            self.db.query(Client.id)
+            .filter(*live_filter(Client))
+            .order_by(Client.id.desc())
+        )
+        if skip is not None:
+            id_query = id_query.offset(skip)
+        if limit is not None:
+            id_query = id_query.limit(limit)
+
+        client_ids = [row[0] for row in id_query.all()]
+        if not client_ids:
+            return []
+
         return (
             self.db.query(Client)
             .options(joinedload(Client.all_aos))
-            .filter(*live_filter(Client))
+            .filter(Client.id.in_(client_ids))
             .order_by(Client.id.desc())
             .all()
         )
@@ -48,13 +75,19 @@ class ClientRepository:
     # AO METHODS
     # ====================================================
 
-    def get_all_aos(self):
-        return (
-            self.db.query(AOInformation)
-            .filter(*live_filter(AOInformation))
-            .order_by(AOInformation.id.desc())
-            .all()
-        )
+    def get_all_aos(self, client_name: str | None = None):
+        query = self.db.query(AOInformation).filter(*live_filter(AOInformation))
+
+        if client_name:
+            query = query.join(
+                Client,
+                Client.client_code == AOInformation.client_code,
+            ).filter(
+                Client.client_name.ilike(f"%{client_name}%"),
+                *live_filter(Client),
+            )
+
+        return query.order_by(AOInformation.id.desc()).all()
 
     def get_ao_by_id(self, ao_id: int):
         return (

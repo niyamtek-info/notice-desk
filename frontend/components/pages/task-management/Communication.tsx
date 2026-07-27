@@ -13,6 +13,7 @@ import {
   message,
   Dropdown,
   DatePicker,
+  notification,
 } from "antd";
 import type { MenuProps } from "antd";
 import {
@@ -97,6 +98,7 @@ interface CommunicationProps {
   token: string;
   bankCode: string;
   banks: any;
+  banksLoading?: boolean;
   initialData: any;
 }
 
@@ -123,6 +125,7 @@ export default function Communication({
   token,
   bankCode,
   banks,
+  banksLoading,
   initialData
 }: CommunicationProps) {
   const dispatch = useDispatch();
@@ -151,6 +154,7 @@ export default function Communication({
     aoCode: false
   });
   const [messageApi, contextHolder] = message.useMessage();
+  const [notificationApi, notificationContextHolder] = notification.useNotification();
   const editorRef = useRef<any>(null);
   const htmlEditorRef = useRef<HTMLIFrameElement>(null);
   const { Option } = Select;
@@ -162,26 +166,54 @@ export default function Communication({
     }
   };
 
+  const [fetchedAos, setFetchedAos] = useState<any[]>([]);
+
   const handleFetchTemplate = async () => {
+    const code = bankCode || selectedBank;
+    if (!code || code === 'all') return;
     try {
-      let response: any = await BankApi.getSingleClientTemplate(bankCode || selectedBank);
-      setTemplatesType(response?.templates);
-    } catch (error) { }
+      setClientSelectLoading((pre: any) => ({ ...pre, template: true }));
+      let response: any = await BankApi.getSingleClientTemplate(code);
+      setTemplatesType(response?.templates || []);
+    } catch (error) { 
+    } finally {
+      setClientSelectLoading((pre: any) => ({ ...pre, template: false }));
+    }
   }
 
+  const handleFetchAOs = async () => {
+    const code = bankCode || selectedBank;
+    if (!code || code === 'all') return;
+    try {
+      setClientSelectLoading((pre: any) => ({ ...pre, aoCode: true }));
+      let response: any = await BankApi.getBankCodeList(code);
+      setFetchedAos(response?.aos || []);
+    } catch (error) {
+    } finally {
+      setClientSelectLoading((pre: any) => ({ ...pre, aoCode: false }));
+    }
+  };
+
   const aoData = useMemo(() => {
-    let result = banks?.find((res: any) => res?.client_code == bankCode)?.aos || []
+    if (fetchedAos && fetchedAos.length > 0) return fetchedAos;
+    let result = banks?.find((res: any) => res?.client_code == (bankCode || selectedBank))?.aos || []
     return result
-  }, [banks, bankCode])
+  }, [banks, bankCode, selectedBank, fetchedAos])
 
 
-  // Handle dropdown open change - show loader for 2 seconds when dropdown opens
+  // Handle dropdown open change
   const handleDropdownOpenChange = (open: boolean, type: string) => {
     if (open) {
-      setClientSelectLoading((pre: any) => ({ ...pre, [type]: true }));
-      setTimeout(() => {
-        setClientSelectLoading((pre: any) => ({ ...pre, [type]: false }));
-      }, 500);
+      if (type === 'aoCode') {
+        handleFetchAOs();
+      } else if (type === 'template') {
+        handleFetchTemplate();
+      } else {
+        setClientSelectLoading((pre: any) => ({ ...pre, [type]: true }));
+        setTimeout(() => {
+          setClientSelectLoading((pre: any) => ({ ...pre, [type]: false }));
+        }, 500);
+      }
     }
   };
 
@@ -194,7 +226,6 @@ export default function Communication({
 
   useEffect(() => {
     setMounted(true); // ✅ only render Editor after hydration
-    handleFetchTemplate()
   }, []);
 
   // 🔹 helper for rendering images & tables in Draft.js
@@ -397,6 +428,8 @@ export default function Communication({
     dispatch(setStructuredComponents(structuredComponents));
   };
 
+  console.log(editorState, 'frfeqwee2342')
+
   // 🔹 fetch real template from backend
   const fetchMailTemplate = async () => {
 
@@ -437,8 +470,32 @@ export default function Communication({
         },
       );
 
-      if (!res.ok) throw new Error("Failed to fetch template");
       const data = await res.json();
+      if (!res.ok) {
+        const detailStr = data.detail || "Failed to generate mail";
+        if (detailStr.includes("Missing required fields:")) {
+          const [mainStr, fieldsStr] = detailStr.split("Missing required fields:");
+          const fields = fieldsStr.split(",").map((f: string) => f.trim()).filter(Boolean);
+          
+          notificationApi.error({
+            message: "Action Required",
+            placement: "top",
+            description: (
+              <div>
+                <div style={{ marginBottom: 8 }}>{mainStr.trim()} Missing required fields:</div>
+                <ul style={{ paddingLeft: 20, margin: 0, listStyleType: "disc" }}>
+                  {fields.map((f: string, i: number) => <li key={i}>{f}</li>)}
+                </ul>
+              </div>
+            ),
+            duration: 0,
+          });
+        } else {
+          messageApi.error(detailStr);
+        }
+        return;
+      }
+
 
       // ✅ load into editor + subject
       setTemplateInEditor(data);
@@ -447,10 +504,11 @@ export default function Communication({
         subject: data.subject,
         to: email,
       });
-    } catch (err) {
-      console.error("Error fetching mail template:", err);
-      messageApi.error("Could not load mail template");
-    } finally {
+    } catch (error) {
+      console.error("Error fetching mail template:", error);
+      messageApi.error(String(error));
+    }
+    finally {
       setLoading(false);
     }
   };
@@ -831,13 +889,18 @@ export default function Communication({
     sync();
   };
 
-
   return (
     <>
       {contextHolder}
+      {notificationContextHolder}
 
       <div className="text-gray-800 mt-0  shadow-md rounded-lg bg-white">
-        <Form form={form} layout="vertical" onFinish={() => fetchMailTemplate()}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={() => fetchMailTemplate()}
+          scrollToFirstError={{ behavior: "smooth", block: "nearest" }}
+        >
           <div className="grid grid-cols-12 gap-6">
             {/* Left side */}
             <div className="col-span-12 md:col-span-3 flex flex-col justify-between border rounded-lg border-gray-200 bg-[#f5f5f5] md:sticky md:top-5 md:h-[80vh] md:max-h-[80vh]">
@@ -850,7 +913,7 @@ export default function Communication({
                     { required: true, message: "Please enter Application ID" },
                   ]}
                 >
-                  <Input readOnly placeholder="Enter Application ID" />
+                  <Input readOnly className="cursor-not-allowed" placeholder="Enter Application ID" />
                 </Form.Item>
 
                 <Form.Item
@@ -907,23 +970,25 @@ export default function Communication({
 
                 <Form.Item
                   name="aoCode"
-                  label="AO Code"
-                  rules={[{ required: true, message: "Please select a AO Code" }]}
+                  label="Select AO"
+                  rules={[{ required: true, message: "Please select an AO" }]}
                 >
                   <Select
-                    placeholder="Select AO Code"
+                    placeholder="Select AO"
                     className="h-[40px] custom-select-height"
                     showSearch
                     allowClear
-                    onOpenChange={(open) => handleDropdownOpenChange(open, "aoCode")}
-                    popupRender={(menu) => (
+                    onOpenChange={(open) => handleDropdownOpenChange(open, 'aoCode')}
+                    notFoundContent={
                       clientSelectLoading?.aoCode ? (
                         <div className="p-4 flex justify-center items-center">
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                           <span className="ml-2 text-gray-600">Loading...</span>
                         </div>
-                      ) : menu
-                    )}
+                      ) : (
+                        "No data"
+                      )
+                    }
                   >
                     {aoData?.map((ao: any, index: number) => (
                       <Option key={ao?.ao_code} value={ao?.ao_code}>
@@ -973,15 +1038,7 @@ export default function Communication({
                     <label className="font-semibold text-gray-700">
                       Subject / Title
                     </label>
-                    <button
-                      type="button"
-                      onClick={handleSendEmail}
-                      disabled={signatureHtml == "" || emailLoading}
-                      className={`${(signatureHtml == "" || emailLoading) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors`}
-                    >
-                      {emailLoading ? <FaSpinner className="animate-spin" /> : <FaPaperPlane />}
-                      <span>{emailLoading ? "Sending..." : "Send Email"}</span>
-                    </button>
+
                   </div>
                   <Form.Item name="subject" noStyle>
                     <Input
@@ -1007,8 +1064,8 @@ export default function Communication({
                         <button
                           type="button"
                           onClick={handleDownloadPDF}
-                          disabled={signatureHtml == "" || pdfLoading}
-                          className={`${(signatureHtml == "" || pdfLoading) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors`}
+                          disabled={htmlPreview == "" || pdfLoading}
+                          className={`${(htmlPreview == "" || pdfLoading) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors`}
                         >
                           {pdfLoading ? <FaSpinner className="animate-spin" /> : <FaFilePdf />}
                           <span>{pdfLoading ? "Downloading..." : "Download PDF"}</span>
@@ -1017,8 +1074,8 @@ export default function Communication({
                         <button
                           type="button"
                           onClick={handleDownloadWord}
-                          disabled={signatureHtml == "" || wordLoading}
-                          className={`${(signatureHtml == "" || wordLoading) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors`}
+                          disabled={htmlPreview == "" || wordLoading}
+                          className={`${(htmlPreview == "" || wordLoading) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors`}
                         >
                           {wordLoading ? <FaSpinner className="animate-spin" /> : <FaFileWord />}
                           <span>{wordLoading ? "Downloading..." : "Download DOCX"}</span>

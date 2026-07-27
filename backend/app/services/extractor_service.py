@@ -24,7 +24,7 @@ from app.utils.ocr_utils import extract_text_with_docai
 from app.utils.prompt_utils import load_prompt_and_schema, load_prompt
 from app.services.translation_service import TranslationService
 
-from app.gateways.s3_gateway import S3Gateway
+from app.gateways.storage_gateway import get_storage_gateway, resolve_any_reference_url
 from app.core.settings import settings
 from app.core.progress_store import set_progress, delete_progress
 
@@ -75,7 +75,7 @@ class ExtractorService:
     def __init__(self, db: Any):
         self.db = db
         self.repo = ExtractorRepository(db)
-        self.s3 = S3Gateway()
+        self.s3 = get_storage_gateway()
 
     _INVALID_DOCUMENT_PROMPT_RULES = """
         CRITICAL INVALID-DOCUMENT CHECK:
@@ -1251,80 +1251,29 @@ class ExtractorService:
 
         s3_url = record.get("s3_original")
         if s3_url:
-            key = s3_url
-            # Clean up key if it's a full URL or URI
-            if s3_url.startswith("gs://"):
-                # Format: gs://bucket/key — strip the bucket prefix
-                key = s3_url.split(f"gs://{settings.GCS_BUCKET_NAME}/", 1)[-1]
-            elif s3_url.startswith("s3://"):
-                # Format: s3://bucket/key
-                parts = s3_url.replace("s3://", "").split("/", 1)
-                if len(parts) == 2:
-                    _, key = parts
-            elif s3_url.startswith("http"):
-                # Format: https://bucket.s3.region.amazonaws.com/key or https://custom-domain/key
-                # We assume the last part of the path is the key relative to the bucket functionality we want.
-                # However, a robust way for standard S3 URLs: split by bucket name or just take path after domain.
-                from urllib.parse import urlparse, unquote
-                parsed = urlparse(s3_url)
-                # parsed.path will be /key for virtual-hosted style (bucket.s3...)
-                # or /bucket/key for path-style (s3.region.../bucket/key)
-                
-                # Simple heuristic: remove leading slash
-                candidate_key = parsed.path.lstrip("/")
-                
-                # If path-style (starts with bucket name), strip it? 
-                # Our settings.S3_BUCKET_NAME is available.
-                if candidate_key.startswith(f"{settings.S3_BUCKET_NAME}/"):
-                    candidate_key = candidate_key.replace(f"{settings.S3_BUCKET_NAME}/", "", 1)
-                
-                key = unquote(candidate_key)
-
-            # Generate Pre-signed URL for processed document
+            # resolve_any_reference_url figures out which backend a stored
+            # reference (gs:// / s3:// URI, https URL, local /files URL, or
+            # a bare key) actually belongs to and presigns it from there -
+            # so documents uploaded under a previous STORAGE_PROVIDER stay
+            # viewable after switching, as long as that backend is still
+            # configured.
             try:
-                # Ensure key doesn't have leading slash (boto3 handles it but cleaner without)
-                key = key.lstrip("/")
-                presigned_url = self.s3.generate_presigned_url(key)
-                record["document_url"] = presigned_url
+                url = resolve_any_reference_url(s3_url)
+                if url:
+                    record["document_url"] = url
                 # We typically keep s3_original as the source of truth
             except Exception as e:
-                print(f"Error generating pre-signed URL for {key}: {e}")
-                # Fallback to static URL if GCS_BASE_URL is configured
-                if settings.S3_BASE_URL:
-                    record["document_url"] = f"{settings.S3_BASE_URL}/{key}"
-                else:
-                    # Last-resort fallback: keep the raw gs:// URI so the frontend's
-                    # normalizeDocumentUrl can route it through /api/v1/files/serve
-                    record["document_url"] = s3_url
+                print(f"Error generating pre-signed URL for {s3_url}: {e}")
 
         # Generate Pre-signed URL for original PDF (complete uploaded file)
         original_pdf_url = record.get("original_pdf_path")
         if original_pdf_url:
-            orig_key = original_pdf_url
-            if original_pdf_url.startswith("gs://"):
-                orig_key = original_pdf_url.split(f"gs://{settings.GCS_BUCKET_NAME}/", 1)[-1]
-            elif original_pdf_url.startswith("s3://"):
-                parts = original_pdf_url.replace("s3://", "").split("/", 1)
-                if len(parts) == 2:
-                    _, orig_key = parts
-            elif original_pdf_url.startswith("http"):
-                from urllib.parse import urlparse, unquote
-                parsed = urlparse(original_pdf_url)
-                orig_key = parsed.path.lstrip("/")
-                if orig_key.startswith(f"{settings.S3_BUCKET_NAME}/"):
-                    orig_key = orig_key.replace(f"{settings.S3_BUCKET_NAME}/", "", 1)
-                    orig_key = unquote(orig_key)
             try:
-                orig_key = orig_key.lstrip("/")
-                record["original_document_url"] = self.s3.generate_presigned_url(orig_key)
+                url = resolve_any_reference_url(original_pdf_url)
+                if url:
+                    record["original_document_url"] = url
             except Exception as e:
                 print(f"Error generating pre-signed URL for original PDF: {e}")
-                if settings.S3_BASE_URL:
-                    record["original_document_url"] = f"{settings.S3_BASE_URL}/{orig_key}"
-                else:
-                    # Last-resort fallback: keep the raw gs:// URI so the frontend's
-                    # normalizeDocumentUrl can route it through /api/v1/files/serve
-                    record["original_document_url"] = original_pdf_url
         elif record.get("document_url"):
             # No separate original PDF stored — reuse the extraction document URL
             # so the "Original Doc" tab shows the uploaded file instead of being blank.

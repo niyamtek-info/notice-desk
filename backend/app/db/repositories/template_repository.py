@@ -128,7 +128,7 @@ class MasterTemplateRepository:
     # ====================================================
     # GET ALL
     # ====================================================
-    def get_all_active_templates(self):
+    def get_all_active_templates(self, skip: int | None = None, limit: int | None = None):
         latest = (
             self.db.query(
                 MasterTemplate.template_code,
@@ -141,7 +141,7 @@ class MasterTemplateRepository:
             .group_by(MasterTemplate.template_code)
             .subquery()
         )
-        return (
+        query = (
             self.db.query(MasterTemplate)
             .join(
                 latest,
@@ -154,8 +154,12 @@ class MasterTemplateRepository:
                 MasterTemplate.is_deleted == False,
                 MasterTemplate.is_active == True,
             )
-            .all()
         )
+        if skip is not None:
+            query = query.offset(skip)
+        if limit is not None:
+            query = query.limit(limit)
+        return query.all()
 
     # ====================================================
     # FILTER CLIENT

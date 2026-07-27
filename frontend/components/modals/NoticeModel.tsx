@@ -10,10 +10,11 @@ interface NoticeModelProps {
   token: string;
   bankCode: string;
   banks: string;
+  banksLoading?: boolean;
   initialData?: any;
 }
 
-export default function NoticeModel({ visible, onCancel, applicationId, token, bankCode, banks, initialData }: NoticeModelProps) {
+export default function NoticeModel({ visible, onCancel, applicationId, token, bankCode, banks, banksLoading, initialData }: NoticeModelProps) {
 
   const [type, setType] = useState<string>("Notice List")
 
@@ -44,7 +45,7 @@ export default function NoticeModel({ visible, onCancel, applicationId, token, b
         </div>
 
         <div className="overflow-y-auto md:overflow-hidden md:h-[82vh]" style={{ maxHeight: '90vh' }}>
-          <Communication initialApplicationId={applicationId} token={token} bankCode={bankCode} banks={banks} initialData={initialData} />
+          <Communication initialApplicationId={applicationId} token={token} bankCode={bankCode} banks={banks} banksLoading={banksLoading} initialData={initialData} />
         </div>
 
       </Modal>

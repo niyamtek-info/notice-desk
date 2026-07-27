@@ -133,6 +133,7 @@ def create_app() -> FastAPI:
 
     api_router.include_router(
         files_router,
+        prefix="/files",
         tags=["Files"]
     )
 

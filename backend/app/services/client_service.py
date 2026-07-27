@@ -10,7 +10,7 @@ from app.api.v1.schemas.client_schema import AOResponse, ClientResponse
 from app.db.repositories.client_repository import ClientRepository
 from app.api.v1.dependencies.auth import AuditUser
 from app.db.versioning import mark_created, close_version, clone_version, OPEN_END_DATE
-from app.gateways.s3_gateway import S3Gateway
+from app.gateways.storage_gateway import get_storage_gateway
 
 
 class ClientService:
@@ -18,7 +18,7 @@ class ClientService:
     def __init__(self, db: Session):
         self.db = db
         self.repo = ClientRepository(db)
-        self.s3 = S3Gateway()
+        self.s3 = get_storage_gateway()
 
     # ====================================================
     # COMMON UTILS
@@ -117,15 +117,17 @@ class ClientService:
 
         return self._attach_client_base64(client)
 
-    def get_all_clients(self):
-        clients = self.repo.get_all()
+    def get_all_clients(self, skip: Optional[int] = None, limit: Optional[int] = None):
+        clients = self.repo.get_all(skip=skip, limit=limit)
 
         result = []
 
         for client in clients:
             client = self._attach_client_base64(client)
 
-            aos = self.repo.get_aos_by_client_code(client.client_code)
+            # client.all_aos is already eager-loaded via joinedload() in
+            # repo.get_all() - reuse it instead of issuing a per-client query.
+            aos = client.all_aos
 
             ao_list = []
             for ao in aos:
@@ -402,8 +404,8 @@ class ClientService:
 
         return {"message": "AO deleted"}
 
-    def get_all_aos(self):
-        aos = self.repo.get_all_aos()
+    def get_all_aos(self, client_name: Optional[str] = None):
+        aos = self.repo.get_all_aos(client_name=client_name)
         for ao in aos:
             self._attach_ao_base64(ao)
         return aos

@@ -17,7 +17,7 @@ from app.db.models.safari_notice import SarfaesiMaster
 from app.db.models.application import Application
 from app.db.versioning import live_filter
 from app.core.settings import settings
-from app.gateways.s3_gateway import S3Gateway
+from app.gateways.storage_gateway import get_storage_gateway
 from app.api.v1.dependencies.auth import AuditUser
 from app.services.pdf_service import PDFService
 from app.services.placeholder_mapping_service import get_placeholder_mapping_lookup
@@ -69,7 +69,7 @@ class CommunicationService:
     def __init__(self, db: Session):
         self.db = db
         self.repo = CommunicationRepository(db)
-        self.s3 = S3Gateway()
+        self.s3 = get_storage_gateway()
         self.template_path = os.path.join(
             os.path.dirname(__file__),
             "..",

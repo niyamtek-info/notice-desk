@@ -560,9 +560,10 @@ function hasTable(html: string): boolean {
 // ─── A4 preview constants (must match PREVIEW_CSS exactly) ───────────────────
 const PREVIEW_PAGE_WIDTH = 794;
 const PREVIEW_PAGE_HEIGHT = 1123;
-const PREVIEW_PAD_V = 48;
+const PREVIEW_PAD_TOP = 156;
+const PREVIEW_PAD_BOT = 156;
 const PREVIEW_PAD_H = 48;
-const PREVIEW_USABLE_HEIGHT = PREVIEW_PAGE_HEIGHT - PREVIEW_PAD_V * 2;
+const PREVIEW_USABLE_HEIGHT = PREVIEW_PAGE_HEIGHT - PREVIEW_PAD_TOP - PREVIEW_PAD_BOT;
 
 // ─── Split HTML into A4 pages ─────────────────────────────────────────────────
 
@@ -572,7 +573,7 @@ function splitHtmlIntoPages(html: string): string[] {
   if (!html || html === "<p></p>") return [];
 
   const USABLE_H = PREVIEW_USABLE_HEIGHT;
-  const W = PREVIEW_PAGE_WIDTH - PREVIEW_PAD_H * 2;
+  const W = 694;
 
   const wrap = document.createElement("div");
   wrap.style.cssText = [
@@ -585,16 +586,18 @@ function splitHtmlIntoPages(html: string): string[] {
 
   wrap.innerHTML = `
     <style>
-      table { border-collapse: collapse; width: 698px !important; max-width: 698px !important; min-width: 698px !important; margin: 6px 0; table-layout: fixed !important; box-sizing: border-box !important; }
+      table { border-collapse: collapse; width: 694px !important; max-width: 694px !important; min-width: 694px !important; margin: 6px 0; table-layout: fixed !important; box-sizing: border-box !important; }
       table table { width: 100% !important; max-width: 100% !important; min-width: 0 !important; margin: 0 !important; }
       th, td { border: 1px solid #000000; padding: 6px 10px; font-weight: normal; vertical-align: top; box-sizing: border-box !important; }
       table p { margin: 0; }
-      p { margin: 0 0 5px; }
-      h1 { font-size: 13pt; margin: 8px 0 4px; font-weight: bold; }
-      h2 { font-size: 11pt; margin: 7px 0 3px; font-weight: bold; }
-      h3 { font-size: 10pt; margin: 6px 0 2px; font-weight: bold; }
-      ul, ol { padding-left: 16px; margin: 4px 0; }
-      li { margin-bottom: 2px; }
+      p { margin: 0 0 8px; }
+      p:empty:before { content: "\\00a0"; }
+      td:empty:before, th:empty:before { content: "\\00a0"; }
+      h1 { font-size: 20pt; margin: 16px 0 8px; font-weight: bold; }
+      h2 { font-size: 16pt; margin: 14px 0 6px; font-weight: bold; }
+      h3 { font-size: 13pt; margin: 12px 0 4px; font-weight: bold; }
+      ul, ol { padding-left: 24px; margin: 4px 0; }
+      li { margin-bottom: 4px; }
     </style>
     ${html}
   `;
@@ -924,6 +927,20 @@ const Divider = () => (
 
 // ─── Preview CSS ──────────────────────────────────────────────────────────────
 const PREVIEW_CSS = `
+  .pc {
+    font-family: 'Times New Roman', serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #111;
+  }
+  .pc p:empty:before { content: "\\00a0"; }
+  .pc td:empty:before, .pc th:empty:before { content: "\\00a0"; }
+
+  .preview-page {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='1123'><line x1='48' y1='139' x2='746' y2='139' stroke='%23cbd5e1' stroke-dasharray='4,4' stroke-width='1'/><line x1='48' y1='983' x2='746' y2='983' stroke='%23cbd5e1' stroke-dasharray='4,4' stroke-width='1'/><text x='48' y='85' fill='%23cbd5e1' font-family='sans-serif' font-size='12' font-weight='500' letter-spacing='1.5'>HEADER</text><text x='48' y='1035' fill='%23cbd5e1' font-family='sans-serif' font-size='12' font-weight='500' letter-spacing='1.5'>FOOTER</text></svg>") !important;
+    background-size: 100% 100%;
+  }
+
   .pc table { border-collapse: collapse; width: 694px !important; max-width: 694px !important; min-width: 694px !important; margin: 6px 0; table-layout: fixed !important; box-sizing: border-box !important; }
   .pc table table { width: 100% !important; max-width: 100% !important; min-width: 0 !important; margin: 0 !important; }
   .pc th, .pc td {
@@ -937,12 +954,12 @@ const PREVIEW_CSS = `
     box-sizing: border-box !important;
   }
   .pc table p { margin: 0; }
-  .pc p { margin: 0 0 5px; }
-  .pc h1 { font-size: 13pt; margin: 8px 0 4px; font-weight: bold; }
-  .pc h2 { font-size: 11pt; margin: 7px 0 3px; font-weight: bold; }
-  .pc h3 { font-size: 10pt; margin: 6px 0 2px; font-weight: bold; }
-  .pc ul, .pc ol { padding-left: 16px; margin: 4px 0; }
-  .pc li { margin-bottom: 2px; }
+  .pc p { margin: 0 0 8px; }
+  .pc h1 { font-size: 20pt; margin: 16px 0 8px; font-weight: bold; }
+  .pc h2 { font-size: 16pt; margin: 14px 0 6px; font-weight: bold; }
+  .pc h3 { font-size: 13pt; margin: 12px 0 4px; font-weight: bold; }
+  .pc ul, .pc ol { padding-left: 24px; margin: 4px 0; }
+  .pc li { margin-bottom: 4px; }
   .pc hr { border: none; border-top: 1px solid #ccc; margin: 8px 0; }
   .pc blockquote { border-left: 2px solid #2b579a; padding-left: 8px; color: #444; font-style: italic; margin: 4px 0; }
   .pc img { max-width: 100%; height: auto; margin: 4px 0; }
@@ -992,6 +1009,7 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
   const [editorHtml, setEditorHtml] = useState("");
   const [tableInserted, setTableInserted] = useState(false);
   const [previewPages, setPreviewPages] = useState<string[]>([]);
+  const [previewScale, setPreviewScale] = useState(0.45);
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -1118,7 +1136,7 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
 
       Highlight.configure({ multicolor: true }),
 
-      Table.extend({
+      TableCell.extend({
         addAttributes() {
           return {
             ...(this.parent?.() || {}),
@@ -1132,8 +1150,7 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
             },
           }
         },
-      }).configure({ resizable: true, lastColumnResizable: false }),
-      TableRow,
+      }),
 
       TableHeader.extend({
         addAttributes() {
@@ -1151,7 +1168,7 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
         },
       }),
 
-      TableCell.extend({
+      TableRow.extend({
         addAttributes() {
           return {
             ...(this.parent?.() || {}),
@@ -1166,6 +1183,22 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
           }
         },
       }),
+
+      Table.extend({
+        addAttributes() {
+          return {
+            ...(this.parent?.() || {}),
+            style: {
+              default: null,
+              parseHTML: (element) => element.getAttribute('style'),
+              renderHTML: (attributes) => {
+                if (!attributes.style) return {}
+                return { style: attributes.style }
+              },
+            },
+          }
+        },
+      }).configure({ resizable: true, lastColumnResizable: false }),
 
       Image.extend({
         addAttributes() {
@@ -1244,7 +1277,6 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
 
   });
 
-
   // Load template content or draft on mount/update
   useEffect(() => {
     if (!editor) return;
@@ -1252,9 +1284,9 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
     const loadContent = async () => {
       setIsLoading(true);
 
+      const savedDraft = localStorage.getItem(LS_KEY);
+
       if (editTempalteData) {
-        // First check if there is already a notice_editor_draft in localStorage
-        const savedDraft = localStorage.getItem(LS_KEY);
         if (savedDraft) {
           editor.commands.setContent(savedDraft, {
             emitUpdate: false,
@@ -1268,9 +1300,6 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
 
         if (editTempalteData.html_presigned_url) {
           try {
-            // Always fetch via proxy — never fall back to a direct GCS URL fetch.
-            // A direct fetch of a private-bucket URL returns an XML AccessDeniedException
-            // body that would be treated as valid HTML template content.
             const proxyUrl = `/api/proxy?url=${encodeURIComponent(editTempalteData.html_presigned_url)}`;
             const response = await fetch(proxyUrl);
             if (!response.ok) {
@@ -1280,12 +1309,11 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
             }
 
             let htmlData = await response.text();
-            // Fix escaped characters
             let cleaned = htmlData
               ?.replace(/\\r\\n/g, "")
               ?.replace(/\\"/g, '"');
 
-            // Extract ONLY body content
+            // Extract body content
             const match = cleaned.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
             const bodyContent = (match && match[1]) ? match[1] : "";
 
@@ -1302,14 +1330,13 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
         }
       } else {
         // Create Notice flow: load draft from localStorage
-        const saved = localStorage.getItem(LS_KEY);
-        if (saved) {
-          editor.commands.setContent(saved, {
+        if (savedDraft) {
+          editor.commands.setContent(savedDraft, {
             emitUpdate: false,
             parseOptions: { preserveWhitespace: 'full' },
           });
-          setEditorHtml(saved);
-          setTableInserted(hasTable(saved));
+          setEditorHtml(savedDraft);
+          setTableInserted(hasTable(savedDraft));
         } else {
           editor.commands.setContent("", {
             emitUpdate: false,
@@ -1346,9 +1373,64 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
     const id = requestAnimationFrame(() => {
       const pages = splitHtmlIntoPages(editorHtml);
       setPreviewPages(pages);
+
+      // ─── Dynamic Editor Page Breaks ─────────────────────────────────────────
+      const editorDom = editor?.view?.dom as HTMLElement;
+      if (editorDom) {
+        const children = Array.from(editorDom.children) as HTMLElement[];
+        if (children.length > 0) {
+          // 1. Clear previous margin-tops so we can measure the natural layout
+          children.forEach(child => {
+            child.style.marginTop = "";
+          });
+
+          const PAGE_HEIGHT = 1123;
+          const VERTICAL_PADDING_TOP = 156;
+          const VERTICAL_PADDING_BOTTOM = 156;
+          const PAGE_CONTENT_LIMIT = PAGE_HEIGHT - VERTICAL_PADDING_BOTTOM; // 967px
+          const PAGE_USABLE_HEIGHT = PAGE_CONTENT_LIMIT - VERTICAL_PADDING_TOP; // 811px
+          const domRect = editorDom.getBoundingClientRect();
+
+          // 2. Measure natural tops and heights in a single pass to avoid layout thrashing
+          const items = children.map(child => {
+            const rect = child.getBoundingClientRect();
+            return {
+              el: child,
+              naturalTop: rect.top - domRect.top,
+              height: rect.height
+            };
+          });
+
+          // 3. Compute and apply margin-tops mathematically
+          let accumulatedShift = 0;
+          items.forEach(item => {
+            const actualTop = item.naturalTop + accumulatedShift;
+            const actualBottom = actualTop + item.height;
+
+            // Determine which page the element starts on
+            const pageIndex = Math.floor(Math.max(0, actualTop - VERTICAL_PADDING_TOP) / PAGE_HEIGHT);
+            const pageStart = pageIndex * PAGE_HEIGHT;
+            const pageLimit = pageStart + PAGE_CONTENT_LIMIT;
+
+            if (actualBottom > pageLimit) {
+              // Element overflows the current page
+              if (item.height < PAGE_USABLE_HEIGHT) {
+                // Fits on the next page, calculate push distance to the next page's content start
+                const nextPageContentStart = (pageIndex + 1) * PAGE_HEIGHT + VERTICAL_PADDING_TOP;
+                const pushDistance = nextPageContentStart - actualTop;
+                item.el.style.marginTop = `${pushDistance}px`;
+                accumulatedShift += pushDistance;
+              } else {
+                // Element is taller than a page (e.g. large table), let it split naturally
+                // No accumulated shift is applied, since it spans across boundaries
+              }
+            }
+          });
+        }
+      }
     });
     return () => cancelAnimationFrame(id);
-  }, [editorHtml]);
+  }, [editorHtml, editor]);
 
   // ─── Table row vertical drag-to-resize ──────────────────────────────────────
   useEffect(() => {
@@ -1417,7 +1499,25 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
 
     /** Get the max height a row can grow before overflowing the A4 page container */
     const getMaxRowHeight = (row: HTMLTableRowElement): number => {
-      return 1000; // Allow rows to grow up to 1000px, safely below the A4 page height limit
+      try {
+        const table = row.closest("table");
+        if (!table) return 811;
+
+        // Measure all other rows in this table
+        const allRows = Array.from(table.querySelectorAll("tr"));
+        let otherRowsHeight = 0;
+        allRows.forEach(r => {
+          if (r !== row) {
+            otherRowsHeight += (r as HTMLElement).offsetHeight || r.getBoundingClientRect().height || 0;
+          }
+        });
+
+        const PAGE_USABLE_HEIGHT = 811; // 1123 - 156 - 156
+        const maxH = PAGE_USABLE_HEIGHT - otherRowsHeight;
+        return Math.max(30, maxH);
+      } catch (_) {
+        return 811;
+      }
     };
 
     // ── mousemove (hover detection) ───────────────────────────────────────────
@@ -1623,6 +1723,26 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
       return;
     }
 
+    const headerHtml = values.headerImageUrl
+      ? `<header>
+        <p>
+        <img src="${values.headerImageUrl}" style="width:809px; height:119px" />
+        </p>
+        </header>`
+      : `<header>
+        <div style="height:119px"></div>
+        </header>`;
+
+    const footerHtml = values.footerImageUrl
+      ? `<footer>
+      <p style="margin:0 0 6px 0; white-space:pre-wrap; text-align:center">
+        <img src="${values.footerImageUrl}" style="width:69px; height:57px" />
+      </p>  
+      </footer>`
+      : `<footer>
+      <div style="height:57px"></div>
+      </footer>`;
+
     const html = `<!DOCTYPE html>
       <html lang="en">
       <head>
@@ -1681,18 +1801,10 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
           }
         </style>
       </head>
-        <header>
-        <p>
-        <img src=${values.headerImageUrl} alt="Header" style="width:809px; height:119px" />
-        </p>
-        </header>
+      ${headerHtml}
       <body style="padding:0px">${currentHtml}</body> 
-      <footer>
-      <p style="margin:0 0 6px 0; white-space:pre-wrap; text-align:center">
-        <img src=${values?.footerImageUrl} alt="Footer" style="width:69px; height:57px" />
-      </p>  
-      </footer>
-          </html>`;
+      ${footerHtml}
+      </html>`;
 
     // ✅ Create FormData
     const formData = new FormData();
@@ -1714,7 +1826,9 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
         setShowCreateModal(false);
         setEditTempalteData("")
         messageApi.success("Notice template Updated successfully.");
-      } catch (error) { }
+      } catch (error: any) {
+        messageApi.error(error?.response?.data?.detail || error?.message || "Failed to update notice template.");
+      }
 
     } else {
       try {
@@ -1725,11 +1839,13 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
         setActiveTab("Notice details")
         setShowCreateModal(false);
         messageApi.success("Notice template created successfully.");
-      } catch (error) { }
+      } catch (error: any) {
+        messageApi.error(error?.response?.data?.detail || error?.message || "Failed to create notice template.");
+      }
 
     }
 
-  }, [editor]);
+  }, [editor, trigger, setActiveTab, setTrigger, editTempalteData, setEditTempalteData, messageApi, trigger, setTrigger, editTempalteData, setEditTempalteData, setActiveTab, messageApi]);
 
   // Save Notice → download as PDF or Word
   const handleSaveNotice = useCallback(
@@ -1806,6 +1922,7 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
   const insertTable = (rows: number, cols: number) => {
     editor?.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
     setShowTableMenu(false);
+    setHoveredTableGrid(null);
   };
 
   // Insert image
@@ -2157,11 +2274,10 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
         height: "100vh",
         background: "#f0f2f5",
       }}>
-        <Spin
-          size="large"
-          tip="Loading editor..."
-          style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-        />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+          <Spin size="large" />
+          <div style={{ color: "#1890ff", fontSize: 14, fontWeight: 500 }}>Loading editor...</div>
+        </div>
       </div>
     );
   }
@@ -2378,24 +2494,6 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
           <Divider />
 
           {/* Font family */}
-          {/* <select value={fontFamily} disabled={!tb}
-            onChange={(e) => handleFontFamily(e.target.value)}
-            style={{
-              height: 26, fontSize: 12, border: "1px solid #d1d5db", borderRadius: 4,
-              padding: "0 6px", background: "#fff", width: 140,
-              cursor: tb ? "pointer" : "not-allowed", opacity: tb ? 1 : 0.38,
-              fontFamily: fontFamily,
-            }}>
-            {FONT_GROUPS.map(group => (
-              <optgroup key={group.label} label={group.label}>
-                {group.fonts.map(font => (
-                  <option key={font} value={font} style={{ fontFamily: font}}>
-                      {font}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select> */}
           <FontFamilyPicker
             fontFamily={fontFamily}
             disabled={!tb}
@@ -2557,7 +2655,7 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
                 <p style={{ margin: "0 0 6px", fontSize: 11, color: "#6b7280", fontWeight: 600 }}>
                   Insert Table
                 </p>
-                <div 
+                <div
                   style={{ display: "grid", gridTemplateColumns: "repeat(6, 22px)", gap: 2 }}
                   onMouseLeave={() => setHoveredTableGrid(null)}
                 >
@@ -2571,8 +2669,8 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
                       <div key={i} onClick={() => insertTable(row, col)} title={`${row}×${col}`}
                         style={{
                           width: 22, height: 22, border: "1px solid #e5e7eb", borderRadius: 3,
-                          cursor: "pointer", 
-                          background: isHighlighted ? "#bfdbfe" : "#f9fafb", 
+                          cursor: "pointer",
+                          background: isHighlighted ? "#bfdbfe" : "#f9fafb",
                           transition: "background .1s",
                         }}
                         onMouseEnter={() => setHoveredTableGrid({ row, col })}
@@ -2960,16 +3058,44 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
                 </div>
               )}
 
-              {/* A4 white page */}
+              {/* A4 page editor container */}
               <div style={{
-                background: "#fff", minHeight: "297mm", width: "210mm",
-                maxWidth: "100%", margin: "0 auto", padding: "10mm 10mm",
-                boxShadow: "0 2px 12px rgba(0,0,0,.15)", borderRadius: 2,
-                boxSizing: "border-box", overflow: "hidden",
+                width: "794px",
+                maxWidth: "100%",
+                margin: "0 auto",
+                boxSizing: "border-box",
+                position: "relative",
+                ["--editor-min-height" as any]: `${Math.max(1, previewPages.length) * 1123}px`,
               }}>
 
                 <style>{`
                 .tiptap-editor { outline: none; font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.6; color: #111; width: 100%; max-width: 100%; box-sizing: border-box; overflow: hidden; }
+                .tiptap-editor p:empty:before { content: "\\00a0"; }
+                .tiptap-editor td:empty:before, .tiptap-editor th:empty:before { content: "\\00a0"; }
+                .tiptap-editor .ProseMirror {
+                  outline: none;
+                  background-color: #e8eaed;
+                  min-height: var(--editor-min-height, 1123px);
+                  width: 794px;
+                  max-width: 100%;
+                  margin: 0 auto;
+                  box-sizing: border-box;
+                  padding: 156px 48px 156px 48px;
+                  position: relative;
+                  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+                  
+                  background-image: 
+                    /* Header and Footer dashed separator lines repeating on every page */
+                    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='1123'><line x1='48' y1='139' x2='746' y2='139' stroke='%23cbd5e1' stroke-dasharray='4,4' stroke-width='1'/><line x1='48' y1='983' x2='746' y2='983' stroke='%23cbd5e1' stroke-dasharray='4,4' stroke-width='1'/><text x='48' y='85' fill='%23cbd5e1' font-family='sans-serif' font-size='12' font-weight='500' letter-spacing='1.5'>HEADER</text><text x='48' y='1035' fill='%23cbd5e1' font-family='sans-serif' font-size='12' font-weight='500' letter-spacing='1.5'>FOOTER</text></svg>"),
+                    /* Top border of each page */
+                    linear-gradient(to bottom, #d1d5db 1px, transparent 1px),
+                    /* Bottom border of each page */
+                    linear-gradient(to bottom, transparent 1106px, #d1d5db 1106px, #d1d5db 1107px, transparent 1107px),
+                    /* Page white background followed by grey break */
+                    linear-gradient(to bottom, #ffffff 0px, #ffffff 1107px, #e8eaed 1107px, #e8eaed 1123px);
+                  background-size: 100% 1123px, 100% 1123px, 100% 1123px, 100% 1123px;
+                  background-repeat: repeat-y, repeat-y, repeat-y, repeat-y;
+                }
                 .tiptap-editor p { margin: 0 0 8px; }
                 .tiptap-editor h1 { font-size: 20pt; font-weight: bold; margin: 16px 0 8px; }
                 .tiptap-editor h2 { font-size: 16pt; font-weight: bold; margin: 14px 0 6px; }
@@ -3086,6 +3212,7 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
                     }
                   }}
                 />
+
               </div>
 
             </div>
@@ -3093,7 +3220,7 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
 
           {/* ─── RIGHT: Preview ───────────────────────────────────────────── */}
           <div style={{
-            overflowY: "auto", overflowX: "hidden", background: "#525659",
+            overflowY: "auto", overflowX: "auto", background: "#525659",
             padding: "24px 0",
             display: "flex", flexDirection: "column",
             alignItems: "center", gap: 0,
@@ -3101,17 +3228,50 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
             <div style={{
               color: "#d1d5db", fontSize: 11, letterSpacing: 1,
               textTransform: "uppercase", fontWeight: 600,
-              alignSelf: "flex-start", marginLeft: 20, marginBottom: 16,
+              alignSelf: "stretch", display: "flex", justifyContent: "space-between",
+              alignItems: "center", padding: "0 20px", marginBottom: 16,
             }}>
-              📄 Page Preview
+              <span>📄 Page Preview</span>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <span style={{ fontSize: 10, color: "#9ca3af" }}>Zoom:</span>
+                {[0.45, 0.7, 1.0].map((scale) => (
+                  <button
+                    key={scale}
+                    onClick={() => setPreviewScale(scale)}
+                    style={{
+                      background: previewScale === scale ? "#2b579a" : "#3a3d40",
+                      border: "none",
+                      color: "#fff",
+                      padding: "2px 8px",
+                      borderRadius: 4,
+                      fontSize: 10,
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      transition: "background 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (previewScale !== scale) {
+                        e.currentTarget.style.background = "#4a4d50";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (previewScale !== scale) {
+                        e.currentTarget.style.background = "#3a3d40";
+                      }
+                    }}
+                  >
+                    {Math.round(scale * 100)}%
+                  </button>
+                ))}
+              </div>
             </div>
 
             <style>{PREVIEW_CSS}</style>
 
             {previewPages.length === 0 ? (
               <div style={{
-                width: Math.round(PREVIEW_PAGE_WIDTH * 0.45),
-                height: Math.round(PREVIEW_PAGE_HEIGHT * 0.45),
+                width: Math.round(PREVIEW_PAGE_WIDTH * previewScale),
+                height: Math.round(PREVIEW_PAGE_HEIGHT * previewScale),
                 margin: "0 auto",
                 position: "relative",
                 marginBottom: 20,
@@ -3121,7 +3281,7 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
                   background: "#fff",
                   width: PREVIEW_PAGE_WIDTH,
                   height: PREVIEW_PAGE_HEIGHT,
-                  transform: "scale(0.45)",
+                  transform: `scale(${previewScale})`,
                   transformOrigin: "top left",
                   borderRadius: 2,
                   boxShadow: "0 4px 24px rgba(0,0,0,.5)",
@@ -3141,8 +3301,8 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
                 <div
                   key={idx}
                   style={{
-                    width: Math.round(PREVIEW_PAGE_WIDTH * 0.45),
-                    height: Math.round(PREVIEW_PAGE_HEIGHT * 0.45),
+                    width: Math.round(PREVIEW_PAGE_WIDTH * previewScale),
+                    height: Math.round(PREVIEW_PAGE_HEIGHT * previewScale),
                     margin: "0 auto",
                     position: "relative",
                     marginBottom: 20,
@@ -3150,13 +3310,14 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
                   }}
                 >
                   <div
+                    className="preview-page"
                     style={{
                       background: "#fff",
                       width: PREVIEW_PAGE_WIDTH,
                       height: PREVIEW_PAGE_HEIGHT,
-                      transform: "scale(0.45)",
+                      transform: `scale(${previewScale})`,
                       transformOrigin: "top left",
-                      padding: `${PREVIEW_PAD_V}px ${PREVIEW_PAD_H}px`,
+                      padding: `${PREVIEW_PAD_TOP}px ${PREVIEW_PAD_H}px ${PREVIEW_PAD_BOT}px ${PREVIEW_PAD_H}px`,
                       boxSizing: "border-box",
                       overflow: "hidden",
                       boxShadow: "0 2px 18px rgba(0,0,0,.5)",

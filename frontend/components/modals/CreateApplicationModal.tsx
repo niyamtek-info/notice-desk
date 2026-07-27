@@ -79,7 +79,7 @@ const CreateApplicationModal: React.FC<CreateApplicationModalProps> = ({
           ASSIGNED_AT: values.dateOfAssign?.format("YYYY-MM-DD"),
           TYPE_OF_WORK: values.typeofwork?.trimEnd() || "",
           CLIENT_NAME: values.clientName?.trimEnd(),
-          LOAN_ACCOUNT_NUMBER: values.loanAccountNumber?.trimEnd(),
+          LOAN_ACCOUNT_NUMBER: values.loanAccountNumber?.trimEnd()?.toUpperCase(),
           LOAN_REQUESTER_NAME: values.borrowerName?.trimEnd(),
           STATE: values.state?.trimEnd(),
           BATCH_CODE: values.batchcode?.trimEnd(),
@@ -95,6 +95,8 @@ const CreateApplicationModal: React.FC<CreateApplicationModalProps> = ({
           `Application ${response?.data?.application_no} updated successfully!`,
         );
       } else {
+        console.log(payload, 'payload23423')
+
         let response: any = await ApplicationApi.create(payload);
         messageApi.success(
           `Application ${response?.data?.application_no} created successfully!`,
@@ -308,7 +310,7 @@ const CreateApplicationModal: React.FC<CreateApplicationModalProps> = ({
         <Form.Item
           name="dateOfAssign"
           label="Date of Assign"
-          rules={[{ required: true, message: "Please select Date" }]}
+          rules={[{ required: false, message: "Please select Date" }]}
         >
           <DatePicker className="w-full h-10 rounded-md" format="DD-MM-YYYY" />
         </Form.Item>

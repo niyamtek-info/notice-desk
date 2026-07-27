@@ -6,6 +6,7 @@ Keeps the same class name and method signatures so all calling code
 import json
 import mimetypes
 import datetime
+import threading
 from urllib.parse import urlparse
 
 import google.auth
@@ -14,31 +15,51 @@ from google.cloud import storage
 
 from app.core.settings import settings
 
+# Cached signing credentials, reused across requests instead of hitting the
+# GCP IAM/metadata server on every call to generate_presigned_url(). Without
+# this, every presigned-URL request (often several per API call, e.g. one
+# per row in a list response) pays a full credential-discovery + token-
+# refresh round trip, which is the dominant source of multi-second latency.
+_signing_creds_lock = threading.Lock()
+_signing_creds_cache: tuple | None = None  # (credentials, email)
+
 
 def _get_signing_credentials():
     """
     Return (credentials, service_account_email) suitable for signed-URL
     generation.  Works both with an explicit service-account JSON file
     (GOOGLE_APPLICATION_CREDENTIALS) and with the VM's attached service
-    account via ADC.
+    account via ADC. Credentials are cached process-wide and only
+    refreshed when actually expired (or close to it).
     """
+    global _signing_creds_cache
+
     creds_file = settings.GOOGLE_APPLICATION_CREDENTIALS
     if creds_file:
-        from google.oauth2 import service_account as sa_module
-        creds = sa_module.Credentials.from_service_account_file(
-            creds_file,
-            scopes=["https://www.googleapis.com/auth/cloud-platform"],
-        )
-        return creds, creds.service_account_email
+        if _signing_creds_cache is None:
+            from google.oauth2 import service_account as sa_module
+            creds = sa_module.Credentials.from_service_account_file(
+                creds_file,
+                scopes=["https://www.googleapis.com/auth/cloud-platform"],
+            )
+            _signing_creds_cache = (creds, creds.service_account_email)
+        return _signing_creds_cache
 
     # ADC path — works on GCE VMs with an attached service account
-    creds, _ = google.auth.default(
-        scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
-    request = google_auth_requests.Request()
-    creds.refresh(request)
-    email = getattr(creds, "service_account_email", None)
-    return creds, email
+    with _signing_creds_lock:
+        creds = _signing_creds_cache[0] if _signing_creds_cache else None
+
+        if creds is None:
+            creds, _ = google.auth.default(
+                scopes=["https://www.googleapis.com/auth/cloud-platform"]
+            )
+
+        if not creds.valid:
+            creds.refresh(google_auth_requests.Request())
+
+        email = getattr(creds, "service_account_email", None)
+        _signing_creds_cache = (creds, email)
+        return _signing_creds_cache
 
 
 class S3Gateway:
@@ -48,7 +69,7 @@ class S3Gateway:
     """
 
     def __init__(self):
-        self.client = storage.Client()
+        self.client = storage.Client(project=settings.GOOGLE_PROJECT_ID)
         self.bucket = self.client.bucket(settings.GCS_BUCKET_NAME)
 
     # ------------------------------------------------------------------ #
@@ -135,9 +156,7 @@ class S3Gateway:
         from urllib.parse import quote
 
         # Strip gs://bucket-name/ prefix if the full URI was stored in the DB
-        if s3_key.startswith("gs://"):
-            s3_key = s3_key.split(f"gs://{settings.GCS_BUCKET_NAME}/", 1)[-1]
-        s3_key = s3_key.lstrip("/")
+        s3_key = self.key_from_reference(s3_key)
 
         # ── Path 1: V4 signed URL (proper https://storage.googleapis.com/… URL) ─
         blob = self._blob(s3_key)
@@ -181,31 +200,46 @@ class S3Gateway:
         ) from sign_exc
 
     # ------------------------------------------------------------------ #
+    #  Resolve any stored reference (gs:// URI, https URL, or a bare key)  #
+    #  back to the bare GCS object key.                                    #
+    # ------------------------------------------------------------------ #
+
+    def key_from_reference(self, value: str) -> str:
+        if value.startswith("gs://"):
+            return value.split(f"gs://{settings.GCS_BUCKET_NAME}/", 1)[-1].lstrip("/")
+        if value.startswith(("http://", "https://")):
+            parsed = urlparse(value)
+            key = parsed.path.lstrip("/")
+            bucket_prefix = f"{settings.GCS_BUCKET_NAME}/"
+            if key.startswith(bucket_prefix):
+                key = key[len(bucket_prefix):]
+            return key
+        return value.lstrip("/")
+
+    # ------------------------------------------------------------------ #
     #  Download                                                           #
     # ------------------------------------------------------------------ #
 
     def get_file_bytes(self, file_url: str) -> bytes:
         try:
-            if file_url.startswith("gs://"):
-                key = file_url.split(f"gs://{settings.GCS_BUCKET_NAME}/", 1)[-1]
-            elif file_url.startswith(("http://", "https://")):
-                parsed = urlparse(file_url)
-                key = parsed.path.lstrip("/")
-                # Strip bucket-name prefix for storage.googleapis.com path-style URLs
-                bucket_prefix = f"{settings.GCS_BUCKET_NAME}/"
-                if key.startswith(bucket_prefix):
-                    key = key[len(bucket_prefix):]
-            else:
-                key = file_url
+            key = self.key_from_reference(file_url)
             return self._blob(key).download_as_bytes()
         except Exception as e:
             raise Exception(f"Failed to fetch file from GCS: {e}")
 
     def get_file_bytes_by_key(self, s3_key: str) -> bytes:
         try:
-            # Strip gs://bucket/ prefix if callers accidentally pass a full URI
-            if s3_key.startswith("gs://"):
-                s3_key = s3_key.split(f"gs://{settings.GCS_BUCKET_NAME}/", 1)[-1]
+            s3_key = self.key_from_reference(s3_key)
             return self._blob(s3_key).download_as_bytes()
         except Exception as e:
             raise Exception(f"Failed to fetch file from GCS key ({s3_key}): {e}")
+
+    # ------------------------------------------------------------------ #
+    #  Cheap existence check (no data transfer)                           #
+    # ------------------------------------------------------------------ #
+
+    def exists(self, s3_key: str) -> bool:
+        try:
+            return self._blob(self.key_from_reference(s3_key)).exists()
+        except Exception:
+            return False

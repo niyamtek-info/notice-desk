@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel
 from typing import Dict, Any
 from celery.result import AsyncResult
@@ -33,7 +34,8 @@ async def translate_document(
     Returns immediately with task_id without waiting for Redis.
     """
     service = TranslationService(db)
-    cached_translation = service.get_cached_translation(
+    cached_translation = await run_in_threadpool(
+        service.get_cached_translation,
         request.record_id,
         request.target_language,
     )

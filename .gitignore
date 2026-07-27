@@ -25,10 +25,12 @@ backend/app/api/__pycache__/
 backend/app/utils/__pycache__/
 backend/app/main/__pycache__/
 backend/.env
+backend/.env.gcp
 *.pyc
 venv/
 .venv/
 env/
+
 backend/app/uploads/
  backend/app/uploads/*
 # Logs

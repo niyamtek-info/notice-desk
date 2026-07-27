@@ -1,8 +1,9 @@
-﻿from sqlalchemy import Boolean, Column, String, DateTime, Integer, Date, Text, Enum, BigInteger, JSON
+﻿from sqlalchemy import Boolean, Column, String, DateTime, Integer, Date, Text, Enum, BigInteger, JSON, and_
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.base_class import Base
 from app.db.models.application import Application
+from app.db.versioning import OPEN_END_DATE
 
 
 class GeneratedReport(Base):
@@ -27,7 +28,12 @@ class GeneratedReport(Base):
 
     application = relationship(
         "Application",
-        primaryjoin="GeneratedReport.record_id == Application.record_id",
+        primaryjoin=lambda: and_(
+            GeneratedReport.record_id == Application.record_id,
+            Application.is_deleted == False,
+            Application.end_date == OPEN_END_DATE,
+            Application.is_active == True,
+        ),
         foreign_keys="[GeneratedReport.record_id]",
         viewonly=True,
         uselist=False,

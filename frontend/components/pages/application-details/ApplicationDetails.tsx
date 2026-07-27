@@ -29,10 +29,12 @@ const ApplicationDetails: React.FC<ApplicationDetailsProps> = ({
     appId: false
   })
   const [banks, setBanks] = useState<any[]>([]);
+  const [banksLoading, setBanksLoading] = useState<boolean>(true);
   const [triggerReport, setTriggerReport] = useState<any>(0);
 
 
   const fetchBanks = async () => {
+    setBanksLoading(true);
     try {
       // Fetch banks data - replace with actual API call
       const bankData: any = await BankApi.getBankList(); // Using existing method
@@ -40,6 +42,8 @@ const ApplicationDetails: React.FC<ApplicationDetailsProps> = ({
     } catch (error) {
       console.error("Failed to fetch banks:", error);
       setBanks([]); // Fallback to empty array
+    } finally {
+      setBanksLoading(false);
     }
   };
 
@@ -152,7 +156,7 @@ const ApplicationDetails: React.FC<ApplicationDetailsProps> = ({
         </div>
         <div className="col-span-13 w-full">{renderContent()}</div>
         <div className="col-span-3 sticky top-[75px] sm:top-[80px] md:top-[85px] self-start h-[calc(100vh-75px)] sm:h-[calc(100vh-80px)] md:h-[calc(100vh-85px)]">
-          <Actionsidebar applicationId={applicationId} token={token} bankCode={bankCode} banks={banks} setTriggerReport={setTriggerReport} initialData={initialData} />
+          <Actionsidebar applicationId={applicationId} token={token} bankCode={bankCode} banks={banks} banksLoading={banksLoading} setTriggerReport={setTriggerReport} initialData={initialData} />
         </div>
       </div>
 

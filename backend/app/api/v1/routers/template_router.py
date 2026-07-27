@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
+from typing import Optional
 
 from app.db.session import get_db
 from app.api.v1.dependencies.auth import AuditUser, get_current_audit_user
@@ -141,12 +142,22 @@ def update_master_template_alias(
 
 
 @router.get("/master-template")
-def get_all_templates(db: Session = Depends(get_db)):
-    return MasterTemplateService(db).get_all_templates()
+def get_all_templates(
+    # Optional pagination - left unset (None) by default so existing callers
+    # keep getting the full list; only applied when explicitly requested.
+    skip: Optional[int] = None,
+    limit: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    return MasterTemplateService(db).get_all_templates(skip=skip, limit=limit)
 
 @router.get("/templates", include_in_schema=False)
-def get_all_templates_alias(db: Session = Depends(get_db)):
-    return MasterTemplateService(db).get_all_templates()
+def get_all_templates_alias(
+    skip: Optional[int] = None,
+    limit: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    return MasterTemplateService(db).get_all_templates(skip=skip, limit=limit)
 
 @router.get("/master-template/client/{client_code}")
 def get_templates_by_client(client_code: str, db: Session = Depends(get_db)):

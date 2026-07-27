@@ -567,7 +567,7 @@
     {
       "field": "court_ao_name",
       "model_field": "court_ao_name",
-      "excel_header": "Court Ao Name",
+      "excel_header": "Court AO Name",
       "placeholder": "COURT_AO_NAME"
     },
     {
@@ -985,71 +985,71 @@
       "placeholder": "IS_REPORT_OVERRIDDEN"
     },
     {
-    "field": "matured_date_13_4",
-    "model_field": "matured_date_13_4",
-    "excel_header": "Matured Date 13 4",
-    "placeholder": "MATURED_DATE_13_4"
-  },
-  {
-    "field": "vacation_notice_moveable",
-    "model_field": "vacation_notice_moveable",
-    "excel_header": "Vacation Notice Moveable",
-    "placeholder": "VACATION_NOTICE_MOVEABLE"
-  },
-  {
-    "field": "vacation_notice_immoveable",
-    "model_field": "vacation_notice_immoveable",
-    "excel_header": "Vacation Notice Immoveable",
-    "placeholder": "VACATION_NOTICE_IMMOVEABLE"
-  },
-  {
-    "field": "physical_vacation_notice_moveable",
-    "model_field": "physical_vacation_notice_moveable",
-    "excel_header": "Physical Vacation Notice Moveable",
-    "placeholder": "PHYSICAL_VACATION_NOTICE_MOVEABLE"
-  },
-  {
-    "field": "physical_vacation_notice_immoveable",
-    "model_field": "physical_vacation_notice_immoveable",
-    "excel_header": "Physical Vacation Notice Immoveable",
-    "placeholder": "PHYSICAL_VACATION_NOTICE_IMMOVEABLE"
-  },
-  {
-    "field": "physical_delivery_status_date",
-    "model_field": "physical_delivery_status_date",
-    "excel_header": "Physical Delivery Status Date",
-    "placeholder": "PHYSICAL_DELIVERY_STATUS_DATE"
-  },
-  {
-    "field": "symbolic_delivery_status_date_13_4",
-    "model_field": "symbolic_delivery_status_date_13_4",
-    "excel_header": "Symbolic Delivery Status Date 13 4",
-    "placeholder": "SYMBOLIC_DELIVERY_STATUS_DATE_13_4"
-  },
-  {
-    "field": "outstanding_amount",
-    "model_field": "outstanding_amount",
-    "excel_header": "Outstanding Amount",
-    "placeholder": "OUTSTANDING_AMOUNT"
-  },
-  {
-    "field": "sold_reg_date",
-    "model_field": "sold_reg_date",
-    "excel_header": "Sold Registration Date",
-    "placeholder": "SOLD_REG_DATE"
-  },
-  {
-    "field": "sarfaesi_category",
-    "model_field": "sarfaesi_category",
-    "excel_header": "Sarfaesi Category",
-    "placeholder": "SARFAESI_CATEGORY"
-  },
-  {
-    "field": "case_status",
-    "model_field": "case_status",
-    "excel_header": "Case Status",
-    "placeholder": "CASE_STATUS"
-  }
+      "field": "matured_date_13_4",
+      "model_field": "matured_date_13_4",
+      "excel_header": "Matured Date 13 4",
+      "placeholder": "MATURED_DATE_13_4"
+    },
+    {
+      "field": "vacation_notice_moveable",
+      "model_field": "vacation_notice_moveable",
+      "excel_header": "Vacation Notice Moveable",
+      "placeholder": "VACATION_NOTICE_MOVEABLE"
+    },
+    {
+      "field": "vacation_notice_immoveable",
+      "model_field": "vacation_notice_immoveable",
+      "excel_header": "Vacation Notice Immoveable",
+      "placeholder": "VACATION_NOTICE_IMMOVEABLE"
+    },
+    {
+      "field": "physical_vacation_notice_moveable",
+      "model_field": "physical_vacation_notice_moveable",
+      "excel_header": "Physical Vacation Notice Moveable",
+      "placeholder": "PHYSICAL_VACATION_NOTICE_MOVEABLE"
+    },
+    {
+      "field": "physical_vacation_notice_immoveable",
+      "model_field": "physical_vacation_notice_immoveable",
+      "excel_header": "Physical Vacation Notice Immoveable",
+      "placeholder": "PHYSICAL_VACATION_NOTICE_IMMOVEABLE"
+    },
+    {
+      "field": "physical_delivery_status_date",
+      "model_field": "physical_delivery_status_date",
+      "excel_header": "Physical Delivery Status Date",
+      "placeholder": "PHYSICAL_DELIVERY_STATUS_DATE"
+    },
+    {
+      "field": "symbolic_delivery_status_date_13_4",
+      "model_field": "symbolic_delivery_status_date_13_4",
+      "excel_header": "Symbolic Delivery Status Date 13 4",
+      "placeholder": "SYMBOLIC_DELIVERY_STATUS_DATE_13_4"
+    },
+    {
+      "field": "outstanding_amount",
+      "model_field": "outstanding_amount",
+      "excel_header": "Outstanding Amount",
+      "placeholder": "OUTSTANDING_AMOUNT"
+    },
+    {
+      "field": "sold_reg_date",
+      "model_field": "sold_reg_date",
+      "excel_header": "Sold Registration Date",
+      "placeholder": "SOLD_REG_DATE"
+    },
+    {
+      "field": "sarfaesi_category",
+      "model_field": "sarfaesi_category",
+      "excel_header": "Sarfaesi Category",
+      "placeholder": "SARFAESI_CATEGORY"
+    },
+    {
+      "field": "case_status",
+      "model_field": "case_status",
+      "excel_header": "Case Status",
+      "placeholder": "CASE_STATUS"
+    }
   ],
   "notice_template_aliases": [
     {
@@ -1103,37 +1103,51 @@
     {
       "alias": "FCL_AMOUNT",
       "target": "FCL_AMOUNT",
-      "source_fields": ["fcl_as_on_date"]
+      "source_fields": [
+        "fcl_as_on_date"
+      ]
     },
     {
       "alias": "FCL_AMOUNT_NUMERIC",
       "target": "FCL_AMOUNT",
-      "source_fields": ["fcl_as_on_date"]
+      "source_fields": [
+        "fcl_as_on_date"
+      ]
     },
     {
       "alias": "NOTICE_DATE",
       "target": "SEC_13_2_NOTICE_DATE",
-      "source_fields": ["notice_13_2_date"]
+      "source_fields": [
+        "notice_13_2_date"
+      ]
     },
     {
       "alias": "LOAN_AMOUNT_NUMERIC",
       "target": "LOAN_AMOUNT",
-      "source_fields": ["loan_amount"]
+      "source_fields": [
+        "loan_amount"
+      ]
     },
     {
       "alias": "LOAN_ACCOUNT_NUMBERS",
       "target": "LOAN_ACCOUNT_NUMBER",
-      "source_fields": ["loan_account_no"]
+      "source_fields": [
+        "loan_account_no"
+      ]
     },
     {
       "alias": "BORROWER_1_NAME",
       "target": "BORROWER_NAME",
-      "source_fields": ["borrower_name"]
+      "source_fields": [
+        "borrower_name"
+      ]
     },
     {
       "alias": "BORROWER_1_ADDRESS",
       "target": "BORROWER_ADDRESS",
-      "source_fields": ["borrower_address"]
+      "source_fields": [
+        "borrower_address"
+      ]
     },
     {
       "alias": "BORROWER_2_NAME",
@@ -1154,82 +1168,114 @@
     {
       "alias": "TOTAL_DISBURSED_AMOUNT_NUMERIC",
       "target": "DISBURSAL_AMOUNT",
-      "source_fields": ["disbursal_amount"]
+      "source_fields": [
+        "disbursal_amount"
+      ]
     },
     {
       "alias": "TOTAL_DISBURSED_AMOUNT_WORDS",
       "target": "LOAN_AMOUNT_WORDS",
-      "source_fields": ["loan_amount_words"]
+      "source_fields": [
+        "loan_amount_words"
+      ]
     },
     {
       "alias": "TRUST_NAME",
       "target": "TRUST_NUMBER",
-      "source_fields": ["trust_number"]
+      "source_fields": [
+        "trust_number"
+      ]
     },
     {
       "alias": "ASSIGNOR_NAME",
       "target": "COMPANY_NAME",
-      "source_fields": ["company_name"]
+      "source_fields": [
+        "company_name"
+      ]
     },
     {
       "alias": "ASSIGNMENT_DATE",
       "target": "ASSIGNMENT_AGREEMENT_DATE",
-      "source_fields": ["assignment_agreement_date"]
+      "source_fields": [
+        "assignment_agreement_date"
+      ]
     },
     {
       "alias": "CO_BORROWER_NAMES",
       "target": "CO_BORROWER_NAME",
-      "source_fields": ["co_borrower_1_name"]
+      "source_fields": [
+        "co_borrower_1_name"
+      ]
     },
     {
       "alias": "FCL_DATE",
       "target": "FCL_AMOUNT",
-      "source_fields": ["fcl_as_on_date"]
+      "source_fields": [
+        "fcl_as_on_date"
+      ]
     },
     {
       "alias": "OUTSTANDING_AS_ON_DATE",
       "target": "AS_ON_DATE",
-      "source_fields": ["updated_at"]
+      "source_fields": [
+        "updated_at"
+      ]
     },
     {
       "alias": "OUTSTANDING_AMOUNT_NUMERIC",
       "target": "TOTAL_OUTSTANDING",
-      "source_fields": ["total_outstanding"]
+      "source_fields": [
+        "total_outstanding"
+      ]
     },
     {
       "alias": "OUTSTANDING_AMOUNT_WORDS",
       "target": "TOTAL_OUTSTANDING_WORDS",
-      "source_fields": ["total_outstanding_words"]
+      "source_fields": [
+        "total_outstanding_words"
+      ]
     },
     {
       "alias": "DEMAND_AMOUNT_NUMERIC",
       "target": "TOTAL_OUTSTANDING",
-      "source_fields": ["total_outstanding"]
+      "source_fields": [
+        "total_outstanding"
+      ]
     },
     {
       "alias": "DEMAND_AMOUNT_WORDS",
       "target": "TOTAL_OUTSTANDING_WORDS",
-      "source_fields": ["total_outstanding_words"]
+      "source_fields": [
+        "total_outstanding_words"
+      ]
     },
     {
       "alias": "ORIGINAL_LENDER_NAME",
       "target": "COMPANY_NAME",
-      "source_fields": ["company_name"]
+      "source_fields": [
+        "company_name"
+      ]
     },
     {
       "alias": "LOAN_PURPOSE",
       "target": "DISBURSEMENT_TYPE",
-      "source_fields": ["disbursement_type"]
+      "source_fields": [
+        "disbursement_type"
+      ]
     },
     {
       "alias": "LOAN_AGREEMENT_DATES",
       "target": "LOAN_AGREEMENT_DATE",
-      "source_fields": ["loan_agreement_date"]
+      "source_fields": [
+        "loan_agreement_date"
+      ]
     },
     {
       "alias": "SCHEDULE_1_PROPERTY_DETAILS",
       "target": "DESCRIPTION_OF_SCHEDULE_PROPERTY",
-      "source_fields": ["property_description"]
+      "source_fields": [
+        "property_description"
+      ]
     },
     {
       "alias": "AO_SIGNATURE",

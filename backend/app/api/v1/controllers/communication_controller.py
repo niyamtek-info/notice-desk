@@ -29,7 +29,7 @@ from app.services.communication_service import (
     sanitize_placeholder_value,
 )
 from app.services.pdf_service import PDFService
-from app.gateways.s3_gateway import S3Gateway
+from app.gateways.storage_gateway import get_storage_gateway
 from app.api.v1.dependencies.auth import AuditUser
 from app.schemas.communication_schema import (
     MailTemplateRequest,
@@ -63,8 +63,8 @@ try:
 except Exception:
     config = {}
 
-# Thread pool
-pdf_executor = ThreadPoolExecutor(max_workers=2)
+# Thread pool for Word/LibreOffice PDF generation (I/O + subprocess bound, not CPU bound)
+pdf_executor = ThreadPoolExecutor(max_workers=8)
 
 
 class CommunicationController:
@@ -72,7 +72,7 @@ class CommunicationController:
     def __init__(self, db: Session):
         self.db = db
         self.service = CommunicationService(db)
-        self.s3 = S3Gateway()
+        self.s3 = get_storage_gateway()
 
     def _extract_base_font_family(self, html_text: str) -> str | None:
         if not html_text:
@@ -473,6 +473,14 @@ class CommunicationController:
         if not value:
             return None
 
+        # Local-storage references (STORAGE_PROVIDER=local) point at our own
+        # /files route rather than S3 - pull the key back out of that first.
+        files_route_marker = "/api/v1/files/"
+        if value.startswith("local://"):
+            return value[len("local://"):].split("?", 1)[0]
+        if files_route_marker in value:
+            return value.split(files_route_marker, 1)[-1].split("?", 1)[0]
+
         base_url = (settings.S3_BASE_URL or "").rstrip("/")
         if base_url and value.startswith(base_url):
             return value[len(base_url):].lstrip("/").split("?", 1)[0]
@@ -550,7 +558,7 @@ class CommunicationController:
             return None, None, signature_path
 
         try:
-            file_bytes = S3Gateway().get_file_bytes_by_key(s3_key)
+            file_bytes = self.s3.get_file_bytes_by_key(s3_key)
             encoded = base64.b64encode(file_bytes).decode("utf-8")
         except Exception:
             return None, None, signature_path
@@ -870,6 +878,9 @@ class CommunicationController:
 
         def _rewrite_token(text: str, index: int) -> str:
             updated = text.replace("{{CO_BORROWER_NAME}}", f"{{{{CO_BORROWER_NAME_{index}}}}}")
+            updated = updated.replace(
+                "{{CO_BORROWER_ADDRESS_ALSO_AT}}", f"{{{{CO_BORROWER_{index}_ADDRESS_ALSO_AT}}}}"
+            )
             updated = updated.replace("{{CO_BORROWER_ADDRESS}}", f"{{{{CO_BORROWER_ADDRESS_{index}}}}}")
             updated = updated.replace("{{CO_BORROWER_NAMES}}", f"{{{{CO_BORROWER_NAME_{index}}}}}")
             updated = re.sub(
@@ -1056,7 +1067,15 @@ class CommunicationController:
             ):
                 return child
             if child.name == "table" and collective_marker in text:
-                return child
+                # A table whose text is essentially just this closing note
+                # (e.g. only "(Hereinafter collectively referred to as the
+                # "Borrowers")") is the trailing marker itself, not the real
+                # party/recipient table — matching it here would make the
+                # caller delete everything from this marker to the next
+                # occurrence of the same marker, i.e. the rest of the
+                # document, since the real marker was already consumed.
+                if len(text) > len(collective_marker) + 100:
+                    return child
 
         return None
 
@@ -1131,18 +1150,25 @@ class CommunicationController:
                 html_source,
             )
             html_source = re.sub(
+                r"&lt;\s*([^&]+?)\s*&gt;",
+                replace_angle,
+                html_source,
+            )
+            html_source = re.sub(
                 r"<\s*([^<>]+?)\s*>",
                 replace_angle,
                 html_source,
             )
 
+            soup_dedup = BeautifulSoup(html_source, "html.parser")
             collective_nodes = [
                 node
-                for node in BeautifulSoup(html_source, "html.parser").find_all("p")
+                for node in soup_dedup.find_all("p")
                 if "Hereinafter collectively referred to as" in node.get_text(" ", strip=True)
             ]
             for extra_node in collective_nodes[1:]:
                 extra_node.decompose()
+            html_source = str(soup_dedup)
 
             rendered_html = cleanup_unresolved_brace_placeholders(html_source)
             if effective_preserve or co_borrower_expanded:
@@ -1173,7 +1199,9 @@ class CommunicationController:
             party for party in parties
             if "co-borrower" in str(party.get("role", "")).lower()
         ]
-        render_parties = co_borrower_parties or parties
+        render_parties = co_borrower_parties
+        if not render_parties:
+         return html_text
 
         raw_mortgaged_address = (
             data.get("MORTGAGED_PROPERTY_ADDRESS")
@@ -1513,10 +1541,12 @@ class CommunicationController:
         if not application_numbers:
             raise HTTPException(status_code=400, detail="application_numbers is required")
 
+        from app.db.versioning import live_filter
+
         missing_applications = []
         for app_no in application_numbers:
             if not self.db.query(Application).filter(
-                Application.business_code == app_no
+                Application.business_code == app_no, *live_filter(Application)
             ).first():
                 missing_applications.append(app_no)
 
@@ -1530,16 +1560,15 @@ class CommunicationController:
         ao_code = str(request.ao_code).strip()
         output_format = "pdf"
 
+        request_content = None
+        if template.html_path:
+            request_content = self._template_bytes_from_storage_ref(template.html_path).decode(
+                "utf-8",
+                errors="ignore",
+            )
+
         with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
             for app_no in application_numbers:
-                request_content = None
-                if template.html_path:
-                    raw_html = self._template_bytes_from_storage_ref(template.html_path).decode(
-                        "utf-8",
-                        errors="ignore",
-                    )
-                    request_content = raw_html
-
                 notice_request = {
                     "application_number": app_no,
                     "template_name": template.template_code,
@@ -1853,8 +1882,14 @@ class CommunicationController:
             data = self.service._build_placeholder_data_from_report(application_number)
 
             word_service = WordService()
+            loop = asyncio.get_running_loop()
 
-            buffer = word_service.generate_from_template(template_path, data)
+            buffer = await loop.run_in_executor(
+                pdf_executor,
+                word_service.generate_from_template,
+                template_path,
+                data
+            )
 
             if request.get("output_format") == "docx":
                 await self._record_download_communication(
@@ -1875,7 +1910,11 @@ class CommunicationController:
                     },
                 )
 
-            pdf_buffer = word_service.convert_docx_to_pdf(buffer)
+            pdf_buffer = await loop.run_in_executor(
+                pdf_executor,
+                word_service.convert_docx_to_pdf,
+                buffer
+            )
 
             await self._record_download_communication(
                 application_number=application_number,

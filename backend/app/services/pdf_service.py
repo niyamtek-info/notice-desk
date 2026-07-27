@@ -155,6 +155,10 @@ SIDE_MARGIN_MM   = 18
 # We compensate in the template CSS by shifting content up.
 _CHROMIUM_HEADER_BLEED_MM = 5
 
+# Default AO signature dimensions (px @ 96 DPI -> reportlab points, 1px = 0.75pt)
+AO_SIGNATURE_WIDTH_PT = 105.82 * 0.75
+AO_SIGNATURE_HEIGHT_PT = 45.35 * 0.75
+
 
 class PDFService:
     def __init__(self):
@@ -1143,6 +1147,15 @@ img {{
 </body>
 </html>"""
 
+    # A real letterhead header/footer (logo + a few lines of address) is a few
+    # hundred to a couple thousand characters. If a <header>/<footer> tag holds
+    # far more than that, it almost certainly isn't a real page header/footer —
+    # some editors leave the rest of the document nested inside it by mistake.
+    # Extracting it whole would squeeze the entire page content into the tiny
+    # fixed-height print header/footer band, silently clipping everything that
+    # doesn't fit. Treat oversized tags as not-a-header/footer instead.
+    MAX_HEADER_FOOTER_CHARS = 4000
+
     def _wrap_html_for_print(self, body_html: str, header_html: str = "", footer_html: str = "") -> tuple[str, str, str]:
         """
         Returns (page_html, header_template_html, footer_template_html).
@@ -1158,12 +1171,16 @@ img {{
         footer = soup.find("footer")
 
         if header is not None:
-            extracted_header = str(header)
-            header.extract()
+            header_text = str(header)
+            if len(header_text) <= self.MAX_HEADER_FOOTER_CHARS:
+                extracted_header = header_text
+                header.extract()
 
         if footer is not None:
-            extracted_footer = str(footer)
-            footer.extract()
+            footer_text = str(footer)
+            if len(footer_text) <= self.MAX_HEADER_FOOTER_CHARS:
+                extracted_footer = footer_text
+                footer.extract()
 
         if not header_html:
             header_html = extracted_header
@@ -1352,8 +1369,8 @@ img {{
             try:
                 sig_bytes = base64.b64decode(signature_block["signature"].split(",")[1])
                 sig = Image(io.BytesIO(sig_bytes))
-                sig.drawHeight = 45
-                sig.drawWidth = 100
+                sig.drawHeight = AO_SIGNATURE_HEIGHT_PT
+                sig.drawWidth = AO_SIGNATURE_WIDTH_PT
                 sig.hAlign = "LEFT"
                 story.append(sig)
                 story.append(Spacer(1, 0.1 * inch))

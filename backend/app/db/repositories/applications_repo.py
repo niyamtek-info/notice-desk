@@ -182,7 +182,10 @@ class ApplicationsRepository:
             prefix = f"{client_token}-"
             existing_codes = (
                 db.query(Application.business_code)
-                .filter(Application.business_code.isnot(None))
+                .filter(
+                    Application.business_code.isnot(None),
+                    Application.business_code.ilike(f"{prefix}%"),
+                )
                 .all()
             )
 
@@ -322,6 +325,8 @@ class ApplicationsRepository:
         type_of_work: Optional[str] = None,
         assigned_from: Optional[datetime] = None,
         assigned_to: Optional[datetime] = None,
+        skip: Optional[int] = None,
+        limit: Optional[int] = None,
     ) -> List[Dict]:
         db = self.get_db()
         try:
@@ -423,7 +428,13 @@ class ApplicationsRepository:
             elif assigned_to:
                 query = query.filter(func.date(Application.assigned_date) == assigned_to.date())
 
-            apps = query.order_by(Application.created_at.desc(), Application.id.desc()).all()
+            query = query.order_by(Application.created_at.desc(), Application.id.desc())
+            if skip is not None:
+                query = query.offset(skip)
+            if limit is not None:
+                query = query.limit(limit)
+
+            apps = query.all()
             self._sync_report_status_for_apps(db, apps)
             return [self._to_dict(a) for a in apps]
         finally:

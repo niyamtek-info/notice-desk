@@ -6,7 +6,7 @@ import HeaderSection from "@/components/layout/HeaderSection";
 
 const { Header, Content } = Layout;
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { BankProvider } from "@/context/BankContext";
@@ -16,7 +16,10 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   const router = useRouter();
+  const pathName = usePathname();
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -33,6 +36,7 @@ export default function ProtectedLayout({
             minHeight: "100vh",
           }}
         >
+        {!pathName.includes("/application-details") &&
           <Header
             className="!bg-white flex items-center"
             style={{
@@ -57,12 +61,13 @@ export default function ProtectedLayout({
               </Suspense>
             </div>
           </Header>
+          }
 
           <Content
             className="bg-[#eceff5]"
             style={{ minHeight: "calc(100vh - 64px)" }}
           >
-            <div className="max-w-[1440px] mx-auto mb-6 px-8 pt-1 pb-8">
+            <div className={`${!pathName.includes("/application-details") ? "max-w-[1440px] mx-auto mb-6 px-8 pt-1 pb-8" : ""} `}>
               {children}
             </div>
           </Content>

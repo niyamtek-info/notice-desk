@@ -18,7 +18,7 @@ from app.db.versioning import (
     mark_created,
     utcnow,
 )
-from app.gateways.s3_gateway import S3Gateway
+from app.gateways.storage_gateway import get_storage_gateway
 from app.services.html_normalizer import normalize_docx_html
 from app.services.light_docx_html_renderer import docx_to_html
 
@@ -28,7 +28,7 @@ class MasterTemplateService:
         self.db = db
         self.repo = MasterTemplateRepository(db)
         self.repo.seed_template_types_if_empty()
-        self.s3 = S3Gateway()
+        self.s3 = get_storage_gateway()
 
     def _safe_path_part(self, value: str, fallback: str) -> str:
         cleaned = "".join(ch if ch.isalnum() or ch in {"-", "_", "."} else "_" for ch in str(value or "").strip())
@@ -621,8 +621,8 @@ class MasterTemplateService:
             "footer_image_name": template.footer_image_name,
         }
 
-    def get_all_templates(self):
-        templates = self.repo.get_all_active_templates()
+    def get_all_templates(self, skip: int | None = None, limit: int | None = None):
+        templates = self.repo.get_all_active_templates(skip=skip, limit=limit)
         return {"templates": [self._build_response(t) for t in templates]}
 
     def get_templates_by_client(self, client_code):

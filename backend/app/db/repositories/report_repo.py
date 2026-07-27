@@ -466,14 +466,17 @@ class ReportRepository:
                 checklist_value_map.get("borrower_name"),
                 sanction.borrower_name,
                 application.loan_requester_name if application else None,
+                report.borrower_name,
             )
             report.borrower_address = self._first_non_empty(
                 checklist_value_map.get("borrower_address"),
                 sanction.borrower_address,
+                report.borrower_address,
             )
             report.borrower_address_also_at = self._first_non_empty(
                 checklist_value_map.get("borrower_address_also_at"),
                 sanction.borrower_address_also_at,
+                report.borrower_address_also_at,
             )
 
             for i in range(1, 6):
@@ -487,6 +490,7 @@ class ReportRepository:
                     self._first_non_empty(
                         checklist_value_map.get(name_field),
                         getattr(sanction, name_field, None),
+                        getattr(report, name_field, None),
                     ),
                 )
                 setattr(
@@ -495,6 +499,7 @@ class ReportRepository:
                     self._first_non_empty(
                         checklist_value_map.get(addr_field),
                         getattr(sanction, addr_field, None),
+                        getattr(report, addr_field, None),
                     ),
                 )
                 setattr(
@@ -503,12 +508,14 @@ class ReportRepository:
                     self._first_non_empty(
                         checklist_value_map.get(addr_also_at_field),
                         getattr(sanction, addr_also_at_field, None),
+                        getattr(report, addr_also_at_field, None),
                     ),
                 )
         else:
             report.borrower_name = self._first_non_empty(
                 checklist_value_map.get("borrower_name"),
-                application.loan_requester_name if application else report.borrower_name,
+                application.loan_requester_name if application else None,
+                report.borrower_name,
             )
 
         # --- Loan Agreement ---
@@ -517,19 +524,21 @@ class ReportRepository:
                 self._first_non_empty(
                     checklist_value_map.get("loan_agreement_date"),
                     loan.loan_agreement_date,
+                    report.loan_agreement_date,
                 )
             )
             report.loan_amount = self._to_decimal(
                 self._first_non_empty(
                     checklist_value_map.get("loan_amount"),
                     loan.loan_amount,
+                    report.loan_amount,
                 )
             )
-        elif application:
+        else:
             report.loan_amount = self._to_decimal(
                 self._first_non_empty(
                     checklist_value_map.get("loan_amount"),
-                    application.loan_request_amount,
+                    report.loan_amount,
                 )
             )
 
@@ -540,13 +549,20 @@ class ReportRepository:
             report.property_address,
         )
 
-        # Map directly from the extracted loan agreement.
-        report.loan_amount_words = loan.loan_amount_in_words if loan else None
+        # Map directly from the extracted loan agreement; fall back to any
+        # checklist override or the report's existing value when there's no
+        # extracted loan agreement to derive it from (e.g. Manual Excel reports).
+        report.loan_amount_words = self._first_non_empty(
+            checklist_value_map.get("loan_amount_words"),
+            loan.loan_amount_in_words if loan else None,
+            report.loan_amount_words,
+        )
 
         # --- MODT ---
         property_description_items = self._build_report_property_description_list(checklist_rows, sales_deed_rows)
-        report.schedule_property_descriptions = property_description_items or None
-        report.property_description = self._format_report_property_descriptions(property_description_items)
+        if property_description_items:
+            report.schedule_property_descriptions = property_description_items
+            report.property_description = self._format_report_property_descriptions(property_description_items)
 
         # --- Foreclosure ---
         if foreclosure:
@@ -558,31 +574,38 @@ class ReportRepository:
                 )
             )
             report.principal_outstanding = self._to_decimal(
-                self._first_non_empty(checklist_value_map.get("principal_outstanding"), foreclosure.principal_outstanding_overdue)
+                self._first_non_empty(checklist_value_map.get("principal_outstanding"), foreclosure.principal_outstanding_overdue, report.principal_outstanding)
             )
             report.instalment_overdue_amount = self._to_decimal(
-                self._first_non_empty(checklist_value_map.get("instalment_overdue_amount"), foreclosure.instalment_overdue_amount_interest_overview)
+                self._first_non_empty(checklist_value_map.get("instalment_overdue_amount"), foreclosure.instalment_overdue_amount_interest_overview, report.instalment_overdue_amount)
             )
             report.interest_on_termination = self._to_decimal(
-                self._first_non_empty(checklist_value_map.get("interest_on_termination"), foreclosure.interest_till_date)
+                self._first_non_empty(checklist_value_map.get("interest_on_termination"), foreclosure.interest_till_date, report.interest_on_termination)
             )
             report.late_payment_penalty = self._to_decimal(
-                self._first_non_empty(checklist_value_map.get("late_payment_penalty"), foreclosure.late_payment_fee)
+                self._first_non_empty(checklist_value_map.get("late_payment_penalty"), foreclosure.late_payment_fee, report.late_payment_penalty)
             )
             report.cheque_bounce_charges = self._to_decimal(
-                self._first_non_empty(checklist_value_map.get("cheque_bounce_charges"), foreclosure.cheque_bounce_charges)
+                self._first_non_empty(checklist_value_map.get("cheque_bounce_charges"), foreclosure.cheque_bounce_charges, report.cheque_bounce_charges)
             )
             report.other_amount = self._to_decimal(
-                self._first_non_empty(checklist_value_map.get("other_amount"), foreclosure.other_amount_charges)
+                self._first_non_empty(checklist_value_map.get("other_amount"), foreclosure.other_amount_charges, report.other_amount)
             )
             report.foreclosure_charges = self._to_decimal(
-                self._first_non_empty(checklist_value_map.get("foreclosure_charges"), foreclosure.foreclosure_charges)
+                self._first_non_empty(checklist_value_map.get("foreclosure_charges"), foreclosure.foreclosure_charges, report.foreclosure_charges)
             )
             report.total_outstanding = self._to_decimal(
-                self._first_non_empty(checklist_value_map.get("total_outstanding"), foreclosure.total_amount_payable)
+                self._first_non_empty(checklist_value_map.get("total_outstanding"), foreclosure.total_amount_payable, report.total_outstanding)
             )
             report.as_on_date = parse_datetime(
-                self._first_non_empty(checklist_value_map.get("as_on_date"), foreclosure.document_date)
+                self._first_non_empty(checklist_value_map.get("as_on_date"), foreclosure.document_date, report.as_on_date)
+            )
+            report.fcl_as_on_date = parse_datetime(
+                self._first_non_empty(
+                    checklist_value_map.get("fcl_as_on_date"),
+                    foreclosure.foreclosure_calculation_date,
+                    report.fcl_as_on_date,
+                )
             )
 
         # --- Application level fallback fields used in legacy export ---

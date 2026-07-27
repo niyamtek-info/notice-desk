@@ -1,6 +1,7 @@
 
 from fastapi import APIRouter, UploadFile, File, Form, Depends, Request
 from sqlalchemy.orm import Session
+from starlette.concurrency import run_in_threadpool
 from app.services.extractor_service import ExtractorService
 from app.db.session import get_db
 from typing import Optional
@@ -89,6 +90,11 @@ async def stream_progress(
 
 
 
+def _write_upload_to_disk(upload_file, dest_path: str):
+    with open(dest_path, "wb") as f_out:
+        shutil.copyfileobj(upload_file.file, f_out)
+
+
 @router.post("/process")
 async def process_document(
     file: UploadFile = File(...),
@@ -115,17 +121,16 @@ async def process_document(
     # Save file temporarily
     from app.core.settings import settings
     temp_path = os.path.join(settings.TMP_DIR, filename)
-    with open(temp_path, "wb") as f_out:
-        shutil.copyfileobj(file.file, f_out)
-    
+    await run_in_threadpool(_write_upload_to_disk, file, temp_path)
+
     # Save original file if provided
     original_temp_path = None
     if orginal_file:
         original_temp_path = os.path.join(settings.TMP_DIR, f"original_{filename}")
-        with open(original_temp_path, "wb") as f_out:
-            shutil.copyfileobj(orginal_file.file, f_out)
+        await run_in_threadpool(_write_upload_to_disk, orginal_file, original_temp_path)
 
-    ExtractorService(db).ensure_processing_record(
+    await run_in_threadpool(
+        ExtractorService(db).ensure_processing_record,
         record_id=file_id,
         application_number=application_number,
         doc_type=doc_type,

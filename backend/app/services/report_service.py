@@ -145,6 +145,7 @@ REPORT_TEMPLATE_COLUMNS = [
     "co_borrower_address_5_also_at",
     "co_borrower_name_6",
     "co_borrower_address_6",
+    "co_borrower_6_address_alt",
     "property_description",
     "guarantor_1_name",
     "guarantor_1_address",
@@ -174,12 +175,98 @@ REPORT_TEMPLATE_COLUMNS = [
     "notice_dispatch_date",
     "notice_pasting_date",
     "delivery_status",
+    "delivery_status_date",
     "delivered_address",
     "undelivered_address",
     "total_address",
     "publication_date_13_2",
     "publication_english_13_2",
     "publication_local_13_2",
+
+    # 13(4) SYMBOLIC POSSESSION
+    "symbolic_possession_date_13_4",
+    "symbolic_dispatch_date_13_4",
+    "symbolic_delivery_status_13_4",
+    "symbolic_delivery_status_date_13_4",
+    "symbolic_photo_13_4",
+    "symbolic_publication_date_13_4",
+    "symbolic_pub_english_13_4",
+    "symbolic_pub_local_13_4",
+    "matured_date_13_4",
+    "vacation_notice_moveable",
+    "vacation_notice_immoveable",
+
+    # CJM / CMM
+    "cjm_filing_date",
+    "court_name",
+    "case_number",
+    "crm_pl_date",
+    "crm_pl_no",
+    "next_hearing_date",
+    "ov_date",
+    "order_date",
+    "court_ao_name",
+    "advocate_details",
+    "adv_com_name",
+    "inventory_status",
+
+    # PHYSICAL POSSESSION
+    "physical_possession_date",
+    "physical_dispatch_date",
+    "physical_delivery_status",
+    "physical_delivery_status_date",
+    "physical_photo",
+    "physical_publication_date",
+    "physical_pub_english",
+    "physical_pub_local",
+    "physical_vacation_notice_moveable",
+    "physical_vacation_notice_immoveable",
+
+    # AUCTION NOTICE
+    "auction_notice_date",
+    "auction_date",
+    "auction_publication_date",
+    "auction_pub_english",
+    "auction_pub_local",
+    "reserve_price",
+
+    # AUCTION PORTAL
+    "sold_price",
+    "auction_status",
+    "inspection_start",
+    "inspection_end",
+    "emd_last_date",
+    "auction_start",
+    "auction_end",
+    "bid_extension_time",
+    "total_extensions",
+    "outstanding_amount",
+    "emd_amount",
+    "bid_increment",
+    "total_bid_count",
+    "authorised_officer",
+
+    # POST SALE
+    "post_sale_notice",
+    "sold_reg_date",
+
+    # SALE CERTIFICATE
+    "sale_confirmation_date",
+    "sale_certificate_date",
+
+    # NIYAMTEK REMARKS
+    "available_documents",
+    "non_available_documents",
+    "discrepancy_doc",
+    "discrepancy_reason",
+    "next_actionable_stage",
+    "next_step_recommended",
+    "niyamtek_remarks",
+
+    # EXTRA
+    "pos",
+    "sarfaesi_category",
+    "case_status",
 ]
 
 REPORT_EXPORT_HEADERS = {
@@ -199,29 +286,30 @@ REPORT_EXPORT_HEADERS = {
     "property_address": "Address of Mortgaged Property",
     "borrower_name": "NAME OF BORROWER",
     "borrower_address": "Borrower Address",
-    "borrower_address_also_at": "Borrower Address_(Also At)",
-    "co_borrower_name_1": "Co-Borrower Name_1",
-    "co_borrower_address_1": "Co-Borrower Address_1",
-    "co_borrower_address_1_also_at": "Co-Borrower Address_1 (Also At)",
-    "co_borrower_name_2": "Co-Borrower Name_2",
-    "co_borrower_address_2": "Co-Borrower Address_2",
-    "co_borrower_address_2_also_at": "Co-Borrower Address_2 (Also At)",
-    "co_borrower_name_3": "Co-Borrower Name_3",
-    "co_borrower_address_3": "Co-Borrower Address_3",
-    "co_borrower_address_3_also_at": "Co-Borrower Address_3 (Also At)",
-    "co_borrower_name_4": "Co-Borrower Name_4",
-    "co_borrower_address_4": "Co-Borrower Address_4",
-    "co_borrower_address_4_also_at": "Co-Borrower Address_4 (Also At)",
-    "co_borrower_name_5": "Co-Borrower Name_5",
-    "co_borrower_address_5": "Co-Borrower Address_5",
-    "co_borrower_address_5_also_at": "Co-Borrower Address_5 (Also At)",
-    "co_borrower_name_6": "Co-Borrower Name_6",
-    "co_borrower_address_6": "Co-Borrower Address_6",
+    "borrower_address_also_at": "Borrower Address (Also At)",
+    "co_borrower_name_1": "Co-Borrower Name 1",
+    "co_borrower_address_1": "Co-Borrower Address 1",
+    "co_borrower_address_1_also_at": "Co-Borrower Address 1 (Also At)",
+    "co_borrower_name_2": "Co-Borrower Name 2",
+    "co_borrower_address_2": "Co-Borrower Address 2",
+    "co_borrower_address_2_also_at": "Co-Borrower Address 2 (Also At)",
+    "co_borrower_name_3": "Co-Borrower Name 3",
+    "co_borrower_address_3": "Co-Borrower Address 3",
+    "co_borrower_address_3_also_at": "Co-Borrower Address 3 (Also At)",
+    "co_borrower_name_4": "Co-Borrower Name 4",
+    "co_borrower_address_4": "Co-Borrower Address 4",
+    "co_borrower_address_4_also_at": "Co-Borrower Address 4 (Also At)",
+    "co_borrower_name_5": "Co-Borrower Name 5",
+    "co_borrower_address_5": "Co-Borrower Address 5",
+    "co_borrower_address_5_also_at": "Co-Borrower Address 5 (Also At)",
+    "co_borrower_name_6": "Co-Borrower Name 6",
+    "co_borrower_address_6": "Co-Borrower Address 6",
+    "co_borrower_6_address_alt": "Co-borrower address 6 (also at)",
     "property_description": "Property Description",
-    "guarantor_1_name": "Guarantor Name_1",
-    "guarantor_1_address": "Guarantor Address_1",
-    "guarantor_2_name": "Guarantor Name_2",
-    "guarantor_2_address": "Guarantor Address_2",
+    "guarantor_1_name": "Guarantor Name 1",
+    "guarantor_1_address": "Guarantor Address 1",
+    "guarantor_2_name": "Guarantor Name 2",
+    "guarantor_2_address": "Guarantor Address 2",
     "date_of_npa": "Date of NPA",
     "dpd_as_on_notice": "DPD as on Notice Issuance Date",
     "disbursement_type": "Disbursement Type (Loan / OD / CC / HL / BLG)",
@@ -231,7 +319,7 @@ REPORT_EXPORT_HEADERS = {
     "loan_amount": "Loan Amount",
     "future_principal": "Future Principle",
     "principal_outstanding": "Principal Outstanding",
-    "instalment_overdue_amount": "Instalment_overdue_amount",
+    "instalment_overdue_amount": "Instalment Overdue Amount",
     "interest_on_termination": "Interest on Termination",
     "late_payment_penalty": "Late Payment Penalty",
     "cheque_bounce_charges": "Cheque Bounce Charges (Including Others)",
@@ -251,6 +339,92 @@ REPORT_EXPORT_HEADERS = {
     "publication_date_13_2": "13(2) Date of Publication",
     "publication_english_13_2": "Publication Details : (Names of News Papers) & Language Name : (English)",
     "publication_local_13_2": "Publication Details : (Names of News Papers) & Vernacular Language Name : (Tamil,Hindi,malayalam,etc...)",
+    "delivery_status_date": "Delivery status date",
+
+    # 13(4) Symbolic possession
+    "symbolic_possession_date_13_4": "13(4) symbolic possession date",
+    "symbolic_dispatch_date_13_4": "13(4) symbolic dispatch date",
+    "symbolic_delivery_status_13_4": "13(4) symbolic delivery status",
+    "symbolic_delivery_status_date_13_4": "13(4) symbolic delivery status date",
+    "symbolic_photo_13_4": "13(4) symbolic photo",
+    "symbolic_publication_date_13_4": "13(4) symbolic publication date",
+    "symbolic_pub_english_13_4": "13(4) symbolic publication (english)",
+    "symbolic_pub_local_13_4": "13(4) symbolic publication (vernacular)",
+    "matured_date_13_4": "13(4) matured date",
+    "vacation_notice_moveable": "Symbolic vacation notice (moveable)",
+    "vacation_notice_immoveable": "Symbolic vacation notice (immoveable)",
+
+    # CJM / CMM
+    "cjm_filing_date": "Cjm filing date",
+    "court_name": "Court name",
+    "case_number": "Case number",
+    "crm_pl_date": "Crm pl date",
+    "crm_pl_no": "Crm pl no",
+    "next_hearing_date": "Next hearing date",
+    "ov_date": "Ov date",
+    "order_date": "Order date",
+    "court_ao_name": "Court ao name",
+    "advocate_details": "Advocate details",
+    "adv_com_name": "Adv com name",
+    "inventory_status": "Inventory status",
+
+    # Physical possession
+    "physical_possession_date": "Physical possession date",
+    "physical_dispatch_date": "Physical dispatch date",
+    "physical_delivery_status": "Physical delivery status",
+    "physical_delivery_status_date": "Physical delivery status date",
+    "physical_photo": "Physical photo",
+    "physical_publication_date": "Physical publication date",
+    "physical_pub_english": "Physical publication (english)",
+    "physical_pub_local": "Physical publication (vernacular)",
+    "physical_vacation_notice_moveable": "Physical vacation notice (moveable)",
+    "physical_vacation_notice_immoveable": "Physical vacation notice (immoveable)",
+
+    # Auction notice
+    "auction_notice_date": "Auction notice date",
+    "auction_date": "Auction date",
+    "auction_publication_date": "Auction publication date",
+    "auction_pub_english": "Auction publication (english)",
+    "auction_pub_local": "Auction publication (vernacular)",
+    "reserve_price": "Reserve price",
+
+    # Auction portal
+    "sold_price": "Sold price",
+    "auction_status": "Auction status",
+    "inspection_start": "Inspection start",
+    "inspection_end": "Inspection end",
+    "emd_last_date": "Emd last date",
+    "auction_start": "Auction start",
+    "auction_end": "Auction end",
+    "bid_extension_time": "Bid extension time",
+    "total_extensions": "Total extensions",
+    "outstanding_amount": "Outstanding amount",
+    "emd_amount": "Emd amount",
+    "bid_increment": "Bid increment",
+    "total_bid_count": "Total bid count",
+    "authorised_officer": "Authorised officer",
+
+    # Post sale
+    "post_sale_notice": "Post sale notice",
+    "sold_reg_date": "Sold registration date",
+
+    # Sale certificate
+    "sale_confirmation_date": "Sale confirmation date",
+    "sale_certificate_date": "Sale certificate date",
+
+    # Niyamtek remarks
+    "available_documents": "Available documents",
+    "non_available_documents": "Non available documents",
+    "discrepancy_doc": "Discrepancy doc",
+    "discrepancy_reason": "Discrepancy reason",
+    "next_actionable_stage": "Next actionable stage",
+    "next_step_recommended": "Next step recommended",
+    "niyamtek_remarks": "Niyamtek remarks",
+
+    # Extra
+    "pos": "Principal Outstanding (POS)",
+    "sarfaesi_category": "Sarfaesi category",
+    "case_status": "Case status",
 }
 
 LEGACY_TO_MODEL_FIELD = {
@@ -414,7 +588,7 @@ class ReportService:
     # =====================================================
     def bulk_download_reports(self, application_numbers: List[str]):
 
-        reports = []
+        fetched_reports = []
         blocked_apps = []
         missing_apps = []
 
@@ -426,7 +600,30 @@ class ReportService:
             if (report.rerun_report or 0) == 1:
                 blocked_apps.append(app_no)
                 continue
-            reports.append(self._model_to_dict(report))
+            fetched_reports.append(report)
+
+        client_names = set()
+        for report in fetched_reports:
+            report_application = getattr(report, "application", None)
+            client_name = getattr(report_application, "client_name", None) if report_application else None
+            if not client_name:
+                client_name = getattr(report, "company_name", None) or getattr(report, "arc_name", None)
+            if client_name:
+                client_names.add(client_name)
+
+        client_code_by_name = {}
+        if client_names:
+            for live_client in (
+                self.db.query(Client)
+                .filter(Client.client_name.in_(client_names), *live_filter(Client))
+                .all()
+            ):
+                client_code_by_name.setdefault(live_client.client_name, live_client.client_code)
+
+        reports = [
+            self._model_to_dict(report, client_code_by_name=client_code_by_name)
+            for report in fetched_reports
+        ]
 
         if blocked_apps:
             raise ValueError(
@@ -450,7 +647,7 @@ class ReportService:
     # =====================================================
     # MODEL → SAFE DICT
     # =====================================================
-    def _model_to_dict(self, report: SarfaesiMaster):
+    def _model_to_dict(self, report: SarfaesiMaster, client_code_by_name: Optional[Dict[str, str]] = None):
 
         data = {}
         resolved_client_code = None
@@ -461,13 +658,16 @@ class ReportService:
         if not client_name:
             client_name = getattr(report, "company_name", None) or getattr(report, "arc_name", None)
         if client_name:
-            live_client = (
-                self.db.query(Client)
-                .filter(Client.client_name == client_name, *live_filter(Client))
-                .first()
-            )
-            if live_client:
-                resolved_client_code = live_client.client_code
+            if client_code_by_name is not None:
+                resolved_client_code = client_code_by_name.get(client_name)
+            else:
+                live_client = (
+                    self.db.query(Client)
+                    .filter(Client.client_name == client_name, *live_filter(Client))
+                    .first()
+                )
+                if live_client:
+                    resolved_client_code = live_client.client_code
 
         for field_config in self.report_fields:
             col = field_config.get("field")

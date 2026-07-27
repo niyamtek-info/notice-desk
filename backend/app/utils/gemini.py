@@ -2,6 +2,11 @@ import google.generativeai as genai
 import os
 from app.core.settings import settings
 
+# Without a timeout, a hung Gemini call blocks the Celery worker/task slot
+# handling it indefinitely, backing up the whole extraction/translation/
+# checklist queue behind it.
+GEMINI_REQUEST_TIMEOUT_SECONDS = 120
+
 def call_gemini_ai(prompt, ocr_text=None):
     """
     Calls Google Gemini AI model to process the prompt.
@@ -32,7 +37,8 @@ def call_gemini_ai(prompt, ocr_text=None):
                 top_p=1,
                 max_output_tokens=30000,
                 response_mime_type="application/json",
-            )
+            ),
+            request_options={"timeout": GEMINI_REQUEST_TIMEOUT_SECONDS},
         )
         
         if response.text:
@@ -82,7 +88,8 @@ CORRECTED JSON:"""
                 temperature=0.0,
                 max_output_tokens=30000,
                 response_mime_type="application/json",
-            )
+            ),
+            request_options={"timeout": GEMINI_REQUEST_TIMEOUT_SECONDS},
         )
         return response.text.strip() if response.text else malformed_json
     except Exception as e:

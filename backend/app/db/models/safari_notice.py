@@ -1,12 +1,13 @@
 from decimal import Decimal
 
-from sqlalchemy import Boolean, Column, Date, DateTime, Integer, Numeric, String, Text, event
+from sqlalchemy import Boolean, Column, Date, DateTime, Integer, Numeric, String, Text, and_, event
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.db.models.application import Application
 from app.db.base_class import Base
 from app.db.models.client_models import Client
+from app.db.versioning import OPEN_END_DATE
 from app.utils.date_utils import parse_datetime
 
 
@@ -43,13 +44,24 @@ class SarfaesiMaster(Base):
     client_code = Column(String(100), nullable=True, index=True)
     client = relationship(
         Client,
-        primaryjoin="SarfaesiMaster.client_code == Client.client_code",
+        primaryjoin=lambda: and_(
+            SarfaesiMaster.client_code == Client.client_code,
+            Client.is_deleted == False,
+            Client.end_date == OPEN_END_DATE,
+            Client.is_active == True,
+        ),
         foreign_keys="[SarfaesiMaster.client_code]",
         viewonly=True,
+        uselist=False,
     )
     application = relationship(
         Application,
-        primaryjoin="SarfaesiMaster.application_number == Application.business_code",
+        primaryjoin=lambda: and_(
+            SarfaesiMaster.application_number == Application.business_code,
+            Application.is_deleted == False,
+            Application.end_date == OPEN_END_DATE,
+            Application.is_active == True,
+        ),
         foreign_keys="[SarfaesiMaster.application_number]",
         viewonly=True,
         uselist=False,

@@ -28,7 +28,7 @@ export default function DashboardPage() {
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
   const [refreshTrigger, setRefreshTrigger] = React.useState(0);
   const { selectedBank, setSelectedBank } = useBank();
-  const [banks, setBanks] = useState<any>([]);
+  const [banks, setBanks] = useState<any>([{client_code:"all", client_name:"All Client", client: "all"}]);
   const [createType,setCreateType] = useState<string>("")
 
   // Search state
@@ -41,23 +41,26 @@ export default function DashboardPage() {
 
   const handleFetchBank = async () => {
     try {
+      setClientSelectLoading(true);
       let response: any = await BankApi.getBankList();
-      setBanks([{client_code:"all",client_name:"All Client"},...response]);
-    } catch (error) {}
+      setBanks([{client_code:"all", client_name:"All Client", client: "all"},...response]);
+    } catch (error) {} finally {
+      setClientSelectLoading(false);
+    }
   };
 
-  // Handle dropdown open change - show loader for 2 seconds when dropdown opens
+  // Handle dropdown open change
   const handleDropdownOpenChange = (open: boolean) => {
     if (open) {
-      setClientSelectLoading(true);
-      setTimeout(() => {
-        setClientSelectLoading(false);
-      }, 500);
+      handleFetchBank();
     }
   };
 
   useEffect(() => {
-    handleFetchBank();
+    const savedBank = localStorage.getItem('selectedBank');
+    if (!savedBank || savedBank === "undefined" || savedBank === "null" || savedBank === "") {
+      setSelectedBank("all");
+    }
   }, []);
 
 

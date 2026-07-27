@@ -16,9 +16,9 @@ class Settings(BaseSettings):
     # Database config — reads DB_* env vars (set in .env / .env.gcp)
     DB_HOST: str = Field("localhost", alias="DB_HOST")
     DB_PORT: int = Field(3306, alias="DB_PORT")
-    DB_USER: str = Field("niyamtek_user", alias="DB_USER")
-    DB_PASSWORD: str = Field("", alias="DB_PASSWORD")
-    DB_NAME: str = Field("matex_db", alias="DB_NAME")
+    DB_USER: str = Field("root", alias="DB_USER")
+    DB_PASSWORD: str = Field("Aietonlabs", alias="DB_PASSWORD")
+    DB_NAME: str = Field("matex_db_test", alias="DB_NAME")
     # Optional override: set SQLALCHEMY_DATABASE_URI to skip per-field building
     SQLALCHEMY_DATABASE_URI: str | None = Field(None, alias="SQLALCHEMY_DATABASE_URI")
 
@@ -30,8 +30,13 @@ class Settings(BaseSettings):
         escaped_password = quote_plus(self.DB_PASSWORD)
         return f"mysql+pymysql://{self.DB_USER}:{escaped_password}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
+    # STORAGE_PROVIDER selects where uploaded documents/assets are written:
+    # "cloud" (Google Cloud Storage) or "local" (disk-only, no cloud
+    # credentials needed).
+    STORAGE_PROVIDER: str = Field("cloud", alias="STORAGE_PROVIDER")
+
     # ── Google Cloud Storage (replaces AWS S3) ───────────────────────
-    GCS_BUCKET_NAME: str = Field(..., alias="GCS_BUCKET_NAME")
+    GCS_BUCKET_NAME: str | None = Field(None, alias="GCS_BUCKET_NAME")
     GCS_LOCATION: str = Field("asia-south1", alias="GCS_LOCATION")
     GCS_BASE_URL: str = Field("", alias="GCS_BASE_URL")
 
@@ -41,7 +46,7 @@ class Settings(BaseSettings):
 
     # Backward-compat aliases so existing service code works without changes
     @property
-    def S3_BUCKET_NAME(self) -> str:
+    def S3_BUCKET_NAME(self) -> str | None:
         return self.GCS_BUCKET_NAME
 
     @property
@@ -51,6 +56,11 @@ class Settings(BaseSettings):
     # Template URL settings (used by template_service.py)
     TEMPLATE_URL_MODE: str = Field("presigned", alias="TEMPLATE_URL_MODE")
     TEMPLATE_PRESIGNED_EXPIRY_SECONDS: int = Field(3600, alias="TEMPLATE_PRESIGNED_EXPIRY_SECONDS")
+
+    # Base URL the frontend/other clients use to reach this backend, used to
+    # build fetchable links for files served from local disk (STORAGE_PROVIDER=local).
+    LOCAL_STORAGE_BASE_URL: str = Field("http://localhost:8000", alias="LOCAL_STORAGE_BASE_URL")
+    LOCAL_STORAGE_ROOT: str = Field("./storage_mirror", alias="LOCAL_STORAGE_ROOT")
 
     GEMINI_API_KEY: str = Field(..., alias="GEMINI_API_KEY")
 
@@ -130,4 +140,17 @@ class Settings(BaseSettings):
 
 settings = Settings()  # pyright: ignore[reportCallIssue]
 
+if settings.STORAGE_PROVIDER == "cloud":
+    if not settings.GCS_BUCKET_NAME:
+        raise RuntimeError(
+            "STORAGE_PROVIDER=cloud requires GCS_BUCKET_NAME to be set "
+            "(or set STORAGE_PROVIDER=local to run without cloud credentials)."
+        )
+elif settings.STORAGE_PROVIDER != "local":
+    raise RuntimeError(
+        f"Unknown STORAGE_PROVIDER '{settings.STORAGE_PROVIDER}'. Expected 'cloud' or 'local'."
+    )
+
 os.makedirs(settings.TMP_DIR, exist_ok=True)
+if settings.STORAGE_PROVIDER == "local":
+    os.makedirs(settings.LOCAL_STORAGE_ROOT, exist_ok=True)

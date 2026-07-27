@@ -590,6 +590,11 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
     }
   }, [selectedBank])
 
+  useEffect(() => {
+    setSelectedRowKeys([]);
+    setSelectedAppNo([]);
+  }, [selectedBank, selectedStatus]);
+
   return (
     <>
       {contextHolder}

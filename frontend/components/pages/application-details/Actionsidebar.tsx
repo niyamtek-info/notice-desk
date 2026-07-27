@@ -51,11 +51,12 @@ interface ActionsidebarProps {
   token: string;
   bankCode: any;
   banks: any;
+  banksLoading?: boolean;
   setTriggerReport: any;
   initialData?: any;
 }
 
-export default function Actionsidebar({applicationId,token,bankCode,banks,setTriggerReport,initialData}:ActionsidebarProps) {
+export default function Actionsidebar({applicationId,token,bankCode,banks,banksLoading,setTriggerReport,initialData}:ActionsidebarProps) {
   const [docModel,setDocModel] = useState<boolean>(false)
   const [modelType,setModelType] = useState<string>("")
 
@@ -166,7 +167,7 @@ export default function Actionsidebar({applicationId,token,bankCode,banks,setTri
     <DocsandCheckListModel visible={docModel} onCancel={handleDocCancel} applicationId={applicationId} token={token} setTriggerReport={setTriggerReport}/>
     }
     {modelType === "Notice" &&
-    <NoticeModel visible={docModel} onCancel={handleDocCancel} applicationId={applicationId} token={token} bankCode={bankCode} banks={banks} initialData={initialData}/>
+    <NoticeModel visible={docModel} onCancel={handleDocCancel} applicationId={applicationId} token={token} bankCode={bankCode} banks={banks} banksLoading={banksLoading} initialData={initialData}/>
     }
     {modelType === "Report" &&
       <GenerateReportModel visible={docModel} onSuccess={handleDownloadApi} onCancel={handleDocCancel} type={"single"}/>

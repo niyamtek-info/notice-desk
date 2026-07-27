@@ -35,7 +35,7 @@ BULK_SARFAESI_FIELD_MAP = {
     "COMPANY_NAME": "client_name",
     "CLIENT_NAME": "client_name",
     "LOAN_REQUESTER_NAME": "borrower_name",
-    "ASSIGNED_DATE": "assignment_agreement_date",
+    "ASSIGNMENT_AGREEMENT_DATE": "assignment_agreement_date",
     "LOAN_ACCOUNT_NUMBER": "loan_account_no",
     "BORROWER_NAME": "borrower_name",
     "TRUST_NUMBER": "trust_number",
@@ -98,6 +98,105 @@ BULK_SARFAESI_FIELD_MAP = {
     "13_2_DATE_OF_PUBLICATION": "publication_date_13_2",
     "PUBLICATION_DETAILS_NAMES_OF_NEWS_PAPERS_LANGUAGE_NAME_ENGLISH": "publication_english_13_2",
     "PUBLICATION_DETAILS_NAMES_OF_NEWS_PAPERS_VERNACULAR_LANGUAGE_NAME_TAMIL_HINDI_MALAYALAM_ETC": "publication_local_13_2",
+    "DELIVERY_STATUS": "delivery_status",
+    "DELIVERY_STATUS_DATE": "delivery_status_date",
+
+    # 13(4) SYMBOLIC POSSESSION
+    "13_4_SYMBOLIC_POSSESSION_DATE": "symbolic_possession_date_13_4",
+    "13_4_SYMBOLIC_DISPATCH_DATE": "symbolic_dispatch_date_13_4",
+    "13_4_SYMBOLIC_DELIVERY_STATUS": "symbolic_delivery_status_13_4",
+    "13_4_SYMBOLIC_DELIVERY_STATUS_DATE": "symbolic_delivery_status_date_13_4",
+    "13_4_SYMBOLIC_PHOTO": "symbolic_photo_13_4",
+    "13_4_SYMBOLIC_PUBLICATION_DATE": "symbolic_publication_date_13_4",
+    "13_4_SYMBOLIC_PUBLICATION_ENGLISH": "symbolic_pub_english_13_4",
+    "13_4_SYMBOLIC_PUBLICATION_VERNACULAR": "symbolic_pub_local_13_4",
+    "13_4_MATURED_DATE": "matured_date_13_4",
+    "SYMBOLIC_VACATION_NOTICE_MOVEABLE": "vacation_notice_moveable",
+    "SYMBOLIC_VACATION_NOTICE_IMMOVEABLE": "vacation_notice_immoveable",
+
+    # CJM / CMM
+    "CJM_FILING_DATE": "cjm_filing_date",
+    "COURT_NAME": "court_name",
+    "CASE_NUMBER": "case_number",
+    "CRM_PL_DATE": "crm_pl_date",
+    "CRM_PL_NO": "crm_pl_no",
+    "NEXT_HEARING_DATE": "next_hearing_date",
+    "OV_DATE": "ov_date",
+    "ORDER_DATE": "order_date",
+    "COURT_AO_NAME": "court_ao_name",
+    "ADVOCATE_DETAILS": "advocate_details",
+    "ADV_COM_NAME": "adv_com_name",
+    "INVENTORY_STATUS": "inventory_status",
+
+    # PHYSICAL POSSESSION
+    "PHYSICAL_POSSESSION_DATE": "physical_possession_date",
+    "PHYSICAL_DISPATCH_DATE": "physical_dispatch_date",
+    "PHYSICAL_DELIVERY_STATUS": "physical_delivery_status",
+    "PHYSICAL_DELIVERY_STATUS_DATE": "physical_delivery_status_date",
+    "PHYSICAL_PHOTO": "physical_photo",
+    "PHYSICAL_PUBLICATION_DATE": "physical_publication_date",
+    "PHYSICAL_PUBLICATION_ENGLISH": "physical_pub_english",
+    "PHYSICAL_PUBLICATION_VERNACULAR": "physical_pub_local",
+    "PHYSICAL_VACATION_NOTICE_MOVEABLE": "physical_vacation_notice_moveable",
+    "PHYSICAL_VACATION_NOTICE_IMMOVEABLE": "physical_vacation_notice_immoveable",
+
+    # AUCTION NOTICE
+    "AUCTION_NOTICE_DATE": "auction_notice_date",
+    "AUCTION_DATE": "auction_date",
+    "AUCTION_PUBLICATION_DATE": "auction_publication_date",
+    "AUCTION_PUBLICATION_ENGLISH": "auction_pub_english",
+    "AUCTION_PUBLICATION_VERNACULAR": "auction_pub_local",
+    "RESERVE_PRICE": "reserve_price",
+
+    # AUCTION PORTAL
+    "SOLD_PRICE": "sold_price",
+    "AUCTION_STATUS": "auction_status",
+    "INSPECTION_START": "inspection_start",
+    "INSPECTION_END": "inspection_end",
+    "EMD_LAST_DATE": "emd_last_date",
+    "AUCTION_START": "auction_start",
+    "AUCTION_END": "auction_end",
+    "BID_EXTENSION_TIME": "bid_extension_time",
+    "TOTAL_EXTENSIONS": "total_extensions",
+    "OUTSTANDING_AMOUNT": "outstanding_amount",
+    "EMD_AMOUNT": "emd_amount",
+    "BID_INCREMENT": "bid_increment",
+    "TOTAL_BID_COUNT": "total_bid_count",
+    "AUTHORISED_OFFICER": "authorised_officer",
+
+    # POST SALE
+    "POST_SALE_NOTICE": "post_sale_notice",
+    "SOLD_REGISTRATION_DATE": "sold_reg_date",
+
+    # SALE CERTIFICATE
+    "SALE_CONFIRMATION_DATE": "sale_confirmation_date",
+    "SALE_CERTIFICATE_DATE": "sale_certificate_date",
+
+    # NIYAMTEK REMARKS
+    "AVAILABLE_DOCUMENTS": "available_documents",
+    "NON_AVAILABLE_DOCUMENTS": "non_available_documents",
+    "DISCREPANCY_DOC": "discrepancy_doc",
+    "DISCREPANCY_REASON": "discrepancy_reason",
+    "NEXT_ACTIONABLE_STAGE": "next_actionable_stage",
+    "NEXT_STEP_RECOMMENDED": "next_step_recommended",
+    "NIYAMTEK_REMARKS": "niyamtek_remarks",
+
+    # EXTRA
+    "POS": "pos",
+    "SARFAESI_CATEGORY": "sarfaesi_category",
+    "CASE_STATUS": "case_status",
+
+    # Alternate headers used by the "final bulk report" download
+    # (ReportService.REPORT_EXPORT_HEADERS) so re-uploading that export
+    # maps back to the same fields as the blank bulk-upload template.
+    "ADDRESS_OF_MORTGAGED_PROPERTY": "property_address",
+    "FUTURE_PRINCIPLE": "future_principal",
+    "DELIVERED_UNDELIVERED_WITH_DATE": "delivery_status",
+    # pos's export header was disambiguated from "Principal Outstanding" to
+    # "Principal Outstanding (POS)" to avoid colliding with the separate
+    # principal_outstanding field's header on re-upload; keep the old "POS"
+    # key too for previously-downloaded exports still using the old header.
+    "PRINCIPAL_OUTSTANDING_POS": "pos",
 }
 
 
@@ -207,22 +306,21 @@ class ApplicationsService:
             "batch_code": batch_code,
         }
 
-    def _has_complete_13_2_details(self, data: Dict[str, Any]) -> bool:
-        required_fields = (
-            "notice_13_2_amount",
-            "notice_13_2_date",
-            "notice_dispatch_date",
-            "notice_pasting_date",
-            "delivery_status",
-            "delivered_address",
-            "undelivered_address",
-            "total_address",
-            "publication_date_13_2",
-            "publication_english_13_2",
-            "publication_local_13_2",
-        )
+    REQUIRED_13_2_FIELDS = (
+        "notice_13_2_amount",
+        "notice_13_2_date",
+        "notice_dispatch_date",
+        "notice_pasting_date",
+        "delivered_address",
+        "undelivered_address",
+        "total_address",
+        "publication_date_13_2",
+        "publication_english_13_2",
+        "publication_local_13_2",
+    )
 
-        for field in required_fields:
+    def _has_complete_13_2_details(self, data: Dict[str, Any]) -> bool:
+        for field in self.REQUIRED_13_2_FIELDS:
             if self._is_blank_value(data.get(field)):
                 return False
         return True
@@ -423,8 +521,7 @@ class ApplicationsService:
             "CLIENT_NAME",
             "LOAN_ACCOUNT_NUMBER",
             "LOAN_REQUESTER_NAME",
-            "STATE",
-            "ASSIGNED_DATE",
+            "STATE"
         ]
 
         for col in required_columns:
@@ -551,6 +648,7 @@ class ApplicationsService:
                                 "loan_details": {},
                                 "13_2_details": {},
                                 "13_4_details": {},
+                                "symbolic_vacation_notice_details": {},
                                 "cjm_details": {},
                                 "physical_possession_details": {},
                                 "auction_notice_details": {},
@@ -591,32 +689,108 @@ class ApplicationsService:
                                 "total_outstanding": "loan_details",
                                 "fcl_as_on_date": "loan_details",
                                 "total_outstanding_words": "loan_details",
+                                "borrower_address_alt": "loan_details",
                                 "co_borrower_1_name": "loan_details",
                                 "co_borrower_1_address": "loan_details",
+                                "co_borrower_1_address_alt": "loan_details",
                                 "co_borrower_2_name": "loan_details",
                                 "co_borrower_2_address": "loan_details",
+                                "co_borrower_2_address_alt": "loan_details",
                                 "co_borrower_3_name": "loan_details",
                                 "co_borrower_3_address": "loan_details",
+                                "co_borrower_3_address_alt": "loan_details",
                                 "co_borrower_4_name": "loan_details",
                                 "co_borrower_4_address": "loan_details",
+                                "co_borrower_4_address_alt": "loan_details",
                                 "co_borrower_5_name": "loan_details",
                                 "co_borrower_5_address": "loan_details",
+                                "co_borrower_5_address_alt": "loan_details",
                                 "co_borrower_6_name": "loan_details",
                                 "co_borrower_6_address": "loan_details",
+                                "co_borrower_6_address_alt": "loan_details",
                                 "guarantor_1_name": "loan_details",
                                 "guarantor_1_address": "loan_details",
                                 "guarantor_2_name": "loan_details",
                                 "guarantor_2_address": "loan_details",
+                                "pos": "loan_details",
+                                "sarfaesi_category": "loan_details",
+                                "case_status": "loan_details",
                                 "notice_13_2_amount": "13_2_details",
                                 "notice_13_2_date": "13_2_details",
                                 "notice_dispatch_date": "13_2_details",
                                 "notice_pasting_date": "13_2_details",
+                                "delivery_status": "13_2_details",
+                                "delivery_status_date": "13_2_details",
                                 "delivered_address": "13_2_details",
                                 "undelivered_address": "13_2_details",
                                 "total_address": "13_2_details",
                                 "publication_date_13_2": "13_2_details",
                                 "publication_english_13_2": "13_2_details",
                                 "publication_local_13_2": "13_2_details",
+                                "symbolic_possession_date_13_4": "13_4_details",
+                                "symbolic_dispatch_date_13_4": "13_4_details",
+                                "symbolic_delivery_status_13_4": "13_4_details",
+                                "symbolic_delivery_status_date_13_4": "13_4_details",
+                                "symbolic_photo_13_4": "13_4_details",
+                                "symbolic_publication_date_13_4": "13_4_details",
+                                "symbolic_pub_english_13_4": "13_4_details",
+                                "symbolic_pub_local_13_4": "13_4_details",
+                                "matured_date_13_4": "13_4_details",
+                                "vacation_notice_moveable": "symbolic_vacation_notice_details",
+                                "vacation_notice_immoveable": "symbolic_vacation_notice_details",
+                                "cjm_filing_date": "cjm_details",
+                                "court_name": "cjm_details",
+                                "case_number": "cjm_details",
+                                "crm_pl_date": "cjm_details",
+                                "crm_pl_no": "cjm_details",
+                                "next_hearing_date": "cjm_details",
+                                "ov_date": "cjm_details",
+                                "order_date": "cjm_details",
+                                "court_ao_name": "cjm_details",
+                                "advocate_details": "cjm_details",
+                                "adv_com_name": "cjm_details",
+                                "inventory_status": "cjm_details",
+                                "physical_possession_date": "physical_possession_details",
+                                "physical_dispatch_date": "physical_possession_details",
+                                "physical_delivery_status": "physical_possession_details",
+                                "physical_delivery_status_date": "physical_possession_details",
+                                "physical_photo": "physical_possession_details",
+                                "physical_publication_date": "physical_possession_details",
+                                "physical_pub_english": "physical_possession_details",
+                                "physical_pub_local": "physical_possession_details",
+                                "physical_vacation_notice_moveable": "physical_possession_details",
+                                "physical_vacation_notice_immoveable": "physical_possession_details",
+                                "auction_notice_date": "auction_notice_details",
+                                "auction_date": "auction_notice_details",
+                                "auction_publication_date": "auction_notice_details",
+                                "auction_pub_english": "auction_notice_details",
+                                "auction_pub_local": "auction_notice_details",
+                                "reserve_price": "auction_notice_details",
+                                "sold_price": "auction_portal_details",
+                                "auction_status": "auction_portal_details",
+                                "inspection_start": "auction_portal_details",
+                                "inspection_end": "auction_portal_details",
+                                "emd_last_date": "auction_portal_details",
+                                "auction_start": "auction_portal_details",
+                                "auction_end": "auction_portal_details",
+                                "bid_extension_time": "auction_portal_details",
+                                "total_extensions": "auction_portal_details",
+                                "outstanding_amount": "auction_portal_details",
+                                "emd_amount": "auction_portal_details",
+                                "bid_increment": "auction_portal_details",
+                                "total_bid_count": "auction_portal_details",
+                                "authorised_officer": "auction_portal_details",
+                                "post_sale_notice": "post_sale_details",
+                                "sold_reg_date": "post_sale_details",
+                                "sale_confirmation_date": "sale_certificate_details",
+                                "sale_certificate_date": "sale_certificate_details",
+                                "available_documents": "niyamtek_remarks_details",
+                                "non_available_documents": "niyamtek_remarks_details",
+                                "discrepancy_doc": "niyamtek_remarks_details",
+                                "discrepancy_reason": "niyamtek_remarks_details",
+                                "next_actionable_stage": "niyamtek_remarks_details",
+                                "next_step_recommended": "niyamtek_remarks_details",
+                                "niyamtek_remarks": "niyamtek_remarks_details",
                             }
                             
                             for field_name, value in report_payload.items():
@@ -631,11 +805,23 @@ class ApplicationsService:
                                 nested_payload,
                                 audit_user,
                             )
-                            
-                            # Preserve rerun_report
-                            existing_rerun_report = getattr(sarfaesi_service.repo.get_by_application_number(application_no), 'rerun_report', 0)
-                            if hasattr(updated_report, 'rerun_report'):
-                                updated_report.rerun_report = existing_rerun_report
+
+                            # Re-evaluate report availability using the effective
+                            # (existing DB value, or newly uploaded value if the DB
+                            # field was empty) 13(2) fields.
+                            merged_13_2 = {}
+                            for field in self.REQUIRED_13_2_FIELDS:
+                                value = report_payload.get(field)
+                                if self._is_blank_value(value):
+                                    value = getattr(existing_report, field, None)
+                                merged_13_2[field] = value
+
+                            ReportRepository(db).mark_rerun_report(
+                                application_no,
+                                0 if self._has_complete_13_2_details(merged_13_2) else 1,
+                                audit_user=audit_user,
+                                auto_commit=False,
+                            )
                             db.commit()
                         finally:
                             db.close()
@@ -674,9 +860,6 @@ class ApplicationsService:
                             }
                         }
                         report_payload = self._build_sarfaesi_payload_from_row(row)
-                        assigned_date = self._first_non_blank_value(row.get("ASSIGNED_DATE"))
-                        if "assignment_agreement_date" not in report_payload and not self._is_blank_value(assigned_date):
-                            report_payload["assignment_agreement_date"] = parse_datetime(assigned_date)
                         report_payload["report_source"] = "Manual Excel"
                         report_payload["has_document"] = False
 
@@ -706,6 +889,12 @@ class ApplicationsService:
                                 manual_payload=report_payload,
                                 report_source="Manual Excel",
                                 has_document=False,
+                                auto_commit=False,
+                            )
+                            ReportRepository(db).mark_rerun_report(
+                                business_code,
+                                0 if self._has_complete_13_2_details(report_payload) else 1,
+                                audit_user=audit_user,
                                 auto_commit=False,
                             )
                             db.commit()
@@ -787,7 +976,9 @@ class ApplicationsService:
         location: Optional[str] = None,
         type_of_work: Optional[str] = None,
         assigned_from: Optional[datetime] = None,
-        assigned_to: Optional[datetime] = None
+        assigned_to: Optional[datetime] = None,
+        skip: Optional[int] = None,
+        limit: Optional[int] = None,
     ) -> List[Dict]:
         return self.repo.list_records(
             client_name=client_name,
@@ -799,6 +990,8 @@ class ApplicationsService:
             type_of_work=type_of_work,
             assigned_from=assigned_from,
             assigned_to=assigned_to,
+            skip=skip,
+            limit=limit,
         )
 
     def search_records(self, query: str) -> List[Dict]:
@@ -844,80 +1037,168 @@ class ApplicationsService:
         if not business_code:
             return None
         s3_key = f"{business_code}/original-document/{filename}"
-        from app.gateways.s3_gateway import S3Gateway
-        gateway = S3Gateway()
+        from app.gateways.storage_gateway import get_storage_gateway
+        gateway = get_storage_gateway()
         return gateway.generate_presigned_url(s3_key)
 
     def download_template(self):
         columns = [
-            "BATCH CODE",
-            "TYPE OF SERVICE",
-            "DATE OF ASSIGN",
-            "NIYAMTEK USER ID OR NAME",
-            "CLIENT ID (CODE)",
-            "Company Name",
-            "LOAN ACCOUNT NO.",
-            "NAME OF BORROWER",
-            "Trust Number",
-            "Assignment agreement Date",
-            "AO NAME",
-            "BRANCH",
-            "STATE",
+            "Batch code",
+            "Type of service",
+            "Date of assign",
+            "Niyamtek user id or name",
+            "Client id (code)",
+            "Company name",
+            "Loan account no.",
+            "Name of borrower",
+            "Trust number",
+            "Assignment agreement date",
+            "Ao name",
+            "Branch",
+            "State",
             "Region",
-            "Property Address",
-            "Property Description",
-            "Borrower Address",
-            "Borrower Address_(Also At)",
-            "Co-Borrower Name_1",
-            "Co-Borrower Address_1",
-            "Co-Borrower Address_1 (Also At)",
-            "Co-Borrower Name_2",
-            "Co-Borrower Address_2",
-            "Co-Borrower Address_2 (Also At)",
-            "Co-Borrower Name_3",
-            "Co-Borrower Address_3",
-            "Co-Borrower Address_3 (Also At)",
-            "Co-Borrower Name_4",
-            "Co-Borrower Address_4",
-            "Co-Borrower Address_4 (Also At)",
-            "Co-Borrower Name_5",
-            "Co-Borrower Address_5",
-            "Co-Borrower Address_5 (Also At)",
-            "Co-Borrower Name_6",
-            "Co-Borrower Address_6",
-            "Guarantor Name_1",
-            "Guarantor Address_1",
-            "Guarantor Name_2",
-            "Guarantor Address_2",
-            "Date of NPA",
-            "DPD as on Notice Issuance Date",
-            "Disbursement Type (Loan / OD / CC / HL / BLG)",
-            "Disbursal Date",
-            "Disbursal Amount",
-            "Loan Agreement Date",
-            "Loan Amount",
-            "Loan Amount in Words",
-            "Future Principle",
-            "Principal Outstanding",
-            "Instalment_overdue_amount",
-            "Interest on Termination",
-            "Late Payment Penalty",
-            "Cheque Bounce Charges (Including Others)",
-            "Other Amount",
-            "Foreclosure Charges",
-            "Total Outstanding",
-            "FCL (As on Date)",
-            "Total Outstanding in words",
-            "13 (2) NOTICE AMT",
-            "13(2) Demand Notice (date)",
-            "Dispatch Date",
-            "Pasting Date (optional)",
+            "Property address",
+            "Property description",
+            "Borrower address",
+            "Borrower address (also at)",
+            "Co-borrower name 1",
+            "Co-borrower address 1",
+            "Co-borrower address 1 (also at)",
+            "Co-borrower name 2",
+            "Co-borrower address 2",
+            "Co-borrower address 2 (also at)",
+            "Co-borrower name 3",
+            "Co-borrower address 3",
+            "Co-borrower address 3 (also at)",
+            "Co-borrower name 4",
+            "Co-borrower address 4",
+            "Co-borrower address 4 (also at)",
+            "Co-borrower name 5",
+            "Co-borrower address 5",
+            "Co-borrower address 5 (also at)",
+            "Co-borrower name 6",
+            "Co-borrower address 6",
+            "Co-borrower address 6 (also at)",
+            "Guarantor name 1",
+            "Guarantor address 1",
+            "Guarantor name 2",
+            "Guarantor address 2",
+            "Date of npa",
+            "Dpd as on notice issuance date",
+            "Disbursement type (loan / od / cc / hl / blg)",
+            "Disbursal date",
+            "Disbursal amount",
+            "Loan agreement date",
+            "Loan amount",
+            "Loan amount in words",
+            "Future principal",
+            "Principal outstanding",
+            "Instalment overdue amount",
+            "Interest on termination",
+            "Late payment penalty",
+            "Cheque bounce charges (including others)",
+            "Other amount",
+            "Foreclosure charges",
+            "Total outstanding",
+            "Fcl (as on date)",
+            "Total outstanding in words",
+            "13 (2) notice amt",
+            "13(2) demand notice (date)",
+            "Dispatch date",
+            "Pasting date (optional)",
             "Delivered address",
             "Undelivered address",
             "Total address",
-            "13(2) Date of Publication",
-            "Publication Details : (Names of News Papers) & Language Name : (English)",
-            "Publication Details : (Names of News Papers) & Vernacular Language Name : (Tamil,Hindi,malayalam,etc...)",
+            "13(2) date of publication",
+            "Publication details : (names of news papers) & language name : (english)",
+            "Publication details : (names of news papers) & vernacular language name : (tamil, hindi, malayalam, etc...)",
+            "Delivery status",
+            "Delivery status date",
+
+            # 13(4) Symbolic possession
+            "13(4) symbolic possession date",
+            "13(4) symbolic dispatch date",
+            "13(4) symbolic delivery status",
+            "13(4) symbolic delivery status date",
+            "13(4) symbolic photo",
+            "13(4) symbolic publication date",
+            "13(4) symbolic publication (english)",
+            "13(4) symbolic publication (vernacular)",
+            "13(4) matured date",
+            "Symbolic vacation notice (moveable)",
+            "Symbolic vacation notice (immoveable)",
+
+            # CJM / CMM
+            "Cjm filing date",
+            "Court name",
+            "Case number",
+            "Crm pl date",
+            "Crm pl no",
+            "Next hearing date",
+            "Ov date",
+            "Order date",
+            "Court ao name",
+            "Advocate details",
+            "Adv com name",
+            "Inventory status",
+
+            # Physical possession
+            "Physical possession date",
+            "Physical dispatch date",
+            "Physical delivery status",
+            "Physical delivery status date",
+            "Physical photo",
+            "Physical publication date",
+            "Physical publication (english)",
+            "Physical publication (vernacular)",
+            "Physical vacation notice (moveable)",
+            "Physical vacation notice (immoveable)",
+
+            # Auction notice
+            "Auction notice date",
+            "Auction date",
+            "Auction publication date",
+            "Auction publication (english)",
+            "Auction publication (vernacular)",
+            "Reserve price",
+
+            # Auction portal
+            "Sold price",
+            "Auction status",
+            "Inspection start",
+            "Inspection end",
+            "Emd last date",
+            "Auction start",
+            "Auction end",
+            "Bid extension time",
+            "Total extensions",
+            "Outstanding amount",
+            "Emd amount",
+            "Bid increment",
+            "Total bid count",
+            "Authorised officer",
+
+            # Post sale
+            "Post sale notice",
+            "Sold registration date",
+
+            # Sale certificate
+            "Sale confirmation date",
+            "Sale certificate date",
+
+            # Niyamtek remarks
+            "Available documents",
+            "Non available documents",
+            "Discrepancy doc",
+            "Discrepancy reason",
+            "Next actionable stage",
+            "Next step recommended",
+            "Niyamtek remarks",
+
+            # Extra
+            "Pos",
+            "Sarfaesi category",
+            "Case status",
         ]
 
         df = pd.DataFrame(columns=columns)
@@ -995,7 +1276,7 @@ class ApplicationsService:
                 column_map[col] = "DISBURSEMENT_TYPE"
             elif "BATCH" in col and "CODE" in col:
                 column_map[col] = "BATCH_CODE"
-            elif "ASSIGN" in col:
+            elif "ASSIGN" in col and "AGREEMENT" not in col:
                 column_map[col] = "ASSIGNED_DATE"
             elif "COMPANY_NAME" in col:
                 column_map[col] = "CLIENT_NAME"

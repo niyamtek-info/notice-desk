@@ -20,6 +20,7 @@ import {
   DownloadOutlined,
   SaveOutlined,
   CloseOutlined,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import * as XLSX from "xlsx";
 import { ReportApi } from "@/src/services/ReportApi";
@@ -296,6 +297,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           courtAOName: data?.cjm_details?.court_ao_name,
           advocateDetails: data?.cjm_details?.advocate_details,
           advComName: data?.cjm_details?.adv_com_name,
+          inventoryStatus: data?.cjm_details?.inventory_status,
 
           physicalPossessionDate: data?.physical_possession_details?.physical_possession_date ? parseToDayjs(data?.physical_possession_details?.physical_possession_date) : null,
           physicalDispatchDate: data?.physical_possession_details?.physical_dispatch_date ? parseToDayjs(data?.physical_possession_details?.physical_dispatch_date) : null,
@@ -386,208 +388,212 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
     }
   };
 
-  const handleSave = () => {
-    form
-      .validateFields()
-      .then(async (values) => {
-        setLoading(true);
-        setConfirmVisible(false);
-        try {
-          const payload = {
-            loan_details: {
-              ao_name: values?.aoName,
-              borrower_address: values?.borrowerAddress,
-              borrower_address_alt: values?.borrowerAddressAlt,
-              borrower_name: values?.borrowerName,
-              branch: values?.branch,
-              cheque_bounce_charges: values?.chequeBounceCharges,
-              client_code: values?.clientCode,
-              company_name: values?.companyName,
-              batch_code: values?.batchCode,
-              property_description: values?.propertyDescription,
-              property_address: values?.propertyAddress,
-              trust_number: values?.trustNumber,
-              assignment_agreement_date: values?.assignmentAgreementDate?.format("YYYY-MM-DD") || null,
-              disbursal_amount: values?.disbursalAmount,
-              disbursal_date: values?.disbursalDate?.format("YYYY-MM-DD") || null,
-              disbursement_type: values?.disbursementType,
-              dpd: values?.dpd,
-              fcl_as_on_date: values?.fclAsOnDate?.format("YYYY-MM-DD") || null,
-              foreclosure_charges: values?.foreClosureCharges,
-              future_principal: values?.futurePrincipal,
-              instalment_overdue: values?.instalmentOverdue,
-              interest_on_termination: values?.interestOnTermination,
-              late_payment_penalty: values?.latePaymentPenalty,
-              loan_account_no: values?.loanAccountNo,
-              loan_agreement_date: values?.loanAgreementDate?.format("YYYY-MM-DD") || null,
-              loan_amount: values?.loanAmount,
-              loan_amount_words: values?.loanAmountWords,
-              niyamtek_user: values?.niyamtekUser,
-              npa_date: values?.npaDate?.format("YYYY-MM-DD") || null,
-              other_amount: values?.otherAmount,
-              principal_outstanding: values?.principalOutstanding,
-              region: values?.region,
-              state: values?.state,
-              total_outstanding: values?.totalOutstanding,
-              total_outstanding_words: values?.totalOutstandingWords,
-              co_borrower_1_name: values?.coBorrowerName1,
-              co_borrower_1_address: values?.coBorrowerAddress1,
-              co_borrower_1_address_alt: values?.coBorrowerAddressAlt1,
-              co_borrower_2_name: values?.coBorrowerName2,
-              co_borrower_2_address: values?.coBorrowerAddress2,
-              co_borrower_2_address_alt: values?.coBorrowerAddress2Alt,
-              co_borrower_3_name: values?.coBorrowerName3,
-              co_borrower_3_address: values?.coBorrowerAddress3,
-              co_borrower_3_address_alt: values?.coBorrowerAddress3Alt,
-              co_borrower_4_name: values?.coBorrowerName4,
-              co_borrower_4_address: values?.coBorrowerAddress4,
-              co_borrower_4_address_alt: values?.coBorrowerAddress4Alt,
-              co_borrower_5_name: values?.coBorrowerName5,
-              co_borrower_5_address: values?.coBorrowerAddress5,
-              co_borrower_5_address_alt: values?.coBorrowerAddress5Alt,
-              co_borrower_6_name: values?.coBorrowerName6,
-              co_borrower_6_address: values?.coBorrowerAddress6,
-              guarantor_1_name: values?.guarantorName1,
-              guarantor_1_address: values?.guarantorAddress1,
-              guarantor_2_name: values?.guarantorName2,
-              guarantor_2_address: values?.guarantorAddress2,
-            },
-            ["13_2_details"]: {
-              delivered_address: values?.deliveredAddress,
-              delivery_status: values?.deliveryStatus,
-              delivery_status_date: values?.deliveryStatusDate?.format("YYYY-MM-DD") || null,
-              notice_13_2_amount: values?.notice132Amount,
-              notice_13_2_date: values?.notice132Date?.format("YYYY-MM-DD") || null,
-              notice_dispatch_date:
-                values?.noticeDispatchDate?.format("YYYY-MM-DD") || null,
-              notice_pasting_date:
-                values?.noticePastingDate?.format("YYYY-MM-DD") || null,
-              publication_date_13_2: values?.publicationDate?.format("YYYY-MM-DD") || null,
-              publication_english_13_2: values?.publicationEnglish,
-              publication_local_13_2: values?.publicationLocal,
-              total_address: values?.totalAddress,
-              undelivered_address: values?.undeliveredAddress,
-            },
-            ["13_4_details"]: {
-              symbolic_delivery_status_13_4: values?.symbolicDeliveryStatus,
-              symbolic_delivery_status_date_13_4: values?.symbolicDeliveryStatusDate?.format("YYYY-MM-DD") || null,
-              symbolic_dispatch_date_13_4:
-                values?.symbolicDispatchDate?.format("YYYY-MM-DD") || null,
-              symbolic_photo_13_4: values?.symbolicPhoto,
-              symbolic_possession_date_13_4:
-                values?.symbolicPossessionDate?.format("YYYY-MM-DD") || null,
-              symbolic_pub_english_13_4: values?.symbolicPubEnglish,
-              symbolic_pub_local_13_4: values?.symbolicPubLocal,
-              symbolic_publication_date_13_4:
-                values?.symbolicPublicationDate?.format("YYYY-MM-DD") || null,
-              matured_date_13_4: values?.maturedDate13_4?.format("YYYY-MM-DD") || null,
-            },
-            symbolic_vacation_notice_details: {
-              vacation_notice_moveable: values?.symbolicVacationNoticeMoveable,
-              vacation_notice_immoveable: values?.symbolicVacationNoticeImmoveable,
-            },
-            cjm_details: {
-              cjm_filing_date: values?.cjmFilingDate?.format("YYYY-MM-DD") || null,
-              court_name: values?.courtName,
-              case_number: values?.caseNumber,
-              crm_pl_date: values?.crmPLDate?.format("YYYY-MM-DD") || null,
-              crm_pl_no: values?.crmPLNo,
-              next_hearing_date: values?.nextHearingDate?.format("YYYY-MM-DD") || null,
-              ov_date: values?.ovDate?.format("YYYY-MM-DD") || null,
-              order_date: values?.orderDate?.format("YYYY-MM-DD") || null,
-              court_ao_name: values?.courtAOName,
-              advocate_details: values?.advocateDetails,
-              adv_com_name: values?.advComName,
-              inventory_status: values?.inventoryStatus,
-            },
-            physical_possession_details: {
-              physical_possession_date: values?.physicalPossessionDate?.format("YYYY-MM-DD") || null,
-              physical_dispatch_date: values?.physicalDispatchDate?.format("YYYY-MM-DD") || null,
-              physical_delivery_status: values?.physicalDeliveryStatus,
-              physical_delivery_status_date: values?.physicalDeliveryStatusDate?.format("YYYY-MM-DD") || null,
-              physical_photo: values?.physicalPhoto,
-              physical_publication_date: values?.physicalPublicationDate?.format("YYYY-MM-DD") || null,
-              physical_pub_english: values?.physicalPubEnglish,
-              physical_pub_local: values?.physicalPubLocal,
-              vacation_notice_moveable: values?.physicalPossessionVacationNoticeMoveable,
-              vacation_notice_immoveable: values?.physicalPossessionVacationNoticeImmoveable,
-            },
+  const handleSave = async () => {
+    console.log("click")
+    // try {
+    //   await form.validateFields();
+    // } catch (info) {
+    //   console.log(info, 'info');
+    // }
 
-            auction_notice_details: {
-              auction_notice_date: values?.auctionNoticeDate?.format("YYYY-MM-DD") || null,
-              auction_date: values?.auctionDate?.format("YYYY-MM-DD") || null,
-              auction_publication_date: values?.auctionPublicationDate?.format("YYYY-MM-DD") || null,
-              auction_pub_english: values?.auctionPubEnglish,
-              auction_pub_local: values?.auctionPubLocal,
-              reserve_price: values?.reservePrice,
-            },
+    const values = form.getFieldsValue();
+    setLoading(true);
+    setConfirmVisible(false);
+    try {
+      const payload = {
+        loan_details: {
+          ao_name: values?.aoName,
+          borrower_address: values?.borrowerAddress,
+          borrower_address_alt: values?.borrowerAddressAlt,
+          borrower_name: values?.borrowerName,
+          branch: values?.branch,
+          cheque_bounce_charges: values?.chequeBounceCharges,
+          client_code: values?.clientCode,
+          company_name: values?.companyName,
+          batch_code: values?.batchCode,
+          property_description: values?.propertyDescription,
+          property_address: values?.propertyAddress,
+          trust_number: values?.trustNumber,
+          assignment_agreement_date: values?.assignmentAgreementDate?.format("YYYY-MM-DD") || null,
+          disbursal_amount: values?.disbursalAmount,
+          disbursal_date: values?.disbursalDate?.format("YYYY-MM-DD") || null,
+          disbursement_type: values?.disbursementType,
+          dpd: values?.dpd,
+          fcl_as_on_date: values?.fclAsOnDate?.format("YYYY-MM-DD") || null,
+          foreclosure_charges: values?.foreClosureCharges,
+          future_principal: values?.futurePrincipal,
+          instalment_overdue: values?.instalmentOverdue,
+          interest_on_termination: values?.interestOnTermination,
+          late_payment_penalty: values?.latePaymentPenalty,
+          loan_account_no: values?.loanAccountNo,
+          loan_agreement_date: values?.loanAgreementDate?.format("YYYY-MM-DD") || null,
+          loan_amount: values?.loanAmount,
+          loan_amount_words: values?.loanAmountWords,
+          niyamtek_user: values?.niyamtekUser,
+          npa_date: values?.npaDate?.format("YYYY-MM-DD") || null,
+          other_amount: values?.otherAmount,
+          principal_outstanding: values?.principalOutstanding,
+          region: values?.region,
+          state: values?.state,
+          total_outstanding: values?.totalOutstanding,
+          total_outstanding_words: values?.totalOutstandingWords,
+          co_borrower_1_name: values?.coBorrowerName1,
+          co_borrower_1_address: values?.coBorrowerAddress1,
+          co_borrower_1_address_alt: values?.coBorrowerAddressAlt1,
+          co_borrower_2_name: values?.coBorrowerName2,
+          co_borrower_2_address: values?.coBorrowerAddress2,
+          co_borrower_2_address_alt: values?.coBorrowerAddress2Alt,
+          co_borrower_3_name: values?.coBorrowerName3,
+          co_borrower_3_address: values?.coBorrowerAddress3,
+          co_borrower_3_address_alt: values?.coBorrowerAddress3Alt,
+          co_borrower_4_name: values?.coBorrowerName4,
+          co_borrower_4_address: values?.coBorrowerAddress4,
+          co_borrower_4_address_alt: values?.coBorrowerAddress4Alt,
+          co_borrower_5_name: values?.coBorrowerName5,
+          co_borrower_5_address: values?.coBorrowerAddress5,
+          co_borrower_5_address_alt: values?.coBorrowerAddress5Alt,
+          co_borrower_6_name: values?.coBorrowerName6,
+          co_borrower_6_address: values?.coBorrowerAddress6,
+          guarantor_1_name: values?.guarantorName1,
+          guarantor_1_address: values?.guarantorAddress1,
+          guarantor_2_name: values?.guarantorName2,
+          guarantor_2_address: values?.guarantorAddress2,
+        },
+        ["13_2_details"]: {
+          delivered_address: values?.deliveredAddress,
+          delivery_status: values?.deliveryStatus,
+          delivery_status_date: values?.deliveryStatusDate?.format("YYYY-MM-DD") || null,
+          notice_13_2_amount: values?.notice132Amount,
+          notice_13_2_date: values?.notice132Date?.format("YYYY-MM-DD") || null,
+          notice_dispatch_date:
+            values?.noticeDispatchDate?.format("YYYY-MM-DD") || null,
+          notice_pasting_date:
+            values?.noticePastingDate?.format("YYYY-MM-DD") || null,
+          publication_date_13_2: values?.publicationDate?.format("YYYY-MM-DD") || null,
+          publication_english_13_2: values?.publicationEnglish,
+          publication_local_13_2: values?.publicationLocal,
+          total_address: values?.totalAddress,
+          undelivered_address: values?.undeliveredAddress,
+        },
+        ["13_4_details"]: {
+          symbolic_delivery_status_13_4: values?.symbolicDeliveryStatus,
+          symbolic_delivery_status_date_13_4: values?.symbolicDeliveryStatusDate?.format("YYYY-MM-DD") || null,
+          symbolic_dispatch_date_13_4:
+            values?.symbolicDispatchDate?.format("YYYY-MM-DD") || null,
+          symbolic_photo_13_4: values?.symbolicPhoto,
+          symbolic_possession_date_13_4:
+            values?.symbolicPossessionDate?.format("YYYY-MM-DD") || null,
+          symbolic_pub_english_13_4: values?.symbolicPubEnglish,
+          symbolic_pub_local_13_4: values?.symbolicPubLocal,
+          symbolic_publication_date_13_4:
+            values?.symbolicPublicationDate?.format("YYYY-MM-DD") || null,
+          matured_date_13_4: values?.maturedDate13_4?.format("YYYY-MM-DD") || null,
+        },
+        symbolic_vacation_notice_details: {
+          vacation_notice_moveable: values?.symbolicVacationNoticeMoveable,
+          vacation_notice_immoveable: values?.symbolicVacationNoticeImmoveable,
+        },
+        cjm_details: {
+          cjm_filing_date: values?.cjmFilingDate?.format("YYYY-MM-DD") || null,
+          court_name: values?.courtName,
+          case_number: values?.caseNumber,
+          crm_pl_date: values?.crmPLDate?.format("YYYY-MM-DD") || null,
+          crm_pl_no: values?.crmPLNo,
+          next_hearing_date: values?.nextHearingDate?.format("YYYY-MM-DD") || null,
+          ov_date: values?.ovDate?.format("YYYY-MM-DD") || null,
+          order_date: values?.orderDate?.format("YYYY-MM-DD") || null,
+          court_ao_name: values?.courtAOName,
+          advocate_details: values?.advocateDetails,
+          adv_com_name: values?.advComName,
+          inventory_status: values?.inventoryStatus,
+        },
+        physical_possession_details: {
+          physical_possession_date: values?.physicalPossessionDate?.format("YYYY-MM-DD") || null,
+          physical_dispatch_date: values?.physicalDispatchDate?.format("YYYY-MM-DD") || null,
+          physical_delivery_status: values?.physicalDeliveryStatus,
+          physical_delivery_status_date: values?.physicalDeliveryStatusDate?.format("YYYY-MM-DD") || null,
+          physical_photo: values?.physicalPhoto,
+          physical_publication_date: values?.physicalPublicationDate?.format("YYYY-MM-DD") || null,
+          physical_pub_english: values?.physicalPubEnglish,
+          physical_pub_local: values?.physicalPubLocal,
+          vacation_notice_moveable: values?.physicalPossessionVacationNoticeMoveable,
+          vacation_notice_immoveable: values?.physicalPossessionVacationNoticeImmoveable,
+        },
 
-            auction_portal_details: {
-              auction_date: values?.auctionDatePortal?.format("YYYY-MM-DD") || null,
-              reserve_price: values?.reservePricePortal,
-              sold_price: values?.soldPricePortal,
-              auction_status: values?.auctionStatusPortal,
-              inspection_start: values?.inspectionStartPortal?.format("YYYY-MM-DD") || null,
-              inspection_end: values?.inspectionEndPortal?.format("YYYY-MM-DD") || null,
-              emd_last_date: values?.emdLastDatePortal?.format("YYYY-MM-DD") || null,
-              auction_start: values?.auctionStartPortal?.format("YYYY-MM-DD") || null,
-              auction_end: values?.auctionEndPortal?.format("YYYY-MM-DD") || null,
-              bid_extension_time: values?.bidExtensionTimePortal,
-              total_extensions: values?.totalExtensionsPortal,
-              outstanding_amount: values?.outstandingAmountPortal,
-              emd_amount: values?.emdAmountPortal,
-              bid_increment: values?.bidIncrementPortal,
-              total_bid_count: values?.totalBidCountPortal,
-              authorised_officer: values?.authorisedOfficerPortal,
-            },
+        auction_notice_details: {
+          auction_notice_date: values?.auctionNoticeDate?.format("YYYY-MM-DD") || null,
+          auction_date: values?.auctionDate?.format("YYYY-MM-DD") || null,
+          auction_publication_date: values?.auctionPublicationDate?.format("YYYY-MM-DD") || null,
+          auction_pub_english: values?.auctionPubEnglish,
+          auction_pub_local: values?.auctionPubLocal,
+          reserve_price: values?.reservePrice,
+        },
 
-            post_sale_details: {
-              post_sale_notice: values?.postSaleNotice,
-              sold_price: values?.soldPrice,
-              sold_reg_date: values?.soldRegDate?.format("YYYY-MM-DD") || null,
-            },
+        auction_portal_details: {
+          auction_date: values?.auctionDatePortal?.format("YYYY-MM-DD") || null,
+          reserve_price: values?.reservePricePortal,
+          sold_price: values?.soldPricePortal,
+          auction_status: values?.auctionStatusPortal,
+          inspection_start: values?.inspectionStartPortal?.format("YYYY-MM-DD") || null,
+          inspection_end: values?.inspectionEndPortal?.format("YYYY-MM-DD") || null,
+          emd_last_date: values?.emdLastDatePortal?.format("YYYY-MM-DD") || null,
+          auction_start: values?.auctionStartPortal?.format("YYYY-MM-DD") || null,
+          auction_end: values?.auctionEndPortal?.format("YYYY-MM-DD") || null,
+          bid_extension_time: values?.bidExtensionTimePortal,
+          total_extensions: values?.totalExtensionsPortal,
+          outstanding_amount: values?.outstandingAmountPortal,
+          emd_amount: values?.emdAmountPortal,
+          bid_increment: values?.bidIncrementPortal,
+          total_bid_count: values?.totalBidCountPortal,
+          authorised_officer: values?.authorisedOfficerPortal,
+        },
 
-            sale_certificate_details: {
-              sale_confirmation_date: values?.saleConfirmationDate?.format("YYYY-MM-DD") || null,
-              sale_certificate_date: values?.saleCertificateDate?.format("YYYY-MM-DD") || null,
-            },
+        post_sale_details: {
+          post_sale_notice: values?.postSaleNotice,
+          sold_price: values?.soldPrice,
+          sold_reg_date: values?.soldRegDate?.format("YYYY-MM-DD") || null,
+        },
 
-            niyamtek_remarks_details: {
-              available_documents: values?.availableDocumentsNiyamtek,
-              non_available_documents: values?.nonAvailableDocumentsNiyamtek,
-              discrepancy_doc: values?.discrepancyDocNiyamtek,
-              discrepancy_reason: values?.discrepancyReasonNiyamtek,
-              next_actionable_stage: values?.nextActionableStageNiyamtek,
-              next_step_recommended: values?.nextStepRecommendedNiyamtek,
-            }
-          };
-          await ReportApi.updateReportMaster(applicationNumber, payload);
-          setIsChanged(false);
-          setTrigger((pre) => pre + 1);
-          messageApi.success("Changes saved successfully");
-        } catch (error) {
-          console.error("Failed to save report data:", error);
-          messageApi.error("Failed to save changes");
-        } finally {
-          setLoading(false);
+        sale_certificate_details: {
+          sale_confirmation_date: values?.saleConfirmationDate?.format("YYYY-MM-DD") || null,
+          sale_certificate_date: values?.saleCertificateDate?.format("YYYY-MM-DD") || null,
+        },
+
+        niyamtek_remarks_details: {
+          available_documents: values?.availableDocumentsNiyamtek,
+          non_available_documents: values?.nonAvailableDocumentsNiyamtek,
+          discrepancy_doc: values?.discrepancyDocNiyamtek,
+          discrepancy_reason: values?.discrepancyReasonNiyamtek,
+          next_actionable_stage: values?.nextActionableStageNiyamtek,
+          next_step_recommended: values?.nextStepRecommendedNiyamtek,
         }
-      })
-      .catch((info) => { });
+      };
+      console.log(payload, 'payload')
+      await ReportApi.updateReportMaster(applicationNumber, payload);
+      setIsChanged(false);
+      setTrigger((pre) => pre + 1);
+      messageApi.success("Changes saved successfully");
+    } catch (error) {
+      console.error("Failed to save report data:", error);
+      messageApi.error("Failed to save changes");
+    } finally {
+      setLoading(false);
+    }
   };
 
 
   const loanDetails: any = [
-    { name: "niyamtekUser", label: "Niyamtek User Name", type: "text" },
-    { name: "clientCode", label: "Client ID", type: "text" },
-    { name: "companyName", label: "Company Name", type: "text" },
-    { name: "loanAccountNo", label: "Loan Account No.", type: "text" },
+    { name: "niyamtekUser", label: "Niyamtek User Name", type: "text", edit: true },
+    { name: "clientCode", label: "Client ID", type: "text", edit: true },
+    { name: "companyName", label: "Company Name", type: "text", edit: true },
+    { name: "loanAccountNo", label: "Loan Account No", type: "text", required: true },
     { name: "trustNumber", label: "Trust Number", type: "text" },
     {
       name: "assignmentAgreementDate",
       label: "Assignment Agreement Date",
       type: "date",
     },
-    { name: "aoName", label: "Ao Name", type: "text" },
+    { name: "aoName", label: "AO Name", type: "text" },
     { name: "branch", label: "Branch", type: "text" },
     { name: "state", label: "State", type: "text" },
     { name: "region", label: "Region", type: "text" },
@@ -598,59 +604,66 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
     },
     { name: "disbursalDate", label: "Disbursal Date", type: "date" },
     { name: "disbursalAmount", label: "Disbursal Amount", type: "number" },
-    { name: "loanAgreementDate", label: "Loan Agreement Date", type: "date" },
-    { name: "loanAmount", label: "Loan Amount", type: "number" },
-    { name: "loanAmountWords", label: "Loan Amount in Words", type: "text" },
-    { name: "npaDate", label: "Date of NPA", type: "date" },
+    { name: "loanAgreementDate", label: "Loan Agreement Date", type: "date", required: true },
+    { name: "loanAmount", label: "Loan Amount", type: "number", required: true },
+    { name: "loanAmountWords", label: "Loan Amount in Words", type: "text", required: true },
+    { name: "npaDate", label: "Date of NPA", type: "date", required: true },
     { name: "dpd", label: "DPD as on Notice", type: "number" },
-    { name: "futurePrincipal", label: "Future Principle", type: "number" },
+    { name: "futurePrincipal", label: "Future Principle", type: "number", required: true },
     {
       name: "principalOutstanding",
       label: "Principal Outstanding",
       type: "number",
+      required: true
     },
     {
       name: "instalmentOverdue",
       label: "Instalment Overdue Amount",
       type: "number",
+      required: true
     },
     {
       name: "interestOnTermination",
       label: "Interest on Termination",
       type: "number",
+      required: true
     },
     {
       name: "latePaymentPenalty",
       label: "Late Payment Penalty",
       type: "number",
+      required: true
     },
     {
       name: "chequeBounceCharges",
       label: "Cheque Bounce Charges",
       type: "number",
+      required: true
     },
-    { name: "otherAmount", label: "Other Amount", type: "number" },
+    { name: "otherAmount", label: "Other Amount", type: "number", required: true },
     {
       name: "foreClosureCharges",
       label: "Foreclosure Charges",
       type: "number",
+      required: true
     },
-    { name: "totalOutstanding", label: "Total Outstanding", type: "number" },
-    { name: "fclAsOnDate", label: "FCL (As on Date)", type: "date" },
+    { name: "totalOutstanding", label: "Total Outstanding", type: "number", required: true },
+    { name: "fclAsOnDate", label: "FCL (As on Date)", type: "date", required: true },
     {
       name: "totalOutstandingWords",
       label: "Total Outstanding in words",
       type: "text",
+      required: true
     },
 
     { name: "batchCode", label: "Batch Code", type: "text" },
-    { name: "propertyAddress", label: "Property Address", type: "longtext" },
+    { name: "propertyAddress", label: "Property Address", type: "longtext", required: true },
 
   ];
 
   const borrowerAdd: any = [
-    { name: "borrowerName", label: "Name  Of Borrower", type: "text" },
-    { name: "borrowerAddress", label: "Borrower Address", type: "text" },
+    { name: "borrowerName", label: "Name  Of Borrower", type: "text", required: true },
+    { name: "borrowerAddress", label: "Borrower Address", type: "text", required: true },
     {
       name: "borrowerAddressAlt",
       label: "Borrower Address (Also At)",
@@ -659,11 +672,11 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
   ];
 
   const CoborrowerAdd: any = [
-    { name: "coBorrowerName1", label: "Co-Borrower Name 1", type: "text" },
+    { name: "coBorrowerName1", label: "Co-Borrower Name 1", type: "text", required: true },
     {
       name: "coBorrowerAddress1",
       label: "Co-Borrower Address 1",
-      type: "text",
+      type: "text", required: true
     },
     {
       name: "coBorrowerAddressAlt1",
@@ -1162,33 +1175,42 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
             },
           }}
           title={
-            <div className="flex justify-between items-center py-4 sticky top-0 md:top-[95px] z-10 bg-white">
-              <span className="text-[20px] font-bold text-stone-800 mb-0">
-                Loan Applications
-              </span>
-              <div className="flex items-center gap-3">
-                {showGenerateButton == 1 ? (
-                  <Button
-                    type="primary"
-                    icon={<IoMdRefresh className="!text-[21px] mt-1" />}
-                    onClick={() => handleGenerateReport()}
-                    loading={generatingReport}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    Generate Report
-                  </Button>
-                ) : (
-                  <Button
-                    type="primary"
-                    icon={<SaveOutlined />}
-                    onClick={() => setConfirmVisible(true)}
-                    loading={loading}
-                    disabled={!isChanged}
-                    className={`${!isChanged ? "opacity-75" : ""} bg-blue-600 !text-white hover:bg-blue-700`}
-                  >
-                    Save Changes
-                  </Button>
-                )}
+            <div className="flex flex-col gap-3 py-4 sticky top-0 md:top-[95px] z-10 bg-white w-full">
+              <div className="flex justify-between items-center w-full">
+                <span className="text-[20px] font-bold text-stone-800 mb-0">
+                  Loan Applications
+                </span>
+                <div className="flex items-center gap-3">
+                  {showGenerateButton == 1 ? (
+                    <Button
+                      type="primary"
+                      icon={<IoMdRefresh className="!text-[21px] mt-1" />}
+                      onClick={() => handleGenerateReport()}
+                      loading={generatingReport}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      Generate Report
+                    </Button>
+                  ) : (
+                    <Button
+                      type="primary"
+                      icon={<SaveOutlined />}
+                      onClick={() => setConfirmVisible(true)}
+                      loading={loading}
+                      disabled={!isChanged}
+                      className={`${!isChanged ? "opacity-75" : ""} bg-blue-600 !text-white hover:bg-blue-700`}
+                    >
+                      Save Changes
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 p-3 bg-[#e6f4ff] border-l-[4px] border-[#1677ff] rounded-r-md text-[14px] text-[#0958d9] w-full">
+                <InfoCircleOutlined className="text-[#1677ff] text-[16px] flex-shrink-0" />
+                <span className="font-normal text-[#0958d9] whitespace-normal">
+                  <strong className="font-bold">Note:</strong> Please ensure that all required fields are filled before generating the notice.
+                </span>
               </div>
             </div>
           }
@@ -1225,7 +1247,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                     <Input
                       placeholder="Enter Application No"
                       readOnly
-                      className="!bg-gray-20"
+                      className="!bg-gray-20 cursor-not-allowed"
                     />
                   </Form.Item>
 
@@ -1238,10 +1260,11 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         getValueFromEvent: (e) =>
                           e.target.value.replace(/^\s+/, ""),
                       })}
+                      rules={field?.required ? [{ required: true, message: `` }] : []}
                     >
                       {field.type === "date" ? (
                         <DatePicker
-                          className="w-full w-full h-[40px] rounded-md"
+                          className={`w-full w-full h-[40px] rounded-md ${field?.edit ? "!bg-gray-20 cursor-not-allowed" : ""}`}
                           format="DD-MM-YYYY"
                         />
                       ) : field.type == "number" ? (
@@ -1252,14 +1275,21 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                             form.setFieldsValue({ [field.name]: value });
                           }}
                           placeholder={`Enter ${field.label}`}
+                          readOnly={field?.edit}
+                          className={`${field?.edit ? "!bg-gray-20 cursor-not-allowed" : ""}`}
                         />
                       ) : field.type == "longtext" ? (
                         <Input.TextArea
                           placeholder={`Enter ${field.label}`}
                           rows={2}
+                          readOnly={field?.edit}
+                          className={`${field?.edit ? "!bg-gray-20 cursor-not-allowed" : ""}`}
                         />
                       ) : (
-                        <Input placeholder={`Enter ${field.label}`} />
+                        <Input placeholder={`Enter ${field.label}`}
+                          readOnly={field?.edit}
+                          className={`${field?.edit ? "!bg-gray-20 cursor-not-allowed" : ""}`}
+                        />
                       )}
                     </Form.Item>
                   ))}
@@ -1278,7 +1308,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                     <Form.Item
                       label="Description of Schedule Property"
                       name="propertyDescription"
-
+                      required
                     >
                       {showGenerateButton == 1 ?
                         <div
@@ -1332,6 +1362,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         getValueFromEvent={(e) =>
                           e.target.value.replace(/^\s+/, "")
                         }
+                        rules={add?.required ? [{ required: true, message: `` }] : []}
+
                       >
                         <TextArea
                           rows={2}
@@ -1362,6 +1394,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         getValueFromEvent={(e) =>
                           e.target.value.replace(/^\s+/, "")
                         }
+                        rules={add?.required ? [{ required: true, message: `` }] : []}
                       >
                         <TextArea
                           rows={2}
