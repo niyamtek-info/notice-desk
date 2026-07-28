@@ -21,8 +21,8 @@ def call_gemini_ai(prompt, ocr_text=None):
 
     genai.configure(api_key=api_key)
     
-    # Using gemini-2.5-flash for speed and reliability
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    # Using gemini-3.1-flash-lite for speed and reliability
+    model = genai.GenerativeModel('gemini-3.1-flash-lite')
 
     if ocr_text is not None:
         prompt = prompt.replace("{{ocr_text}}", ocr_text)
@@ -60,8 +60,8 @@ def repair_json_with_llm(malformed_json):
         api_key = os.getenv("GEMINI_API_KEY")
 
     genai.configure(api_key=api_key)
-    # Using the same model family as extraction (assuming 1.5 logic applies even if user wants 2.5 name retained)
-    model = genai.GenerativeModel('gemini-2.5-pro')
+    # Using the same model as extraction for consistency
+    model = genai.GenerativeModel('gemini-3.1-flash-lite')
 
     repair_prompt = f"""FIX THIS MALFORMED JSON. 
 YOU ARE A JSON REPAIR ENGINE. 

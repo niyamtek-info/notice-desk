@@ -30,7 +30,7 @@ def call_gemini(message: str, history: Optional[List[ChatTurn]] = None) -> str:
             return "Error: GEMINI_API_KEY not found."
 
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    model = genai.GenerativeModel('gemini-3.1-flash-lite')
 
     # Convert history to Gemini format
     gemini_history = []
