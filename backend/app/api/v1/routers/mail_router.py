@@ -49,6 +49,20 @@ async def generate_pdf(
     return await controller.generate_pdf_response(request, audit_user=audit_user)
 
 
+@router.post("/generate-notice-word")
+async def generate_notice_word(
+    request: dict,
+    db: Session = Depends(get_db),
+    audit_user: AuditUser = Depends(get_current_audit_user),
+):
+    """
+    Generate and download a Word (.docx) version of the communication,
+    entirely backend-side - no draft/editor round-trip required.
+    """
+    controller = CommunicationController(db)
+    return await controller.generate_docx_response(request, audit_user=audit_user)
+
+
 @router.post("/bulk-notice-download")
 async def bulk_notice_download(
     request: BulkNoticeDownloadRequest,

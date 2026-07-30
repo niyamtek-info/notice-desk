@@ -28,6 +28,28 @@ export const CommunicationApi = {
         link.remove();
 
         window.URL.revokeObjectURL(url);
-    }
+    },
 
+
+
+    downloadWord: async (data: any, initialData: any, templateNameVal: any) => {
+        const blob = await apiClient.post<Blob>(
+            "/mail/generate-notice-word",
+            data,
+            { responseType: "blob" }
+        );
+
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${initialData?.loan_account_number}-${initialData?.borrower_name}-${templateNameVal?.template_type}.docx`;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
+    }
+   
 };

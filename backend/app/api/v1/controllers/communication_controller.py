@@ -1657,10 +1657,12 @@ class CommunicationController:
         )
 
         data = self.service._build_placeholder_data_from_report(application_number)
-        # User-supplied date from frontend (for templates that have {{DATE}})
+        # User-supplied date from frontend (for templates that have {{DATE}}).
+        # Matches generate_mail_template's key/format - the template's actual
+        # placeholder resolves through CURRENT_DATE, not a lowercase "date".
         date_value = request.get("date")
         if date_value:
-            data["date"] = date_value
+            data["CURRENT_DATE"] = datetime.strptime(date_value, "%Y-%m-%d").strftime("%d-%m-%Y")
         print(
             "[MAIL_PDF_MORTGAGED]",
             {
@@ -1840,31 +1842,16 @@ class CommunicationController:
                     }
                 )
 
-            pdf_buffer = await loop.run_in_executor(
-                pdf_executor,
-                word_service.convert_docx_to_pdf,
-                buffer
+            # This template has a raw .docx file_path but no html_path - the
+            # pre-HTML-pipeline template shape. PDF output for that shape
+            # depended on a LibreOffice conversion step that's been removed
+            # (no template in current use is missing html_path); docx output
+            # above still works since it never needed LibreOffice.
+            raise HTTPException(
+                status_code=400,
+                detail="PDF output is not supported for templates without an HTML source. Use output_format=docx, or migrate this template to an HTML template.",
             )
 
-            await self._record_download_communication(
-                application_number=application_number,
-                template_name=template.template_code if template else template_name,
-                subject=template.template_code if template else template_name,
-                content="",
-                pdf_buffer=pdf_buffer.getvalue(),
-                request=request,
-                output_format="pdf",
-                audit_user=audit_user,
-            )
-
-            return StreamingResponse(
-                pdf_buffer,
-                media_type="application/pdf",
-                headers={
-                    "Content-Disposition": f'attachment; filename="{pdf_filename}"'
-                }
-            )
-        
         # ==========================================================
         # ✅ STEP 1: YAML WORD TEMPLATE CHECK (ADD HERE)
         # ==========================================================
@@ -1910,29 +1897,13 @@ class CommunicationController:
                     },
                 )
 
-            pdf_buffer = await loop.run_in_executor(
-                pdf_executor,
-                word_service.convert_docx_to_pdf,
-                buffer
-            )
-
-            await self._record_download_communication(
-                application_number=application_number,
-                template_name=template_name or yaml_template.get("template_name", ""),
-                subject=template_name or yaml_template.get("template_name", ""),
-                content="",
-                pdf_buffer=pdf_buffer.getvalue(),
-                request=request,
-                output_format="pdf",
-                audit_user=audit_user,
-            )
-
-            return StreamingResponse(
-                pdf_buffer,
-                media_type="application/pdf",
-                headers={
-                    "Content-Disposition": f'attachment; filename="{pdf_filename}"'
-                },
+            # PDF output for this legacy YAML "word" render mode depended on
+            # a LibreOffice conversion step that's been removed (unused in
+            # practice - zero communications on record for this template);
+            # docx output above still works since it never needed LibreOffice.
+            raise HTTPException(
+                status_code=400,
+                detail="PDF output is not supported for this template's render mode. Use output_format=docx.",
             )
 
         if not template:
@@ -1969,76 +1940,140 @@ class CommunicationController:
                 headers={"Content-Disposition": f'attachment; filename="{pdf_filename}"'}
             )
 
-        # 4️⃣ Fetch Placeholder Data
+    # ==========================================================
+    # NOTICE WORD GENERATOR (single backend call, no draft round-trip)
+    # ==========================================================
+    async def generate_docx_response(self, request: dict, audit_user: AuditUser | None = None):
+
+        application_number = request.get("application_number")
+        template_name = request.get("template_name")
+        content = request.get("content")
+        subject = request.get("subject", template_name or "")
+
+        if not application_number or (not template_name and not content):
+            raise HTTPException(status_code=400, detail="Missing required fields")
+
+        missing_fields = self.service.validate_required_notice_fields(application_number)
+        if missing_fields:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Cannot generate notice. Missing required fields: {', '.join(missing_fields)}",
+            )
+
+        from app.db.versioning import live_filter
+        application = self.db.query(Application).filter(
+            Application.business_code == application_number,
+            *live_filter(Application)
+        ).first()
+
+        if not application:
+            raise HTTPException(status_code=404, detail="Application not found")
+
+        client = self._resolve_client_for_application(application)
+
+        if not client:
+            raise HTTPException(status_code=404, detail="Client not found")
+
+        docx_filename = self._notice_download_filename(
+            application,
+            template_name or subject,
+            "docx",
+        )
+
         data = self.service._build_placeholder_data_from_report(application_number)
+        # Matches generate_mail_template's key/format - the template's actual
+        # placeholder resolves through CURRENT_DATE, not a lowercase "date".
+        date_value = request.get("date")
+        if date_value:
+            data["CURRENT_DATE"] = datetime.strptime(date_value, "%Y-%m-%d").strftime("%d-%m-%Y")
+
         ao = self._resolve_ao_information(client.id, request)
         ao_signature_url, ao_signature_html, ao_signature_path = self._resolve_ao_signature(ao)
-
+        if ao_signature_html:
+            data["ao_signature"] = ao_signature_html
+        if ao_signature_url:
+            data["ao_signature_url"] = ao_signature_url
         if ao_signature_path:
             data["ao_signature_path"] = ao_signature_path
 
-        # 5️⃣ YAML Header / Footer / Seal
-        header_style = request.get("header_style")
-        footer_style = request.get("footer_style")
-        seal_key = request.get("seal_key")
+        template = self._resolve_master_template_any(template_name)
 
-        client_config = config.get("clients", {}).get(client.client_name, {})
-
-        data["header_config"] = client_config.get("headers", {}).get(header_style, {})
-        data["footer_config"] = client_config.get("footers", {}).get(footer_style, {})
-        data["seal_config"] = client_config.get("seals", {}).get(seal_key, {})
-
-        # 6️⃣ Generate Word
         word_service = WordService()
         loop = asyncio.get_running_loop()
 
-        buffer = await loop.run_in_executor(
-            pdf_executor,
-            word_service.generate_from_template,
-            template.file_path,
-            data
-        )
+        # Same HTML source the PDF path renders from - either the caller's
+        # already-rendered content, or the raw uploaded MasterTemplate HTML.
+        raw_html = content
+        if not raw_html and template and template.html_path:
+            raw_html = self._template_bytes_from_storage_ref(template.html_path).decode(
+                "utf-8", errors="ignore"
+            )
 
-        if request.get("output_format") == "docx":
+        if raw_html:
+            rendered_content = self._replace_placeholders_in_html(
+                raw_html,
+                data,
+                preserve_notice_party_layout=False,
+            )
+            if ao_signature_html:
+                rendered_content = re.sub(
+                    r"\{\{\s*AO[_\s]?SIGNATURE(?:[_\s]?(?:PATH|URL))?\s*\}\}",
+                    lambda _m: ao_signature_html,
+                    rendered_content,
+                    flags=re.IGNORECASE,
+                )
+
+            docx_buffer = await loop.run_in_executor(
+                pdf_executor,
+                word_service.generate_docx_from_html,
+                rendered_content,
+            )
+
             await self._record_download_communication(
                 application_number=application_number,
-                template_name=template_name or "",
-                subject=subject,
+                template_name=template_name or (template.template_code if template else ""),
+                subject=request.get("subject", template.template_code if template else ""),
+                content=rendered_content,
+                pdf_buffer=None,
+                request=request,
+                structured_components=request.get("structuredComponents") or {},
+                output_format="docx",
+                audit_user=audit_user,
+            )
+
+            return StreamingResponse(
+                docx_buffer,
+                media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                headers={"Content-Disposition": f'attachment; filename="{docx_filename}"'},
+            )
+
+        if template and template.file_path:
+            temp_template_path = self._load_docx_template_from_storage(template.file_path)
+            try:
+                buffer = await loop.run_in_executor(
+                    pdf_executor,
+                    word_service.generate_from_template,
+                    temp_template_path,
+                    data,
+                )
+            finally:
+                self._cleanup_temp_file(temp_template_path)
+
+            await self._record_download_communication(
+                application_number=application_number,
+                template_name=template.template_code,
+                subject=template.template_code,
                 content="",
                 pdf_buffer=None,
                 request=request,
                 output_format="docx",
                 audit_user=audit_user,
             )
+
             return StreamingResponse(
                 buffer,
                 media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                headers={
-                    "Content-Disposition": f'attachment; filename="{docx_filename}"'
-                }
+                headers={"Content-Disposition": f'attachment; filename="{docx_filename}"'},
             )
 
-        pdf_buffer = await loop.run_in_executor(
-            pdf_executor,
-            word_service.convert_docx_to_pdf,
-            buffer
-        )
-
-        await self._record_download_communication(
-            application_number=application_number,
-            template_name=template_name or "",
-            subject=subject,
-            content="",
-            pdf_buffer=pdf_buffer.getvalue(),
-            request=request,
-            output_format=request.get("output_format", "pdf"),
-            audit_user=audit_user,
-        )
-
-        return StreamingResponse(
-            pdf_buffer,
-            media_type="application/pdf",
-            headers={
-                "Content-Disposition": f'attachment; filename="{pdf_filename}"'
-            }
-        )
+        raise HTTPException(status_code=404, detail="Template not found")

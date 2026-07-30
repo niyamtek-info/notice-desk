@@ -74,7 +74,6 @@ class Settings(BaseSettings):
     TMP_DIR: str = Field("./tmp", alias="TMP_DIR")
 
     POPPLER_PATH: str = Field(..., alias="POPPLER_PATH")
-    LIBREOFFICE_PATH: str = Field(..., env="LIBREOFFICE_PATH")
 
     JWT_SECRET_KEY: str = Field(..., alias="JWT_SECRET_KEY")
 

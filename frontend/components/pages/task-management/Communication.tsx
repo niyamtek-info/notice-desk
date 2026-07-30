@@ -648,7 +648,7 @@ export default function Communication({
     }
   };
 
-  const handleDownloadPDF = async () => {
+  const handleDownload = async (type : string) => {
     const applicationId = form.getFieldValue("applicationId");
     const subject = form.getFieldValue("subject");
     const templateName = form.getFieldValue("template");
@@ -708,8 +708,8 @@ export default function Communication({
       signatureHtml,
     );
     const templateNameVal = templatesType?.find((t: any) => templateName.includes(t.service_code));
-
-    try {
+    if(type == "PDF"){
+try {
       setPdfLoading(true);
       await CommunicationApi.downloadPdf({
         application_number: String(applicationId),
@@ -727,6 +727,27 @@ export default function Communication({
     } finally {
       setPdfLoading(false);
     }
+    }else{
+try {
+      setWordLoading(true);
+      await CommunicationApi.downloadWord({
+        application_number: String(applicationId),
+        template_name: templateName,
+        ao_code: aoCode,
+        subject: subject,
+        content: finalReconstructedText,
+        structuredComponents: structuredComponents,
+        date: dateString,
+      }, initialData, templateNameVal);
+      messageApi.success("Word Downloaded successfully");
+    } catch (err) {
+      console.error("Error downloading Word:", err);
+      messageApi.error("Failed to download Word");
+    } finally {
+      setWordLoading(false);
+    }
+    }
+    
   };
 
   const handleDownloadHtml = () => {
@@ -807,7 +828,6 @@ export default function Communication({
     );
 
     try {
-      setWordLoading(true);
       let htmlContent = "";
       if (templateRenderMode === "html") {
         htmlContent = finalReconstructedText;
@@ -834,7 +854,6 @@ export default function Communication({
       console.error("Error downloading Word document:", err);
       messageApi.error("Failed to download Word document");
     } finally {
-      setWordLoading(false);
     }
   };
 
@@ -1063,7 +1082,7 @@ export default function Communication({
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={handleDownloadPDF}
+                          onClick={()=>handleDownload("PDF")}
                           disabled={htmlPreview == "" || pdfLoading}
                           className={`${(htmlPreview == "" || pdfLoading) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors`}
                         >
@@ -1073,7 +1092,7 @@ export default function Communication({
 
                         <button
                           type="button"
-                          onClick={handleDownloadWord}
+                          onClick={()=>handleDownload("WORD")}
                           disabled={htmlPreview == "" || wordLoading}
                           className={`${(htmlPreview == "" || wordLoading) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors`}
                         >

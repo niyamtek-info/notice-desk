@@ -19,6 +19,12 @@ try:
 except ImportError:
     _YAML_AVAILABLE = False
 
+try:
+    import fitz  # PyMuPDF
+    _PYMUPDF_AVAILABLE = True
+except ImportError:
+    _PYMUPDF_AVAILABLE = False
+
 if os.name == "nt":
     try:
         asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
@@ -147,7 +153,7 @@ def _download_google_font_ttf(family_name: str, import_url: str) -> Path | None:
 # ─────────────────────────────────────────────────────────────────────────────
 # Layout constants
 # ─────────────────────────────────────────────────────────────────────────────
-HEADER_HEIGHT_MM = 30
+HEADER_HEIGHT_MM = 36
 FOOTER_HEIGHT_MM = 30
 SIDE_MARGIN_MM   = 18
 
@@ -922,9 +928,49 @@ class PDFService:
         finally:
             shutil.rmtree(tmpdir, ignore_errors=True)
 
+        use_header = bool(header_template and header_template.strip())
+        if use_header:
+            pdf_bytes = self._shift_repeating_header_image_up(pdf_bytes)
+
         buffer = io.BytesIO(pdf_bytes)
         buffer.seek(0)
         return buffer
+
+    def _shift_repeating_header_image_up(self, pdf_bytes: bytes) -> bytes:
+        # Chromium's print header/footer template mechanism injects a fixed
+        # ~5mm top inset into the header band that cannot be cancelled from
+        # CSS inside the template (confirmed by testing bleed-compensation
+        # values from 0-20mm, standalone rendering, and bundled vs system
+        # Chromium - all identical). The only remaining lever is to shift the
+        # already-rendered header image back up in the finished PDF itself.
+        if not _PYMUPDF_AVAILABLE:
+            return pdf_bytes
+
+        top_zone_pt = HEADER_HEIGHT_MM * mm
+
+        try:
+            doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+            for page in doc:
+                for img in page.get_images(full=True):
+                    xref = img[0]
+                    for rect in page.get_image_rects(xref):
+                        if rect.y0 >= top_zone_pt:
+                            continue
+                        # Shift by the image's own measured offset rather than
+                        # the nominal bleed constant - Chromium's actual inset
+                        # is not exactly round, so snapping straight to 0
+                        # eliminates any residual sliver instead of leaving
+                        # (actual_offset - nominal_constant) behind.
+                        shift_pt = rect.y0
+                        new_rect = fitz.Rect(rect.x0, 0, rect.x1, rect.y1 - shift_pt)
+                        page.draw_rect(rect, color=None, fill=(1, 1, 1), overlay=True)
+                        page.insert_image(new_rect, xref=xref, overlay=True, keep_proportion=False)
+            shifted_bytes = doc.tobytes()
+            doc.close()
+            return shifted_bytes
+        except Exception as exc:
+            print("STEP: Header image shift failed, keeping original PDF:", exc)
+            return pdf_bytes
 
     def _inject_print_styles(
         self,
@@ -955,7 +1001,7 @@ class PDFService:
             head = soup.new_tag("head")
             html_tag.insert(0, head)
 
-        top_mm    = HEADER_HEIGHT_MM + _CHROMIUM_HEADER_BLEED_MM if use_header else 0
+        top_mm    = HEADER_HEIGHT_MM if use_header else 0
         bottom_mm = FOOTER_HEIGHT_MM if use_footer else 0
         embedded_font_css = self._build_embedded_font_face_css(html_text, base_font_family=base_font_family)
         body_font_css = ""
@@ -1148,13 +1194,27 @@ img {{
 </html>"""
 
     # A real letterhead header/footer (logo + a few lines of address) is a few
-    # hundred to a couple thousand characters. If a <header>/<footer> tag holds
-    # far more than that, it almost certainly isn't a real page header/footer —
-    # some editors leave the rest of the document nested inside it by mistake.
-    # Extracting it whole would squeeze the entire page content into the tiny
-    # fixed-height print header/footer band, silently clipping everything that
-    # doesn't fit. Treat oversized tags as not-a-header/footer instead.
+    # hundred to a couple thousand characters of actual markup/text. If a
+    # <header>/<footer> tag holds far more than that, it almost certainly
+    # isn't a real page header/footer — some editors leave the rest of the
+    # document nested inside it by mistake. Extracting it whole would squeeze
+    # the entire page content into the tiny fixed-height print header/footer
+    # band, silently clipping everything that doesn't fit. Treat oversized
+    # tags as not-a-header/footer instead.
+    #
+    # Embedded logo/signature images are shipped as inline base64 data URIs,
+    # which can easily run to hundreds of KB of harmless character bulk for a
+    # visually tiny image. Counting those bytes against this budget made
+    # ordinary letterhead headers look "oversized", got rejected here, and
+    # fell through to the much less reliable heuristic search below - which
+    # has no size guard at all and can grab a large, wrong chunk of the body.
+    # So the budget is measured on the markup with data-URI payloads
+    # collapsed, not on the raw character count.
     MAX_HEADER_FOOTER_CHARS = 4000
+    _DATA_URI_RE = re.compile(r"data:[^;,\"']+;base64,[^\"'\s]+")
+
+    def _content_length_excluding_data_uris(self, html_text: str) -> int:
+        return len(self._DATA_URI_RE.sub("", html_text))
 
     def _wrap_html_for_print(self, body_html: str, header_html: str = "", footer_html: str = "") -> tuple[str, str, str]:
         """
@@ -1172,13 +1232,13 @@ img {{
 
         if header is not None:
             header_text = str(header)
-            if len(header_text) <= self.MAX_HEADER_FOOTER_CHARS:
+            if self._content_length_excluding_data_uris(header_text) <= self.MAX_HEADER_FOOTER_CHARS:
                 extracted_header = header_text
                 header.extract()
 
         if footer is not None:
             footer_text = str(footer)
-            if len(footer_text) <= self.MAX_HEADER_FOOTER_CHARS:
+            if self._content_length_excluding_data_uris(footer_text) <= self.MAX_HEADER_FOOTER_CHARS:
                 extracted_footer = footer_text
                 footer.extract()
 
@@ -1232,11 +1292,10 @@ img {{
             base_font_family=base_font_family,
         )
 
-        band_h = f"{HEADER_HEIGHT_MM}mm"
         header_template = (
             self._build_playwright_template(
                 header_html,
-                band_height=band_h,
+                band_height=f"{HEADER_HEIGHT_MM}mm",
                 align_items="flex-start",
                 base_font_family=base_font_family,
             )
@@ -1245,7 +1304,7 @@ img {{
         footer_template = (
             self._build_playwright_template(
                 footer_html,
-                band_height=band_h,
+                band_height=f"{FOOTER_HEIGHT_MM}mm",
                 align_items="flex-end",
                 base_font_family=base_font_family,
             )

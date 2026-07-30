@@ -193,12 +193,6 @@ templates:
       </div>
       </div>
 
-  prudent_13_2_word_draft:
-    render_mode: "word"
-    word_template_path: "Draft of 13(2) Notice.docx"
-    subject: "NOTICE OF DEMAND UNDER SECTION 13(2) OF THE SARFAESI ACT, 2002"
-
-
 banks:
 
   PRUDENT ARC LIMITED:
