@@ -210,6 +210,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
   const fetchData = async () => {
     try {
       setLoading(true);
+      dispatch(setApplications([])); // clear stale data immediately so loader covers a clean table
       // Prioritize global selectedBank, then fallback to external filters
       const bankToFilter =
         selectedBank || externalFilters?.bank_name || externalFilters?.bankName;
@@ -582,15 +583,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
 
   ];
 
-  useEffect(() => {
-    if (selectedBank) {
-      setLoading(true)
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    }
-  }, [selectedBank])
-
+  // Row selection is reset whenever the active bank or status tab changes
   useEffect(() => {
     setSelectedRowKeys([]);
     setSelectedAppNo([]);
