@@ -557,7 +557,7 @@ class CommunicationController:
             signature_html = (
                 f'<img src="{safe_signature_path}" '
                 'alt="AO Signature" '
-                'style="width:90px; height:auto; display:inline-block; vertical-align:middle;" />'
+                'style="width:200px; height:auto; display:inline-block; vertical-align:middle;" />'
             )
             return signature_path, signature_html, signature_path
 
@@ -567,7 +567,7 @@ class CommunicationController:
             signature_html = (
                 f'<img src="{safe_data_uri}" '
                 'alt="AO Signature" '
-                'style="width:90px; height:auto; display:inline-block; vertical-align:middle;" />'
+                'style="width:200px; height:auto; display:inline-block; vertical-align:middle;" />'
             )
             return data_uri, signature_html, data_uri
 
@@ -590,7 +590,7 @@ class CommunicationController:
         signature_html = (
             f'<img src="{safe_data_uri}" '
             'alt="AO Signature" '
-            'style="width:90px; height:auto; display:inline-block; vertical-align:middle;" />'
+            'style="width:200px; height:auto; display:inline-block; vertical-align:middle;" />'
         )
         return data_uri, signature_html, signature_path
 
@@ -1103,6 +1103,7 @@ class CommunicationController:
         data: dict,
         *,
         preserve_notice_party_layout: bool = True,
+        rebuild_recipient_block: bool = True,
     ) -> str:
         rendered = html_text or ""
         if not rendered.strip():
@@ -1189,7 +1190,7 @@ class CommunicationController:
             html_source = str(soup_dedup)
 
             rendered_html = cleanup_unresolved_brace_placeholders(html_source)
-            if effective_preserve or co_borrower_expanded:
+            if effective_preserve or co_borrower_expanded or not rebuild_recipient_block:
                 return self._apply_notice_layout_tweaks(rendered_html)
 
             return self._apply_notice_layout_tweaks(self._replace_notice_recipient_block(rendered_html, data))
@@ -1715,10 +1716,17 @@ class CommunicationController:
         template = self._resolve_master_template_any(template_name)
 
         if content:
+            # `content` is already-rendered HTML from the preview iframe - real
+            # names/addresses, no more `{{TOKENS}}`. Don't let this second pass
+            # rebuild the recipient block: that step is only correct against a
+            # raw template, and against already-rendered text it mismatches on
+            # the words "borrower"/"co-borrower" and duplicates/overwrites the
+            # already-correct party rows with the wrong names.
             rendered_content = self._replace_placeholders_in_html(
                 content,
                 data,
                 preserve_notice_party_layout=False,
+                rebuild_recipient_block=False,
             )
             # Safety net: inject AO signature if the placeholder survived BeautifulSoup
             # processing (e.g. the frontend already embedded the <img> so this is a no-op,
@@ -2024,6 +2032,7 @@ class CommunicationController:
         # Same HTML source the PDF path renders from - either the caller's
         # already-rendered content, or the raw uploaded MasterTemplate HTML.
         raw_html = content
+        is_prerendered_content = bool(raw_html)
         if not raw_html and template and template.html_path:
             raw_html = self._template_bytes_from_storage_ref(template.html_path).decode(
                 "utf-8", errors="ignore"
@@ -2031,10 +2040,16 @@ class CommunicationController:
             raw_html = self._normalize_letterhead_footer_image(raw_html)
 
         if raw_html:
+            # When `raw_html` is the caller's already-rendered `content` (real
+            # names, no more `{{TOKENS}}`), don't let this pass rebuild the
+            # recipient block - see the matching comment in
+            # generate_pdf_response for why that duplicates/overwrites the
+            # already-correct party rows.
             rendered_content = self._replace_placeholders_in_html(
                 raw_html,
                 data,
                 preserve_notice_party_layout=False,
+                rebuild_recipient_block=not is_prerendered_content,
             )
             if ao_signature_html:
                 rendered_content = re.sub(
