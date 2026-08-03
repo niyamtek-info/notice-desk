@@ -218,7 +218,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
         client_name: bankToFilter,
         loan_account_number: searchAppNo || localFilters.appNo,
         borrower_name: searchAppNo || localFilters.borrowerName,
-        state: searchAppNo || localFilters.state,
+        location: searchAppNo || localFilters.state,
         process_status:
           selectedStatus !== "All"
             ? selectedStatus
@@ -285,7 +285,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
           case "Borrower Name":
             return app.borrower_name?.toLowerCase().includes(searchLower) || false;
           case "State":
-            return app.state?.toLowerCase().includes(searchLower) || false;
+            return (app.location ?? app.state)?.toLowerCase().includes(searchLower) || false;
           case "Type of Service":
             return app.type_of_work?.toLowerCase().includes(searchLower) || false;
           case "Batch Code":
@@ -302,7 +302,8 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
           app.application_no.toLowerCase().includes(searchLower) ||
           (app.borrower_name &&
             app.borrower_name.toLowerCase().includes(searchLower)) ||
-          (app.state && app.state.toLowerCase().includes(searchLower)) ||
+          ((app.location ?? app.state) &&
+            (app.location ?? app.state)!.toLowerCase().includes(searchLower)) ||
           (app.loan_account_number &&
             app.loan_account_number.toLowerCase().includes(searchLower)) ||
           (app.type_of_work &&
@@ -321,7 +322,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
         cusName: app.borrower_name ?? "-",
         loanAccNo: app.loan_account_number ?? "-",
         loanAmount: app.loan_amount ?? 0,
-        state: app.state ?? "-",
+        state: (app.location ?? app.state) ?? "-",
         bankName: app.bank_name ?? "-",
         status: (app.process_status as StatusType) ?? "New",
         report_status: (app.report_status as ReportStatus) ?? "Not_Available",

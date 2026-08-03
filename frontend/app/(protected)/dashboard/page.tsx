@@ -39,28 +39,27 @@ export default function DashboardPage() {
   const [selectedSearchField, setSelectedSearchField] = useState<string>("All");
   const [clientSelectLoading, setClientSelectLoading] = useState<boolean>(false);
 
-  const handleFetchBank = async () => {
-    try {
-      setClientSelectLoading(true);
-      let response: any = await BankApi.getBankList();
-      setBanks([{client_code:"all", client_name:"All Client", client: "all"},...response]);
-    } catch (error) {} finally {
-      setClientSelectLoading(false);
-    }
-  };
-
-  // Handle dropdown open change
-  const handleDropdownOpenChange = (open: boolean) => {
-    if (open) {
-      handleFetchBank();
-    }
-  };
-
   useEffect(() => {
+    // Restore last selected bank
     const savedBank = localStorage.getItem('selectedBank');
     if (!savedBank || savedBank === "undefined" || savedBank === "null" || savedBank === "") {
       setSelectedBank("all");
     }
+
+    // Fetch client list once on mount — data is always needed as a primary filter
+    const fetchBanks = async () => {
+      try {
+        setClientSelectLoading(true);
+        const response: any = await BankApi.getBankList();
+        setBanks([{ client_code: "all", client_name: "All Client", client: "all" }, ...response]);
+      } catch (error) {
+        // keep the default "All Client" entry on error
+      } finally {
+        setClientSelectLoading(false);
+      }
+    };
+
+    fetchBanks();
   }, []);
 
 
@@ -112,25 +111,16 @@ export default function DashboardPage() {
                 placeholder="Choose Client"
                 className="dashboard-select"
                 style={{ borderRadius: "4px" }}
+                loading={clientSelectLoading}
                 onChange={(val) => {
                   setSelectedBank(val);
                   setSelectedStatus("All");
                   setSelectedSearchField("All");
                   setSearchAppNo("");
-                 
                 }}
-                onOpenChange={handleDropdownOpenChange}
                 value={selectedBank || undefined}
                 showSearch
                 allowClear
-                popupRender={(menu) => (
-                  clientSelectLoading ? (
-                    <div className="p-4 flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                      <span className="ml-2 text-gray-600">Loading...</span>
-                    </div>
-                  ) : menu
-                )}
               >
                 {banks.map((bank: any) => (
                   <Option key={bank.client_code} value={bank.client}>

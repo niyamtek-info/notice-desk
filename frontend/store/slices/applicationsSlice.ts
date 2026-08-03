@@ -8,6 +8,7 @@ interface Application {
   borrower_name?: string | null;
   bank_name?: string | null;
   state?: string | null;
+  location?: string | null;
   assigned_date?: string | null;
   process_status?: string | null;
   report_status?: string | null;
