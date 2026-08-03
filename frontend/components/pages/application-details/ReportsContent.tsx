@@ -1271,7 +1271,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value });
                           }}
                           placeholder={`Enter ${field.label}`}
@@ -1483,7 +1483,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value });
                           }}
                           placeholder={`Enter ${field.label}`}
@@ -1524,7 +1524,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value })
                           }}
                           placeholder={`Enter ${field.label}`} />
@@ -1566,7 +1566,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value })
                           }}
                           placeholder={`Enter ${field.label}`} />
@@ -1607,7 +1607,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value })
                           }}
                           placeholder={`Enter ${field.label}`} />
@@ -1648,7 +1648,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value })
                           }}
                           placeholder={`Enter ${field.label}`} />
@@ -1690,7 +1690,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value })
                           }}
                           placeholder={`Enter ${field.label}`} />
@@ -1731,7 +1731,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={field.type === "number" ? "₹" : ""}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value })
                           }}
                           placeholder={`Enter ${field.label}`} />
@@ -1772,7 +1772,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value })
                           }}
                           placeholder={`Enter ${field.label}`} />
@@ -1813,7 +1813,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value })
                           }}
                           placeholder={`Enter ${field.label}`} />
@@ -1855,7 +1855,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"{field.prefix}"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9]/g, "");
+                            const value = e.target.value.replace(/[^0-9.,]/g, "");
                             form.setFieldsValue({ [field.name]: value })
                           }}
                           placeholder={`Enter ${field.label}`} />
