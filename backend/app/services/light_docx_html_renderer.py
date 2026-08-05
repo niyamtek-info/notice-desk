@@ -589,8 +589,8 @@ def docx_to_html(file_path: str) -> str:
     .docx-footer img {{
       display: block;
       width: auto !important;
-      height: auto;
-      max-height: none;
+      height: auto !important;
+      max-height: 25mm !important;
       max-width: 100% !important;
       object-fit: contain;
       margin: 0 auto !important;

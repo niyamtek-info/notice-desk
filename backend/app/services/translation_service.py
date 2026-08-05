@@ -179,42 +179,47 @@ class TranslationService:
         if doc_type != "sale_deed":
             return projected_data
 
-        # Sale Deed special handling: translate only raw data fields.
-        source = raw_parsed_data if isinstance(raw_parsed_data, dict) else projected_data
-        if not isinstance(source, dict):
+        # Sale Deed: translate the full extracted payload like every other doc
+        # type (not just description/property text), but still prefer the
+        # verbatim raw-extracted description/property text over the projected
+        # value for those two fields specifically, for higher-fidelity
+        # translation source text.
+        if not isinstance(projected_data, dict):
             return None
 
-        sales_deed = source.get("SalesDeed") if isinstance(source.get("SalesDeed"), dict) else {}
-        projected_sales_deed = {}
-        if isinstance(projected_data, dict):
-            psd = projected_data.get("SalesDeed")
-            if isinstance(psd, dict):
-                projected_sales_deed = psd
+        import copy
+        out = copy.deepcopy(projected_data)
+
+        raw_source = raw_parsed_data if isinstance(raw_parsed_data, dict) else {}
+        sales_deed_raw = raw_source.get("SalesDeed") if isinstance(raw_source.get("SalesDeed"), dict) else {}
+        projected_sales_deed = out.get("SalesDeed") if isinstance(out.get("SalesDeed"), dict) else {}
 
         property_raw_text = self._stringify_if_present(
-            sales_deed.get("Property_Raw_Text")
-            if sales_deed.get("Property_Raw_Text") is not None
+            sales_deed_raw.get("Property_Raw_Text")
+            if sales_deed_raw.get("Property_Raw_Text") is not None
             else projected_sales_deed.get("Property_Raw_Text")
         )
         original_description = (
-            self._stringify_if_present(sales_deed.get("description"))
+            self._stringify_if_present(sales_deed_raw.get("description"))
             or self._stringify_if_present(projected_sales_deed.get("description"))
         )
         english_description = (
-            self._stringify_if_present(sales_deed.get("raw_description"))
+            self._stringify_if_present(sales_deed_raw.get("raw_description"))
             or self._stringify_if_present(projected_sales_deed.get("raw_description"))
         )
 
         # Translate from the verbatim extracted description first.
         raw_description = original_description or english_description or property_raw_text
 
-        out_sales_deed: Dict[str, Any] = {}
-        if property_raw_text:
-            out_sales_deed["Property_Raw_Text"] = property_raw_text
-        if raw_description:
-            out_sales_deed["raw_description"] = raw_description
+        if property_raw_text or raw_description:
+            if not isinstance(out.get("SalesDeed"), dict):
+                out["SalesDeed"] = {}
+            if property_raw_text:
+                out["SalesDeed"]["Property_Raw_Text"] = property_raw_text
+            if raw_description:
+                out["SalesDeed"]["raw_description"] = raw_description
 
-        return {"SalesDeed": out_sales_deed} if out_sales_deed else None
+        return out
 
     async def _perform_llm_translation(self, data: Dict, target_language: str) -> Dict:
         """

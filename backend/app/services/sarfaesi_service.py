@@ -143,6 +143,49 @@ class SarfaesiService:
             "extracted_loan_agreement": extracted_loan_agreement,
         }
     
+    @staticmethod
+    def _format_indian_amount(value) -> str | None:
+        """
+        Render a stored amount using Indian digit grouping (last 3 digits,
+        then groups of 2 - e.g. 195560000 -> "19,55,60,000"). The DB column
+        holds a plain Decimal with no grouping, so returning it as-is left
+        the frontend edit form redisplaying saved amounts as "195560000.00"
+        (comma stripped) on every reload, even though the user had typed
+        "1,95,56,000.00". report_repo.py already strips commas back out
+        before saving, so handing back a formatted string here is safe to
+        round-trip through edit/save.
+        """
+        if value is None:
+            return None
+
+        raw = str(value).strip()
+        if not raw:
+            return None
+
+        is_negative = raw.startswith("-")
+        unsigned = raw.replace("-", "").replace(",", "")
+        int_part, _, dec_part = unsigned.partition(".")
+        int_part = "".join(ch for ch in int_part if ch.isdigit())
+        if not int_part:
+            return None
+
+        last_three = int_part[-3:]
+        rest = int_part[:-3]
+        if rest:
+            grouped_rest = []
+            # group the remainder into pairs from the right (Indian style)
+            while len(rest) > 2:
+                grouped_rest.insert(0, rest[-2:])
+                rest = rest[:-2]
+            grouped_rest.insert(0, rest)
+            formatted_int = ",".join(grouped_rest) + "," + last_three
+        else:
+            formatted_int = last_three
+
+        dec_part = "".join(ch for ch in dec_part if ch.isdigit())[:2].ljust(2, "0") or "00"
+        result = f"{formatted_int}.{dec_part}"
+        return f"-{result}" if is_negative else result
+
     def _format_response(self, s):
         resolved_client_code = None
         application_rel = getattr(s, "application", None)
@@ -229,27 +272,27 @@ class SarfaesiService:
 
                 # LOAN
                 "npa_date": s.npa_date,
-                "dpd": s.dpd,
+                "dpd": self._format_indian_amount(s.dpd),
                 "disbursement_type": s.disbursement_type,
                 "disbursal_date": s.disbursal_date,
-                "disbursal_amount": s.disbursal_amount,
+                "disbursal_amount": self._format_indian_amount(s.disbursal_amount),
                 "loan_agreement_date": s.loan_agreement_date,
-                "loan_amount": s.loan_amount,
-                "future_principal": s.future_principal,
-                "principal_outstanding": s.principal_outstanding,
-                "instalment_overdue": s.instalment_overdue,
-                "interest_on_termination": s.interest_on_termination,
-                "late_payment_penalty": s.late_payment_penalty,
-                "cheque_bounce_charges": s.cheque_bounce_charges,
-                "other_amount": s.other_amount,
-                "foreclosure_charges": s.foreclosure_charges,
-                "total_outstanding": s.total_outstanding,
+                "loan_amount": self._format_indian_amount(s.loan_amount),
+                "future_principal": self._format_indian_amount(s.future_principal),
+                "principal_outstanding": self._format_indian_amount(s.principal_outstanding),
+                "instalment_overdue": self._format_indian_amount(s.instalment_overdue),
+                "interest_on_termination": self._format_indian_amount(s.interest_on_termination),
+                "late_payment_penalty": self._format_indian_amount(s.late_payment_penalty),
+                "cheque_bounce_charges": self._format_indian_amount(s.cheque_bounce_charges),
+                "other_amount": self._format_indian_amount(s.other_amount),
+                "foreclosure_charges": self._format_indian_amount(s.foreclosure_charges),
+                "total_outstanding": self._format_indian_amount(s.total_outstanding),
                 "fcl_as_on_date": s.fcl_as_on_date,
                 "total_outstanding_words": s.total_outstanding_words,
             },
 
             "13_2_details": {
-                "notice_13_2_amount": s.notice_13_2_amount,
+                "notice_13_2_amount": self._format_indian_amount(s.notice_13_2_amount),
                 "notice_13_2_date": s.notice_13_2_date,
                 "notice_dispatch_date": s.notice_dispatch_date,
                 "notice_pasting_date": s.notice_pasting_date,
@@ -314,13 +357,13 @@ class SarfaesiService:
                 "auction_publication_date": s.auction_publication_date,
                 "auction_pub_english": s.auction_pub_english,
                 "auction_pub_local": s.auction_pub_local,
-                "reserve_price": s.reserve_price,
+                "reserve_price": self._format_indian_amount(s.reserve_price),
             },
 
             "auction_portal_details": {
                 "auction_date": s.auction_date,
-                "reserve_price": s.reserve_price,
-                "sold_price": s.sold_price,
+                "reserve_price": self._format_indian_amount(s.reserve_price),
+                "sold_price": self._format_indian_amount(s.sold_price),
                 "auction_status": s.auction_status,
                 "inspection_start": s.inspection_start,
                 "inspection_end": s.inspection_end,
@@ -329,16 +372,16 @@ class SarfaesiService:
                 "auction_end": s.auction_end,
                 "bid_extension_time": s.bid_extension_time,
                 "total_extensions": s.total_extensions,
-                "outstanding_amount": s.outstanding_amount,
-                "emd_amount": s.emd_amount,
-                "bid_increment": s.bid_increment,
+                "outstanding_amount": self._format_indian_amount(s.outstanding_amount),
+                "emd_amount": self._format_indian_amount(s.emd_amount),
+                "bid_increment": self._format_indian_amount(s.bid_increment),
                 "total_bid_count": s.total_bid_count,
                 "authorised_officer": s.authorised_officer,
             },
 
             "post_sale_details": {
                 "post_sale_notice": s.post_sale_notice,
-                "sold_price": s.sold_price,
+                "sold_price": self._format_indian_amount(s.sold_price),
                 "sold_reg_date": s.sold_reg_date,
             },
 
@@ -486,6 +529,15 @@ class SarfaesiService:
                     if isinstance(value, str):
                         value = value.strip()
                     update_data[normalized_key] = value
+
+        # This path writes via clone_version() below, not self.repo.create()/
+        # update() - so it never went through SarfaesiRepository's numeric
+        # cleanup. A comma-formatted amount (e.g. "45,000.00" typed for a
+        # display-formatted field like dpd) sailed straight through as a raw
+        # string into an INTEGER/NUMERIC column and blew up with a MySQL
+        # "Data truncated" error. Route it through the same normalizer
+        # self.repo.create()/update() already use.
+        update_data = self.repo._normalize_payload(update_data)
 
         print("UPDATE DATA:", update_data)
 

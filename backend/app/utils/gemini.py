@@ -1,11 +1,58 @@
 import google.generativeai as genai
 import os
+from typing import Optional
 from app.core.settings import settings
 
 # Without a timeout, a hung Gemini call blocks the Celery worker/task slot
 # handling it indefinitely, backing up the whole extraction/translation/
 # checklist queue behind it.
 GEMINI_REQUEST_TIMEOUT_SECONDS = 120
+
+
+def detect_document_language(sample_text: str) -> Optional[str]:
+    """
+    Asks Gemini to identify the dominant language of OCR'd text and returns
+    its ISO 639-1/639-2 code (e.g. "hi", "te", "ta", "en").
+
+    This lets OCR language hints scale to any language Gemini can recognise
+    instead of being pinned to a fixed list or a UI-selected value — callers
+    use the detected code as a Document AI hint for the rest of the document.
+    Returns None on any failure so callers can fall back to unhinted
+    (auto-detected) OCR rather than breaking extraction.
+    """
+    sample = (sample_text or "").strip()
+    if not sample:
+        return None
+
+    api_key = settings.GEMINI_API_KEY or os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return None
+
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-3.1-flash-lite')
+
+    prompt = (
+        "Identify the dominant language of the text below.\n"
+        "Respond with ONLY its ISO 639-1 two-letter code (e.g. hi, ta, te, kn, "
+        "ml, bn, gu, mr, pa, en). No explanation, no punctuation — just the code.\n\n"
+        f"TEXT:\n{sample[:1500]}"
+    )
+
+    try:
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.0,
+                max_output_tokens=10,
+            ),
+            request_options={"timeout": 20},
+        )
+        code = "".join(ch for ch in (response.text or "").strip().lower() if ch.isalpha())
+        return code[:3] or None
+    except Exception as e:
+        print(f"WARNING: Gemini language detection failed: {e}")
+        return None
+
 
 def call_gemini_ai(prompt, ocr_text=None):
     """

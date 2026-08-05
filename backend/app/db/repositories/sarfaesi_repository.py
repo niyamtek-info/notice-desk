@@ -32,6 +32,27 @@ class SarfaesiRepository:
         except Exception:
             return None
 
+    def _to_int(self, value):
+        if value is None:
+            return None
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, int):
+            return value
+        if isinstance(value, float):
+            return int(value)
+        import re
+
+        cleaned = str(value).strip().replace(",", "")
+        cleaned = re.sub(r"(?i)rs\.?", "", cleaned)
+        cleaned = re.sub(r"[^\d.\-]", "", cleaned)
+        if cleaned in {"", "-", ".", "-."}:
+            return None
+        try:
+            return int(float(cleaned))
+        except Exception:
+            return None
+
     def _normalize_value(self, field: str, value: Any):
         column = SarfaesiMaster.__table__.columns.get(field)
         if column is None or value is None:
@@ -41,10 +62,7 @@ class SarfaesiRepository:
         if "NUMERIC" in column_type or "DECIMAL" in column_type or "FLOAT" in column_type:
             return self._to_decimal(value)
         if "INTEGER" in column_type and not isinstance(value, bool):
-            try:
-                return int(value)
-            except Exception:
-                return value
+            return self._to_int(value)
         if "DATE" in column_type or "DATETIME" in column_type:
             if isinstance(value, datetime):
                 return value

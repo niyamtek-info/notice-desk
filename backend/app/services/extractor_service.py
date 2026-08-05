@@ -228,7 +228,7 @@ class ExtractorService:
 
             update_progress(file_id, 20, "OCR extraction in progress")
 
-            ocr_text = extract_text_with_docai(temp_path)
+            ocr_text = extract_text_with_docai(temp_path, language=language)
 
             ocr_json_key = f"{storage_prefix}/ocr-output/{file_id}.json"
             self.s3.save_json({"ocr_text": ocr_text}, ocr_json_key)

@@ -91,7 +91,63 @@ class CommunicationService:
     def load_report_schema(self):
         return self.mapping if isinstance(self.mapping, dict) else {}
 
-    def _format_report_value(self, value):
+    # Same amount fields SarfaesiService._format_response() comma-formats for
+    # the report edit form - kept in sync here so the generated notice shows
+    # the same "19,55,60,000.00" grouping instead of the raw DB "195560000.00".
+    _AMOUNT_FIELDS = {
+        "dpd",
+        "disbursal_amount",
+        "loan_amount",
+        "future_principal",
+        "principal_outstanding",
+        "instalment_overdue",
+        "interest_on_termination",
+        "late_payment_penalty",
+        "cheque_bounce_charges",
+        "other_amount",
+        "foreclosure_charges",
+        "total_outstanding",
+        "notice_13_2_amount",
+        "reserve_price",
+        "sold_price",
+        "outstanding_amount",
+        "emd_amount",
+        "bid_increment",
+    }
+
+    @staticmethod
+    def _format_indian_amount(value) -> str | None:
+        if value is None:
+            return None
+
+        raw = str(value).strip()
+        if not raw:
+            return None
+
+        is_negative = raw.startswith("-")
+        unsigned = raw.replace("-", "").replace(",", "")
+        int_part, _, dec_part = unsigned.partition(".")
+        int_part = "".join(ch for ch in int_part if ch.isdigit())
+        if not int_part:
+            return None
+
+        last_three = int_part[-3:]
+        rest = int_part[:-3]
+        if rest:
+            grouped_rest = []
+            while len(rest) > 2:
+                grouped_rest.insert(0, rest[-2:])
+                rest = rest[:-2]
+            grouped_rest.insert(0, rest)
+            formatted_int = ",".join(grouped_rest) + "," + last_three
+        else:
+            formatted_int = last_three
+
+        dec_part = "".join(ch for ch in dec_part if ch.isdigit())[:2].ljust(2, "0") or "00"
+        result = f"{formatted_int}.{dec_part}"
+        return f"-{result}" if is_negative else result
+
+    def _format_report_value(self, value, field_name: str | None = None):
         if value is None:
             return ""
 
@@ -100,6 +156,10 @@ class CommunicationService:
 
         if isinstance(value, (dict, list)):
             return json.dumps(value, ensure_ascii=False)
+
+        if field_name in self._AMOUNT_FIELDS:
+            formatted = self._format_indian_amount(value)
+            return formatted if formatted is not None else value
 
         return value
 
@@ -477,6 +537,46 @@ class CommunicationService:
         )
         return pdf_buffer.getvalue()
 
+    # (primary address field, also-at field name variants that alias the
+    # same underlying "_alt" DB column - see safari_notice.py's
+    # borrower_address_also_at / co_borrower_N_address_also_at properties)
+    _ADDRESS_ALSO_AT_PAIRS = [
+        ("borrower_address", ("borrower_address_alt", "borrower_address_also_at")),
+    ] + [
+        (
+            f"co_borrower_{i}_address",
+            (f"co_borrower_{i}_address_alt", f"co_borrower_{i}_address_also_at"),
+        )
+        for i in range(1, 7)
+    ]
+
+    @staticmethod
+    def _normalize_address_for_compare(value) -> str:
+        return re.sub(r"\s+", " ", str(value or "")).strip().lower()
+
+    def _suppress_duplicate_also_at_addresses(self, report, data: dict) -> None:
+        """
+        An "Also At" address is only meant to appear when it's genuinely
+        different from the borrower's/co-borrower's primary address.
+        Placeholder substitution just inserts whatever value is stored, so
+        if both were saved identically the notice would show the same
+        address twice under an "Also At" heading. Blank the also-at value
+        here so any {{..._ALSO_AT}} / {{..._ALT}} placeholder resolves to
+        empty instead of repeating the primary address.
+        """
+        for primary_field, alt_fields in self._ADDRESS_ALSO_AT_PAIRS:
+            primary_norm = self._normalize_address_for_compare(
+                getattr(report, primary_field, None)
+            )
+            if not primary_norm:
+                continue
+            for alt_field in alt_fields:
+                alt_norm = self._normalize_address_for_compare(
+                    getattr(report, alt_field, None)
+                )
+                if alt_norm and alt_norm == primary_norm and alt_field in data:
+                    data[alt_field] = ""
+
     def _build_report_schema_data(self, report):
         data = {}
         for field_config in self.report_fields:
@@ -484,7 +584,7 @@ class CommunicationService:
             if not field_name:
                 continue
             model_field = field_config.get("model_field") or field_name
-            value = self._format_report_value(getattr(report, model_field, None))
+            value = self._format_report_value(getattr(report, model_field, None), field_name=field_name)
             if "address" in field_name:
                 value = self._format_address_value(value)
             data[field_name] = value if value is not None else ""
@@ -496,6 +596,7 @@ class CommunicationService:
 
         data = self._build_report_schema_data(report) if report else {}
         if report:
+            self._suppress_duplicate_also_at_addresses(report, data)
             mortgaged_property_address = self._build_mortgaged_property_address(report)
             data["mortgaged_property_address"] = mortgaged_property_address
             data["ADDRESS_OF_MORTGAGED_PROPERTY"] = mortgaged_property_address
