@@ -781,10 +781,24 @@ class CommunicationService:
     # ==========================================================
 
     def _get_generated_report(self, application_number: str):
-        return self.db.query(SarfaesiMaster).filter(
-            SarfaesiMaster.application_number == application_number,
-            *live_filter(SarfaesiMaster)
-        ).first()
+        # Explicit ordering matters here: if more than one row ever ends up
+        # matching live_filter for the same application (e.g. a past race
+        # between two concurrent saves each closing/cloning a version), an
+        # unordered .first() can hand back a stale row - which is exactly
+        # how a freshly-saved borrower/co-borrower address update failed to
+        # show up in the generated notice. sarfaesi_repository.py's
+        # get_by_application_number() already guards against this the same
+        # way; mirror it here since this is the read path every notice/PDF/
+        # Word generation goes through.
+        return (
+            self.db.query(SarfaesiMaster)
+            .filter(
+                SarfaesiMaster.application_number == application_number,
+                *live_filter(SarfaesiMaster),
+            )
+            .order_by(SarfaesiMaster.updated_at.desc(), SarfaesiMaster.id.desc())
+            .first()
+        )
 
     def _build_report_placeholder_aliases(self, application_number: str, report=None):
         report = report or self._get_generated_report(application_number)

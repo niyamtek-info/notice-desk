@@ -1237,7 +1237,7 @@ class CommunicationController:
             else ""
         )
 
-        def _render_party_block(template_block, party, serial):
+        def _render_party_block(template_block, party, serial, co_borrower_number):
             block = copy.deepcopy(template_block)
             address_html = "\n".join(party.get("address_lines") or [])
             name_html = html.escape(str(party.get("name", "") or ""))
@@ -1265,10 +1265,19 @@ class CommunicationController:
                 updated = raw
                 if re.search(r"\bS\.?\s*No\.?\b", updated, re.I):
                     updated = re.sub(r"\bS\.?\s*No\.?\b", str(serial), updated, flags=re.I)
-                if "Co-Borrower No." in updated:
-                    updated = updated.replace("Co-Borrower No.", "Co-Borrower")
-                if "Co-Borrower No. " in updated:
-                    updated = updated.replace("Co-Borrower No. ", "Co-Borrower")
+                # Co-Borrower No. is its own sequence (1, 2, 3... excluding the
+                # borrower), independent of the overall S.No (which counts the
+                # borrower as row 1). This used to just strip "No." down to a
+                # bare "Co-Borrower" label, leaving the adjacent S.No cell's
+                # value (the overall serial, e.g. 2) as the only visible
+                # number - so the first co-borrower showed "Co-Borrower - 2"
+                # instead of "Co-Borrower No. 1".
+                updated = re.sub(
+                    r"Co-Borrower No\.?\s*\d*",
+                    f"Co-Borrower No. {co_borrower_number}",
+                    updated,
+                    flags=re.I,
+                )
                 for token, value in replacement_map.items():
                     if token in updated:
                         updated = updated.replace(token, value)
@@ -1294,8 +1303,12 @@ class CommunicationController:
 
             return block
 
-        for idx, party in enumerate(render_parties, start=2):
-            cloned_block = _render_party_block(target_block, party, idx)
+        for co_borrower_number, party in enumerate(render_parties, start=1):
+            # S.No (overall row count) counts the borrower as row 1, so
+            # co-borrowers start at 2 - Co-Borrower No. is a separate count
+            # that always starts at 1, independent of the borrower row.
+            serial = co_borrower_number + 1
+            cloned_block = _render_party_block(target_block, party, serial, co_borrower_number)
             target_block.insert_before(cloned_block)
 
         nodes_to_remove = [target_block]
