@@ -907,9 +907,16 @@ class CommunicationController:
                 updated,
                 flags=re.I,
             )
-            # Co-borrower S.No starts from 2 because borrower (first row) is always 1
             if re.search(r"\bS\.?\s*No\.?\b", updated, re.I):
-                updated = re.sub(r"\bS\.?\s*No\.?\b", str(index + 1), updated, flags=re.I)
+                # "(Co-Borrower - SNO)" labels use the co-borrower's own
+                # ordinal (1, 2, 3...); the row's leading "SNO." column
+                # instead needs the overall serial number, offset by 1 to
+                # account for the borrower always occupying row 1. Both
+                # reuse the same literal "SNO" placeholder text, so they
+                # have to be told apart by whether "Co-Borrower" appears in
+                # the same text node.
+                replacement = index if "co-borrower" in updated.lower() else index + 1
+                updated = re.sub(r"\bS\.?\s*No\.?\b", str(replacement), updated, flags=re.I)
             return updated
 
         for idx in range(1, count + 1):
