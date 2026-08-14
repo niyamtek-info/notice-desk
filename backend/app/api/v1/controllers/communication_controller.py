@@ -1606,6 +1606,11 @@ class CommunicationController:
                 "utf-8",
                 errors="ignore",
             )
+            # Bulk always renders via the `content=` path in generate_pdf_response,
+            # which (unlike the template-fetch path individual downloads use) never
+            # normalizes the footer image, so it's saved crushed to 69x57px unless
+            # fixed up here too.
+            request_content = self._normalize_letterhead_footer_image(request_content)
 
         with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as archive:
             for app_no in application_numbers:
