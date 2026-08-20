@@ -931,6 +931,129 @@ class CommunicationController:
         target_block.decompose()
         return str(soup)
 
+    def _suppress_empty_name_address_blocks(
+        self, html_source: str, placeholder_map: dict, alias_map: dict
+    ) -> str:
+        """
+        A party's name/address block only makes sense when it actually has an
+        address. If the address token in a block resolves to nothing, blank
+        the paired name too - and for "Also At" blocks specifically (which
+        exist only to show an alternate address) remove the whole block,
+        since a bare "Also At" heading with no name or address under it would
+        still show up as a half-empty section in the PDF.
+        """
+        name_token_re = re.compile(r"\{\{\s*([A-Za-z0-9_]*NAME[A-Za-z0-9_]*)\s*\}\}")
+        address_token_re = re.compile(r"\{\{\s*([A-Za-z0-9_]*ADDRESS[A-Za-z0-9_]*)\s*\}\}")
+        also_at_marker_re = re.compile(r"Also\s+[Aa]t\b")
+
+        def _resolved(token_text: str) -> str:
+            normalized = normalize_placeholder_token(token_text)
+            candidates = [normalized]
+
+            # Borrower/co-borrower fields are addressed with several
+            # different index-placement conventions across this codebase -
+            # "CO_BORROWER_ADDRESS_1", "CO_BORROWER_1_ADDRESS",
+            # "CO_BORROWER_ADDRESS_1_ALSO_AT" (index sandwiched mid-word),
+            # even a bare unindexed "CO_BORROWER_ADDRESS_ALSO_AT" that
+            # report_fields aliases straight to co-borrower 1. Only one of
+            # these is guaranteed to have an alias/data entry for any given
+            # field, so rather than hardcode each shape, pull the index digit
+            # out and try it at every position in the remaining words before
+            # concluding a value is empty - getting this wrong means silently
+            # deleting a real co-borrower's name from a legal notice, which
+            # is worse than occasionally leaving a block that should've been
+            # suppressed.
+            parts = normalized.split("_")
+            digit_positions = [i for i, part in enumerate(parts) if part.isdigit()]
+            if len(digit_positions) == 1:
+                pos = digit_positions[0]
+                index = parts[pos]
+                bare_parts = parts[:pos] + parts[pos + 1:]
+                for insert_at in range(len(bare_parts) + 1):
+                    candidate_parts = bare_parts[:insert_at] + [index] + bare_parts[insert_at:]
+                    candidates.append("_".join(candidate_parts))
+                if index == "1":
+                    candidates.append("_".join(bare_parts))
+
+            for candidate in candidates:
+                # Check the candidate itself before following alias_map -
+                # e.g. the unindexed "CO_BORROWER_ADDRESS_ALSO_AT" is aliased
+                # to "CO_BORROWER_1_ADDRESS_ALSO_AT" for final token
+                # substitution, but it's also a real field in its own right
+                # (report_fields maps it straight to co-borrower 1's data),
+                # so redirecting it through the alias here would skip past a
+                # value that's actually sitting under the unindexed key.
+                value = (placeholder_map.get(candidate) or "").strip()
+                if value:
+                    return value
+                resolved_key = alias_map.get(candidate, candidate)
+                value = (placeholder_map.get(resolved_key) or "").strip()
+                if value:
+                    return value
+            return ""
+
+        soup = BeautifulSoup(html_source, "html.parser")
+        changed = False
+
+        def _process(tag_name: str) -> bool:
+            nonlocal changed
+            found_any = False
+            for block in list(soup.find_all(tag_name)):
+                block_markup = str(block)
+                name_tokens = name_token_re.findall(block_markup)
+                address_tokens = address_token_re.findall(block_markup)
+                if not name_tokens or not address_tokens:
+                    continue
+
+                found_any = True
+                if any(_resolved(token) for token in address_tokens):
+                    continue
+
+                if also_at_marker_re.search(block.get_text(" ", strip=True)):
+                    block.decompose()
+                else:
+                    for token in name_tokens:
+                        normalized = normalize_placeholder_token(token)
+                        resolved_key = alias_map.get(normalized, normalized)
+                        if resolved_key in placeholder_map:
+                            placeholder_map[resolved_key] = ""
+                changed = True
+
+            return found_any
+
+        if not _process("table"):
+            _process("div")
+
+        # Some templates don't wrap "Also At"/"Also at" in a table or div at
+        # all - it's just a bare run of sibling <p> tags (heading, name,
+        # address, trailing blank line) dropped directly between two
+        # tables. _process() above only looks inside table/div containers,
+        # so this run is otherwise invisible to it. Treat the marker
+        # paragraph plus its following <p> siblings as one block.
+        for marker_p in list(soup.find_all("p")):
+            if marker_p.decomposed:
+                continue
+            if not also_at_marker_re.search(marker_p.get_text(" ", strip=True)):
+                continue
+            group = [marker_p]
+            sibling = marker_p.find_next_sibling()
+            while sibling is not None and getattr(sibling, "name", None) == "p":
+                group.append(sibling)
+                sibling = sibling.find_next_sibling()
+
+            group_markup = "".join(str(node) for node in group)
+            address_tokens = address_token_re.findall(group_markup)
+            if not address_tokens:
+                continue
+            if any(_resolved(token) for token in address_tokens):
+                continue
+
+            for node in group:
+                node.decompose()
+            changed = True
+
+        return str(soup) if changed else html_source
+
     def _expand_standalone_co_borrower_placeholders(self, html_text: str, data: dict) -> str:
         count = self._co_borrower_render_count(data)
         if count <= 0:
@@ -1152,6 +1275,8 @@ class CommunicationController:
             }
 
             known_tokens = set(placeholder_map.keys()) | set(alias_map.keys())
+
+            html_source = self._suppress_empty_name_address_blocks(html_source, placeholder_map, alias_map)
 
             def replace_token(raw: str) -> str:
                 normalized = normalize_placeholder_token(raw)

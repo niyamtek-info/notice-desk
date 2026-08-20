@@ -455,7 +455,13 @@ class ExtractorService:
                         matched_input_keys.add(k)
                         break
             
-            if val is not None:
+            # An empty matched object (e.g. the LLM emitted a literal
+            # "LoanAgreementDOM": {} placeholder while the actual fields sit
+            # flattened as its siblings) is functionally the same as a missing
+            # match - fall through to the sibling-recovery branch below rather
+            # than recursing into nothing and silently losing the real data.
+            val_is_empty_object = field_type == "object" and isinstance(val, dict) and not val
+            if val is not None and not val_is_empty_object:
                 # Recursive mapping
                 if field_type == "object" and "properties" in field:
                     mapped[name] = self._map_item_to_schema(val, field["properties"])
@@ -474,6 +480,20 @@ class ExtractorService:
                              mapped[name] = [val]
                 else:
                     mapped[name] = val
+            elif (
+                field_type == "object"
+                and "properties" in field
+                and self._keys_matching_fields(data, field["properties"])
+            ):
+                # The LLM sometimes ignores the requested wrapper (e.g. returns
+                # loanAgreementDate/borrowerName/... at the root instead of
+                # nested under "LoanAgreementDOM"). response_mime_type=json only
+                # guarantees valid JSON, not this shape, so it isn't malformed -
+                # just flattened. Recover it from the sibling keys instead of
+                # silently writing an empty required object and losing the data.
+                matched_input_keys.update(self._keys_matching_fields(data, field["properties"]))
+                sibling_data = {k: v for k, v in data.items() if k not in (name, llm_key)}
+                mapped[name] = self._map_item_to_schema(sibling_data, field["properties"])
             else:
                 # Initialize missing fields if they are required or just to maintain structure
                 mapped[name] = [] if field_type == "array" else ({} if field_type == "object" else None)
@@ -485,6 +505,34 @@ class ExtractorService:
                 mapped[k] = v
 
         return mapped
+
+    def _keys_matching_fields(self, data: Any, fields: list) -> set:
+        """Keys in `data` that any of `fields` would match, via the same
+        direct/heuristic rules as _map_item_to_schema's own field matching."""
+        if not isinstance(data, dict):
+            return set()
+
+        matched: set = set()
+        for field in fields:
+            name = field.get("name")
+            llm_key = field.get("llm_key")
+
+            if llm_key and llm_key in data:
+                matched.add(llm_key)
+                continue
+            if name in data:
+                matched.add(name)
+                continue
+
+            norm_llm = llm_key.lower().replace("_", "").replace(" ", "") if llm_key else None
+            norm_name = name.lower().replace("_", "").replace(" ", "") if name else None
+            for k in data.keys():
+                norm_k = k.lower().replace("_", "").replace(" ", "")
+                if norm_k == norm_llm or norm_k == norm_name:
+                    matched.add(k)
+                    break
+
+        return matched
 
     # -----------------------------------------------------------
     # 2. GET RECORD BY ID

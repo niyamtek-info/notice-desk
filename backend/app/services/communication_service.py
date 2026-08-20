@@ -101,6 +101,7 @@ class CommunicationService:
         "future_principal",
         "principal_outstanding",
         "instalment_overdue",
+        "instalment_overdue_amount",
         "interest_on_termination",
         "late_payment_penalty",
         "cheque_bounce_charges",
@@ -563,7 +564,24 @@ class CommunicationService:
         address twice under an "Also At" heading. Blank the also-at value
         here so any {{..._ALSO_AT}} / {{..._ALT}} placeholder resolves to
         empty instead of repeating the primary address.
+
+        report_fields declares several differently-named `data` keys that
+        all read from the same underlying "*_also_at"/"*_alt" model column
+        (e.g. "co_borrower_address_also_at", "co_borrower_address_1_also_at"
+        and "co_borrower_1_address_also_at" are all just the co-borrower 1
+        also-at column under different placeholder spellings). Blanking only
+        one of those `data` keys leaves the others still holding the
+        duplicate address, which a later placeholder/alias lookup can still
+        pick up - so every `data` key backed by the same model column has to
+        be blanked together.
         """
+        model_field_to_data_keys: dict[str, list[str]] = {}
+        for field_config in self.report_fields:
+            field_name = field_config.get("field")
+            model_field = field_config.get("model_field") or field_name
+            if field_name and model_field:
+                model_field_to_data_keys.setdefault(model_field, []).append(field_name)
+
         for primary_field, alt_fields in self._ADDRESS_ALSO_AT_PAIRS:
             primary_norm = self._normalize_address_for_compare(
                 getattr(report, primary_field, None)
@@ -574,8 +592,11 @@ class CommunicationService:
                 alt_norm = self._normalize_address_for_compare(
                     getattr(report, alt_field, None)
                 )
-                if alt_norm and alt_norm == primary_norm and alt_field in data:
-                    data[alt_field] = ""
+                if not alt_norm or alt_norm != primary_norm:
+                    continue
+                for data_key in model_field_to_data_keys.get(alt_field, [alt_field]):
+                    if data_key in data:
+                        data[data_key] = ""
 
     def _build_report_schema_data(self, report):
         data = {}
@@ -596,13 +617,20 @@ class CommunicationService:
 
         data = self._build_report_schema_data(report) if report else {}
         if report:
-            self._suppress_duplicate_also_at_addresses(report, data)
             mortgaged_property_address = self._build_mortgaged_property_address(report)
             data["mortgaged_property_address"] = mortgaged_property_address
             data["ADDRESS_OF_MORTGAGED_PROPERTY"] = mortgaged_property_address
             data["ADDRESS_OF_THE_MORTGAGED_PROPERTY"] = mortgaged_property_address
             data["MORTGAGED_PROPERTY_ADDRESS"] = mortgaged_property_address
         data.update(self._build_report_placeholder_aliases(application_number, report=report))
+        if report:
+            # Must run after the alias merge above: _resolve_placeholder_alias
+            # re-reads "*_also_at"/"*_alt" values straight from the report
+            # model (see notice_template_aliases' fallback-to-target source
+            # field), so it can reintroduce a duplicate-of-primary address
+            # under an alias-only data key even when the matching
+            # report_fields key was already blanked here first.
+            self._suppress_duplicate_also_at_addresses(report, data)
 
         return data
 

@@ -30,7 +30,7 @@ export default function NoticeReportModel({ visible, onCancel,onSuccess,template
   }
 
   const filterAoDatas = useMemo(()=>{
-   const result = banks?.find((res:any)=>res?.client_code == selectedBank)?.aos || [];
+   const result = banks?.find((res:any)=>res?.client_code === selectedBank || res?.client_name === selectedBank || res?.client === selectedBank)?.aos || [];
    return result
   },[banks,selectedBank])
 

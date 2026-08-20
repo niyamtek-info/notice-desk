@@ -592,8 +592,8 @@ export default function BankList() {
                 onCancel={() => setBranchModalVisible(false)}
                 footer={null}
                 centered
-                width="50%"
-                style={{ top: 20 }}
+                width="max-content"
+                style={{ top: 20, minWidth: '50%' }}
                 classNames={{
                     content: ' !shadow-none'
                 }}
@@ -607,7 +607,6 @@ export default function BankList() {
                                     dataIndex: 'ao_code',
                                     key: 'AOCode',
                                     align: 'center',
-                                    width: '25%',
                                     className: 'font-medium',
                                     render: (text: string) => (
                                         <span className="px-3 py-2 bg-gray-50 rounded-lg inline-block break-words max-w-full">
@@ -620,7 +619,6 @@ export default function BankList() {
                                     dataIndex: 'ao_name',
                                     key: 'AOName',
                                     align: 'center',
-                                    width: '50%',
                                     className: 'font-medium',
                                     render: (text: string) => (
                                         <span className="px-4 py-2 bg-white rounded-lg inline-block break-words max-w-full">
@@ -633,7 +631,6 @@ export default function BankList() {
                                     dataIndex: 'ao_email',
                                     key: 'AOEmail',
                                     align: 'center',
-                                    width: '45%',
                                     className: 'font-medium',
                                     render: (text: string) => (
                                         <span className="px-4 py-2 bg-white rounded-lg inline-block break-words max-w-full">
@@ -646,7 +643,6 @@ export default function BankList() {
                                     dataIndex: 'signature_path',
                                     key: 'signature',
                                     align: 'center',
-                                    width: '30%',
                                     render: (signaturePath: string) => (
                                         signaturePath ? (
                                             <div className="flex justify-center">
@@ -668,7 +664,6 @@ export default function BankList() {
                                     title: 'Actions',
                                     key: 'actions',
                                     align: 'center',
-                                    width: '15%',
                                     render: (_, record) => (
                                         <div className="flex items-center justify-center gap-3">
                                             <button
@@ -697,7 +692,7 @@ export default function BankList() {
                             ]}
                             dataSource={selectedBankBranches}
                             pagination={{ pageSize: 5 }}
-                            scroll={{ x: 500 }}
+                            scroll={{ x: 'max-content' }}
                             className="branch-details-table"
                             rowClassName="hover:bg-gray-50 transition-colors"
                             bordered

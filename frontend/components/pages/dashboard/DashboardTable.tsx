@@ -146,12 +146,11 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
   const { selectedBank } = useBank();
   const [messageApi, contextHolder] = message.useMessage();
   const [token, setToken] = useState<string>("");
-  const [docModel, setDocModel] = useState<boolean>(false)
-  const [modelType, setModelType] = useState<string>("")
+  const [docModel, setDocModel] = useState<boolean>(false);
+  const [modelType, setModelType] = useState<string>("");
   const [docData, setDocData] = useState<any>([]);
-  const [createType, setCreateType] = useState<string>("")
+  const [createType, setCreateType] = useState<string>("");
   const [templatesType, setTemplatesType] = useState<any>([]);
-
 
   // Handle responsive behavior
   useEffect(() => {
@@ -167,14 +166,17 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
 
   const handleFetchTemplate = async () => {
     try {
-      let response: any = await BankApi.getSingleClientTemplate(selectedBank);
-      setTemplatesType(response?.templates || []);
-    } catch (error) { }
-  }
+      const bankObj = banks.find((b: any) => b.client_code === selectedBank || b.client_name === selectedBank || b.client === selectedBank);
+      const codeToFetch = bankObj?.client_code || selectedBank;
+      let response: any = await BankApi.getSingleClientTemplate(codeToFetch);
+      const templates = response?.templates ? response.templates : (Array.isArray(response) ? response : []);
+      setTemplatesType(templates);
+    } catch (error) {}
+  };
 
   useEffect(() => {
-    handleFetchTemplate()
-  }, [selectedBank])
+    handleFetchTemplate();
+  }, [selectedBank, banks]);
 
   useEffect(() => {
     const tokenData = localStorage.getItem("token");
@@ -234,7 +236,9 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
         params.assigned_date = localFilters.dateRange[0].format("YYYY-MM-DD");
       }
 
-      const data: any = await ApplicationApi.getAll(!["all", "All Client"].includes(bankToFilter) && sanitizeParams(params));
+      const data: any = await ApplicationApi.getAll(
+        !["all", "All Client"].includes(bankToFilter) && sanitizeParams(params),
+      );
       const items = data.data || [];
       dispatch(setApplications(items));
     } catch (err) {
@@ -243,8 +247,6 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
       setLoading(false);
     }
   };
-
-
 
   useEffect(() => {
     fetchData();
@@ -282,13 +284,24 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
           case "Application No":
             return app.application_no.toLowerCase().includes(searchLower);
           case "Loan Account No":
-            return app.loan_account_number?.toLowerCase().includes(searchLower) || false;
+            return (
+              app.loan_account_number?.toLowerCase().includes(searchLower) ||
+              false
+            );
           case "Borrower Name":
-            return app.borrower_name?.toLowerCase().includes(searchLower) || false;
+            return (
+              app.borrower_name?.toLowerCase().includes(searchLower) || false
+            );
           case "State":
-            return (app.location ?? app.state)?.toLowerCase().includes(searchLower) || false;
+            return (
+              (app.location ?? app.state)
+                ?.toLowerCase()
+                .includes(searchLower) || false
+            );
           case "Type of Service":
-            return app.type_of_work?.toLowerCase().includes(searchLower) || false;
+            return (
+              app.type_of_work?.toLowerCase().includes(searchLower) || false
+            );
           case "Batch Code":
             return app.batch_code?.toLowerCase().includes(searchLower) || false;
           default:
@@ -311,7 +324,6 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
             app.type_of_work.toLowerCase().includes(searchLower)) ||
           (app.batch_code &&
             app.batch_code.toLowerCase().includes(searchLower)),
-
       );
     }
 
@@ -323,7 +335,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
         cusName: app.borrower_name ?? "-",
         loanAccNo: app.loan_account_number ?? "-",
         loanAmount: app.loan_amount ?? 0,
-        state: (app.location ?? app.state) ?? "-",
+        state: app.location ?? app.state ?? "-",
         bankName: app.bank_name ?? "-",
         status: (app.process_status as StatusType) ?? "New",
         report_status: (app.report_status as ReportStatus) ?? "Not_Available",
@@ -465,11 +477,11 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
   ];
 
   const handleDownloadApi = async (setLoader: any): Promise<void> => {
-    setLoader(true)
+    setLoader(true);
     try {
       let payload = {
-        "application_numbers": selectedAppNo
-      }
+        application_numbers: selectedAppNo,
+      };
       const blob: Blob = await ReportApi.create(payload);
 
       const url = window.URL.createObjectURL(blob);
@@ -484,24 +496,24 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
       window.URL.revokeObjectURL(url);
       setSelectedAppNo([]);
       setSelectedRowKeys([]);
-      handleDocCancel()
+      handleDocCancel();
     } catch (error) {
       console.error("Download failed:", error);
       messageApi.error(String(error));
     } finally {
-      setLoader(false)
+      setLoader(false);
     }
   };
 
   const handleNoticeGenerate = async (values: any, setLoader: any) => {
-    setLoader(true)
+    setLoader(true);
     try {
       let payload = {
-        "template_id": values?.reportType,
-        "ao_code": values?.aoCode,
-        "application_numbers": selectedAppNo
-      }
-      const blob: Blob = await ReportApi.bulkNoticeGenerate(payload)
+        template_id: values?.reportType,
+        ao_code: values?.aoCode,
+        application_numbers: selectedAppNo,
+      };
+      const blob: Blob = await ReportApi.bulkNoticeGenerate(payload);
 
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -512,32 +524,31 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      message.success('Notice generated successfully!')
-      handleDocCancel()
+      message.success("Notice generated successfully!");
+      handleDocCancel();
       setSelectedAppNo([]);
       setSelectedRowKeys([]);
     } catch (error) {
       messageApi.error(String(error));
     } finally {
-      setLoader(false)
+      setLoader(false);
     }
-  }
-
+  };
 
   const handleOpenReportModel = (type: any) => {
     if (type == "Report") {
-      setDocModel(true)
-      setModelType(type)
+      setDocModel(true);
+      setModelType(type);
     } else if (type == "Notice") {
-      setDocModel(true)
-      setModelType(type)
+      setDocModel(true);
+      setModelType(type);
     }
-  }
+  };
 
   const handleDocCancel = () => {
-    setDocModel(false)
-    setModelType("")
-  }
+    setDocModel(false);
+    setModelType("");
+  };
 
   const handleClearFilter = (res: any) => {
     let filterValue = filterData.filter((val) => val?.name != res?.name);
@@ -549,10 +560,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
         localFilters.borrowerName === res?.value
           ? undefined
           : localFilters.borrowerName,
-      state:
-        localFilters.state === res?.value
-          ? undefined
-          : localFilters.state,
+      state: localFilters.state === res?.value ? undefined : localFilters.state,
       status:
         localFilters.status === res?.value ? undefined : localFilters.status,
     };
@@ -566,7 +574,6 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
         setTrigger((pre: number) => pre + 1);
       }
     } catch (error) {
-
     } finally {
       setConfirmVisible(false);
     }
@@ -579,8 +586,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
     { label: "Borrower Name", value: "Borrower Name" },
     { label: "State", value: "State" },
     { label: "Type of Service", value: "Type of Service" },
-    { label: "Batch Code", value: "Batch Code" }
-
+    { label: "Batch Code", value: "Batch Code" },
   ];
 
   // Row selection is reset whenever the active bank or status tab changes
@@ -597,13 +603,13 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
         <h2 className="text-lg font-semibold mb-0">
           Loan Applications {selectedBank && `for`}{" "}
           <span className="text-primary-500 font-bold">
-            {selectedBank ? `${selectedBank == "all" ? "All Clients" : selectedBank}` : ""}
+            {selectedBank
+              ? `${selectedBank == "all" ? "All Clients" : selectedBank}`
+              : ""}
           </span>
         </h2>
 
-
         <div className="flex gap-3">
-
           <Badge count={selectedAppNo?.length} offset={[-2, 2]} size="default">
             <button
               disabled={selectedAppNo?.length == 0}
@@ -625,7 +631,6 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
               Download Report
             </button>
           </Badge>
-
         </div>
       </div>
 
@@ -663,7 +668,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
           <Table<DataType>
             columns={columns}
             dataSource={tableData}
-            pagination={{ pageSize: 10 }}
+            pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
             bordered
             loading={loading}
             rowKey="key"
@@ -703,7 +708,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
         <Table<DataType>
           columns={columns}
           dataSource={tableData}
-          pagination={{ pageSize: 10 }}
+          pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '50', '100'] }}
           bordered
           rowKey="key"
           loading={loading}
@@ -747,7 +752,11 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
           </button>
         </div>
         <div className="bg-white px-2 pb-4 rounded-b-lg max-h-[85vh] overflow-y-auto">
-          <Document1 token={token} setDocData={setDocData} setTriggerReport={() => { }} />
+          <Document1
+            token={token}
+            setDocData={setDocData}
+            setTriggerReport={() => {}}
+          />
         </div>
       </Modal>
 
@@ -770,13 +779,25 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
         <p>Are you sure you want to delete this application?</p>
       </Modal>
 
-      {modelType === "Report" &&
-        <GenerateReportModel visible={docModel} onSuccess={handleDownloadApi} onCancel={handleDocCancel} type={"multiple"} />
-      }
+      {modelType === "Report" && (
+        <GenerateReportModel
+          visible={docModel}
+          onSuccess={handleDownloadApi}
+          onCancel={handleDocCancel}
+          type={"multiple"}
+        />
+      )}
 
-      {modelType === "Notice" &&
-        <NoticeReportModel visible={docModel} onSuccess={handleNoticeGenerate} onCancel={handleDocCancel} templatesType={templatesType} banks={banks} selectedBank={selectedBank} />
-      }
+      {modelType === "Notice" && (
+        <NoticeReportModel
+          visible={docModel}
+          onSuccess={handleNoticeGenerate}
+          onCancel={handleDocCancel}
+          templatesType={templatesType}
+          banks={banks}
+          selectedBank={selectedBank}
+        />
+      )}
     </>
   );
 };

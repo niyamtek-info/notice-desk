@@ -93,7 +93,8 @@ const NewChecklistContent: React.FC<NewChecklistContentProps> = ({
 
   const { progressId, setProgressId } = useAppContext();
 
-  const [form] = Form.useForm();
+  const [formSL] = Form.useForm();
+  const [formMODT] = Form.useForm();
   const checklistPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const stopChecklistPolling = () => {
@@ -454,14 +455,14 @@ const NewChecklistContent: React.FC<NewChecklistContentProps> = ({
         const nameA = `sanctionLetter${record.attribute_code}`;
         const nameB = `loanAgreement${record.attribute_code}`;
         const handleCopyAtoB = () => {
-          const valA = form.getFieldValue(nameA);
-          form.setFieldsValue({ [nameB]: valA });
+          const valA = formSL.getFieldValue(nameA);
+          formSL.setFieldsValue({ [nameB]: valA });
           setShowSave(true);
           handleChange(record, valA, "doc_b");
         };
         const handleCopyBtoA = () => {
-          const valB = form.getFieldValue(nameB);
-          form.setFieldsValue({ [nameA]: valB });
+          const valB = formSL.getFieldValue(nameB);
+          formSL.setFieldsValue({ [nameA]: valB });
           setShowSave(true);
           handleChange(record, valB, "doc_a");
         };
@@ -622,14 +623,14 @@ const NewChecklistContent: React.FC<NewChecklistContentProps> = ({
         const nameA = `MODT${record.attribute_code}`;
         const nameB = `saleDeed${record.attribute_code}`;
         const handleCopyAtoB = () => {
-          const valA = form.getFieldValue(nameA);
-          form.setFieldsValue({ [nameB]: valA });
+          const valA = formMODT.getFieldValue(nameA);
+          formMODT.setFieldsValue({ [nameB]: valA });
           setShowSave(true);
           handleChange(record, valA, "doc_b");
         };
         const handleCopyBtoA = () => {
-          const valB = form.getFieldValue(nameB);
-          form.setFieldsValue({ [nameA]: valB });
+          const valB = formMODT.getFieldValue(nameB);
+          formMODT.setFieldsValue({ [nameA]: valB });
           setShowSave(true);
           handleChange(record, valB, "doc_a");
         };
@@ -759,6 +760,8 @@ const NewChecklistContent: React.FC<NewChecklistContentProps> = ({
                   setShowSave(false);
                   setEditMode(false);
                   setApiPayload([]);
+                  formSL.resetFields();
+                  formMODT.resetFields();
                 }}
                 type="text"
                 className="!bg-gray-100"
@@ -769,7 +772,23 @@ const NewChecklistContent: React.FC<NewChecklistContentProps> = ({
             ) : (
               <Button
                 disabled={showEdit}
-                onClick={() => setEditMode(true)}
+                onClick={() => {
+                  const slValues: any = {};
+                  sl_la_data.forEach((item: any) => {
+                     slValues[`sanctionLetter${item.attribute_code}`] = item.attribute_code === "date" ? parseToDayjs(item.document_a_value) : item.document_a_value;
+                     slValues[`loanAgreement${item.attribute_code}`] = item.attribute_code === "date" ? parseToDayjs(item.document_b_value) : item.document_b_value;
+                  });
+                  formSL.setFieldsValue(slValues);
+
+                  const modtValues: any = {};
+                  modt_sd_data.forEach((item: any) => {
+                     modtValues[`MODT${item.attribute_code}`] = item.attribute_code === "date" ? parseToDayjs(item.document_a_value) : item.document_a_value;
+                     modtValues[`saleDeed${item.attribute_code}`] = item.attribute_code === "date" ? parseToDayjs(item.document_b_value) : item.document_b_value;
+                  });
+                  formMODT.setFieldsValue(modtValues);
+                  
+                  setEditMode(true);
+                }}
                 type={showEdit ? "dashed" : "primary"}
               >
                 <FaEdit size={20} />
@@ -817,7 +836,7 @@ const NewChecklistContent: React.FC<NewChecklistContentProps> = ({
               }
               key="1"
             >
-              <Form form={form}>
+              <Form form={formSL} preserve={false}>
                 <Table
                   columns={slCols}
                   dataSource={sl_la_data}
@@ -845,7 +864,7 @@ const NewChecklistContent: React.FC<NewChecklistContentProps> = ({
               }
               key="2"
             >
-              <Form form={form} component={false}>
+              <Form form={formMODT} component={false} preserve={false}>
                 <Table
                   columns={modtCols}
                   dataSource={modt_sd_data}
