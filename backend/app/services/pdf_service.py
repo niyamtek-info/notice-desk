@@ -860,6 +860,19 @@ class PDFService:
                 pass
             print("PAGE LOADED")
 
+            # page.pdf() always renders with 'print' media at the A4 paper
+            # width internally, regardless of the page's current viewport or
+            # emulated media - but page.evaluate() below reads
+            # getBoundingClientRect() against whatever is *currently* active
+            # (default: 'screen' media at Playwright's normal viewport
+            # width). Without matching both here first, the split-avoidance
+            # math below measures the wrong layout entirely (different text
+            # wrapping above the table shifts every position below it), so
+            # switch to print media and the real A4 pixel width before
+            # measuring anything.
+            await page.emulate_media(media="print")
+            await page.set_viewport_size({"width": 794, "height": 1123})  # A4 @ 96dpi
+
             use_header = bool(header_template and header_template.strip())
             use_footer = bool(footer_template and footer_template.strip())
 
@@ -876,6 +889,58 @@ class PDFService:
             print(f"PDF MARGINS: top={top_margin}, bottom={bottom_margin}")
             print(f"USE_HEADER: {use_header}, USE_FOOTER: {use_footer}")
             print("=" * 60)
+
+            # Chromium's page.pdf() does not reliably respect
+            # page-break-inside/break-inside: avoid, so elements marked
+            # .js-avoid-split (visible/real tables - see
+            # _prevent_visible_table_page_breaks) are measured here in real
+            # layout pixels and, if one would straddle a page boundary, is
+            # pushed down with a computed top margin so it starts cleanly at
+            # the top of the next page instead of splitting mid-table.
+            await page.evaluate(
+                """
+                ({ topMarginMm, bottomMarginMm }) => {
+                    const mmToPx = 96 / 25.4;
+                    const pageHeightPx = 297 * mmToPx; // A4
+                    const usableHeightPx = pageHeightPx - (topMarginMm * mmToPx) - (bottomMarginMm * mmToPx);
+                    if (usableHeightPx <= 0) return;
+
+                    // Chromium's real print-pass pagination reserves somewhat
+                    // more space per page than this live-DOM measurement can
+                    // see (observed ~70px short in testing, i.e. the printed
+                    // page fits noticeably less than getBoundingClientRect
+                    // predicts) - a fixed safety buffer is added only to the
+                    // "does this fit" decision below, not to usableHeightPx
+                    // itself, so the page-boundary math used to compute the
+                    // actual push distance stays accurate for elements
+                    // further down a long, multi-page document.
+                    const SAFETY_BUFFER_PX = 120;
+
+                    const targets = Array.from(document.querySelectorAll('.js-avoid-split'));
+                    targets.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+
+                    for (const el of targets) {
+                        const rect = el.getBoundingClientRect();
+                        const top = rect.top + window.scrollY;
+                        const height = rect.height;
+                        if (height <= 0 || height + SAFETY_BUFFER_PX > usableHeightPx) continue;
+
+                        const pageIndexAtTop = Math.floor(top / usableHeightPx);
+                        const pageIndexAtBottom = Math.floor((top + height - 1 + SAFETY_BUFFER_PX) / usableHeightPx);
+                        if (pageIndexAtTop !== pageIndexAtBottom) {
+                            const nextPageTop = (pageIndexAtTop + 1) * usableHeightPx;
+                            const requiredGap = nextPageTop - top;
+                            const currentMarginTop = parseFloat(getComputedStyle(el).marginTop) || 0;
+                            el.style.marginTop = (currentMarginTop + requiredGap) + 'px';
+                        }
+                    }
+                }
+                """,
+                {
+                    "topMarginMm": HEADER_HEIGHT_MM if use_header else 0,
+                    "bottomMarginMm": FOOTER_HEIGHT_MM if use_footer else 0,
+                },
+            )
 
             await page.pdf(
                 path=pdf_path,
@@ -1082,7 +1147,57 @@ img {{
         for node in reversed(list(font_assets.contents)):
             head.insert(0, node)
         head.append(style)
+        self._prevent_visible_table_page_breaks(soup)
         return str(soup)
+
+    def _table_cell_has_visible_border(self, cell: Tag) -> bool:
+        style = (cell.get("style") or "").lower()
+        border_style_match = re.search(r"border(?:-top)?-style\s*:\s*([a-z]+)", style)
+        if border_style_match:
+            return border_style_match.group(1) != "none"
+        border_match = re.search(r"(?<!-)border\s*:\s*([^;]+)", style)
+        if border_match:
+            value = border_match.group(1)
+            if "none" in value:
+                return False
+            return any(
+                keyword in value
+                for keyword in ("solid", "dashed", "dotted", "double", "groove", "ridge", "inset", "outset")
+            )
+        return False
+
+    def _prevent_visible_table_page_breaks(self, soup: BeautifulSoup) -> None:
+        for table in soup.find_all("table"):
+            classes = table.get("class") or []
+            if "hidden-table" in classes:
+                continue
+            cells = table.find_all(["td", "th"])
+            is_visible = any(self._table_cell_has_visible_border(cell) for cell in cells)
+            if not is_visible:
+                continue
+            style = (table.get("style") or "").rstrip("; ")
+            extra = "page-break-inside: avoid; break-inside: avoid;"
+            table["style"] = f"{style}; {extra}" if style else extra
+            # Chromium's print/PDF pagination does not actually honor
+            # break-inside:avoid on a <table> itself (a known engine
+            # limitation - tables always remain breakable regardless of this
+            # rule, only plain block boxes respect it). Wrapping the table in
+            # a block-level <div> carrying the same rule is what actually
+            # keeps the whole table together across a page boundary.
+            # Chromium's headless PDF printer (page.pdf()) does not reliably
+            # honor break-inside:avoid at all (a known engine limitation) -
+            # the CSS above is kept as a harmless best-effort hint, but the
+            # class below is what actually gets enforced, by a JS pass run
+            # right before printing that measures real layout and pushes the
+            # element to the next page with a computed margin when needed.
+            wrapper = soup.new_tag(
+                "div",
+                attrs={
+                    "class": "js-avoid-split",
+                    "style": "display:block; page-break-inside: avoid; break-inside: avoid;",
+                },
+            )
+            table.wrap(wrapper)
 
     def _is_valid_header(self, html_text: str) -> bool:
         if not html_text:

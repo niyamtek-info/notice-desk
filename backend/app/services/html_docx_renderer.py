@@ -303,6 +303,18 @@ def _render_table(
     if not widths or len(widths) != num_cols:
         widths = [content_width_twips // num_cols] * num_cols
 
+    # A table with at least one visibly-bordered cell is real content (e.g.
+    # a summary table), as opposed to the borderless tables used purely for
+    # layout/alignment - only the former should be kept off a page break,
+    # same signal already used above to decide whether to draw cell borders
+    # at all. `avoid_row_split` remains a template-wide opt-in on top of this.
+    table_is_visible = any(
+        _cell_border_size_eighths_pt(cell_tag) is not None
+        for tr in rows
+        for cell_tag in tr.find_all(["td", "th"], recursive=False)
+    )
+    avoid_row_split = avoid_row_split or table_is_visible
+
     for row_idx, tr in enumerate(rows):
         if avoid_row_split:
             # OOXML has no whole-table "keep together" flag; w:cantSplit per

@@ -49,6 +49,48 @@ class SarfaesiBase(BaseModel):
     guarantor_2_name: Optional[str] = None
     guarantor_2_address: Optional[str] = None
 
+    # BORROWER/CO-BORROWER CONTACT, MORTGAGOR, MACHINERY, SANCTION, LRN, PRE-SARFAESI
+    cif_no: Optional[str] = None
+    borrower_email: Optional[str] = None
+    borrower_number: Optional[str] = None
+    borrower_range: Optional[str] = None
+    co_borrower_range: Optional[str] = None
+    co_borrower_1_email: Optional[str] = None
+    co_borrower_1_number: Optional[str] = None
+    co_borrower_2_email: Optional[str] = None
+    co_borrower_2_number: Optional[str] = None
+    co_borrower_3_email: Optional[str] = None
+    co_borrower_3_number: Optional[str] = None
+    co_borrower_4_email: Optional[str] = None
+    co_borrower_4_number: Optional[str] = None
+    co_borrower_5_email: Optional[str] = None
+    co_borrower_5_number: Optional[str] = None
+    co_borrower_6_email: Optional[str] = None
+    co_borrower_6_number: Optional[str] = None
+    mortager_name_1: Optional[str] = None
+    mortager_address_1: Optional[str] = None
+    mortager_name_2: Optional[str] = None
+    mortager_address_2: Optional[str] = None
+    collateral_property_description: Optional[str] = None
+    model_of_machinery: Optional[str] = None
+    manufacturer: Optional[str] = None
+    category_of_machinery: Optional[str] = None
+    dealer_name: Optional[str] = None
+    type_of_machine: Optional[str] = None
+    property_name: Optional[str] = None
+    sanction_date: Optional[date | str] = None
+    sanction_date_words: Optional[str] = None
+    sanction_amount: Optional[Decimal] = None
+    pending_emi: Optional[Decimal] = None
+    interest_for_the_month: Optional[Decimal] = None
+    lrn_date: Optional[date | str] = None
+    lrn_date_words: Optional[str] = None
+    lrn_dispatch_date: Optional[date | str] = None
+    pre_sarfeasi_date: Optional[date | str] = None
+    pre_sarfeasi_date_words: Optional[str] = None
+    pre_sarfeasi_dispatch_date: Optional[date | str] = None
+    demand_notice_date_words: Optional[str] = None
+
     property_description: Optional[str] = Field(
         default=None,
         validation_alias=AliasChoices(
@@ -227,6 +269,49 @@ class LoanDetails(BaseModel):
     guarantor_2_name: Optional[str] = None
     guarantor_2_address: Optional[str] = None
 
+    # BORROWER/CO-BORROWER CONTACT, MORTGAGOR, MACHINERY, SANCTION, LRN, PRE-SARFAESI
+    cif_no: Optional[str] = None
+    borrower_email: Optional[str] = None
+    borrower_number: Optional[str] = None
+    borrower_range: Optional[str] = None
+    co_borrower_range: Optional[str] = None
+    co_borrower_1_email: Optional[str] = None
+    co_borrower_1_number: Optional[str] = None
+    co_borrower_2_email: Optional[str] = None
+    co_borrower_2_number: Optional[str] = None
+    co_borrower_3_email: Optional[str] = None
+    co_borrower_3_number: Optional[str] = None
+    co_borrower_4_email: Optional[str] = None
+    co_borrower_4_number: Optional[str] = None
+    co_borrower_5_email: Optional[str] = None
+    co_borrower_5_number: Optional[str] = None
+    co_borrower_6_email: Optional[str] = None
+    co_borrower_6_number: Optional[str] = None
+    mortager_name_1: Optional[str] = None
+    mortager_address_1: Optional[str] = None
+    mortager_name_2: Optional[str] = None
+    mortager_address_2: Optional[str] = None
+    collateral_property_description: Optional[str] = None
+    model_of_machinery: Optional[str] = None
+    manufacturer: Optional[str] = None
+    category_of_machinery: Optional[str] = None
+    dealer_name: Optional[str] = None
+    type_of_machine: Optional[str] = None
+    property_name: Optional[str] = None
+    sanction_date: Optional[date | str] = None
+    sanction_date_words: Optional[str] = None
+    # Comma-formatted display string, same convention as the other amount
+    # fields in this section (see disbursal_amount above).
+    sanction_amount: Optional[str] = None
+    pending_emi: Optional[str] = None
+    interest_for_the_month: Optional[str] = None
+    lrn_date: Optional[date | str] = None
+    lrn_date_words: Optional[str] = None
+    lrn_dispatch_date: Optional[date | str] = None
+    pre_sarfeasi_date: Optional[date | str] = None
+    pre_sarfeasi_date_words: Optional[str] = None
+    pre_sarfeasi_dispatch_date: Optional[date | str] = None
+
     property_description: Optional[str] = Field(
         default=None,
         validation_alias=AliasChoices(
@@ -286,6 +371,8 @@ class Thirteen2Details(BaseModel):
     publication_date: Optional[date | str] = None
     publication_english: Optional[str] = None
     publication_local: Optional[str] = None
+    # Words-format companion to notice_13_2_date above.
+    demand_notice_date_words: Optional[str] = None
 
 
 class Thirteen4Details(BaseModel):

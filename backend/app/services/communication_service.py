@@ -114,6 +114,9 @@ class CommunicationService:
         "outstanding_amount",
         "emd_amount",
         "bid_increment",
+        "sanction_amount",
+        "pending_emi",
+        "interest_for_the_month",
     }
 
     @staticmethod

@@ -273,6 +273,62 @@ class SarfaesiMaster(Base):
     co_borrower_6_address_alt = Column(Text, nullable=True)
 
     # =========================
+    # BORROWER/CO-BORROWER CONTACT, MORTGAGOR, MACHINERY, SANCTION, LRN, PRE-SARFAESI
+    # =========================
+    cif_no = Column(String(50), nullable=True)
+    borrower_email = Column(String(255), nullable=True)
+    borrower_number = Column(String(20), nullable=True)
+    borrower_range = Column(String(100), nullable=True)
+    co_borrower_range = Column(String(100), nullable=True)
+
+    # Per co-borrower (1-6), matching the co_borrower_N_name/address pattern
+    co_borrower_1_email = Column(String(255), nullable=True)
+    co_borrower_1_number = Column(String(20), nullable=True)
+    co_borrower_2_email = Column(String(255), nullable=True)
+    co_borrower_2_number = Column(String(20), nullable=True)
+    co_borrower_3_email = Column(String(255), nullable=True)
+    co_borrower_3_number = Column(String(20), nullable=True)
+    co_borrower_4_email = Column(String(255), nullable=True)
+    co_borrower_4_number = Column(String(20), nullable=True)
+    co_borrower_5_email = Column(String(255), nullable=True)
+    co_borrower_5_number = Column(String(20), nullable=True)
+    co_borrower_6_email = Column(String(255), nullable=True)
+    co_borrower_6_number = Column(String(20), nullable=True)
+
+    mortager_name_1 = Column(String(255), nullable=True)
+    mortager_address_1 = Column(Text, nullable=True)
+    mortager_name_2 = Column(String(255), nullable=True)
+    mortager_address_2 = Column(Text, nullable=True)
+
+    collateral_property_description = Column(Text, nullable=True)
+
+    model_of_machinery = Column(String(255), nullable=True)
+    manufacturer = Column(String(255), nullable=True)
+    category_of_machinery = Column(String(255), nullable=True)
+    dealer_name = Column(String(255), nullable=True)
+    type_of_machine = Column(String(255), nullable=True)
+    property_name = Column(String(255), nullable=True)
+
+    sanction_date = Column(Date, nullable=True)
+    sanction_date_words = Column(Text, nullable=True)
+    sanction_amount = Column(Numeric(18, 2), nullable=True)
+
+    pending_emi = Column(Numeric(18, 2), nullable=True)
+    interest_for_the_month = Column(Numeric(18, 2), nullable=True)
+
+    lrn_date = Column(Date, nullable=True)
+    lrn_date_words = Column(Text, nullable=True)
+    lrn_dispatch_date = Column(Date, nullable=True)
+
+    pre_sarfeasi_date = Column(Date, nullable=True)
+    pre_sarfeasi_date_words = Column(Text, nullable=True)
+    pre_sarfeasi_dispatch_date = Column(Date, nullable=True)
+
+    # Words-format companion to the existing 13(2) demand notice date
+    # (notice_13_2_date) - same pairing pattern as loan_amount_words.
+    demand_notice_date_words = Column(Text, nullable=True)
+
+    # =========================
     # AUDIT
     # =========================
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -454,6 +510,9 @@ def _normalize_sarfaesi_values(mapper, connection, target):
         "emd_amount",
         "bid_increment",
         "outstanding_amount",
+        "sanction_amount",
+        "pending_emi",
+        "interest_for_the_month",
     }
 
     date_fields = {
@@ -494,6 +553,11 @@ def _normalize_sarfaesi_values(mapper, connection, target):
         "sold_reg_date",
         "effective_date",
         "end_date",
+        "sanction_date",
+        "lrn_date",
+        "lrn_dispatch_date",
+        "pre_sarfeasi_date",
+        "pre_sarfeasi_dispatch_date",
     }
 
     datetime_fields = {

@@ -1049,9 +1049,297 @@
       "model_field": "case_status",
       "excel_header": "Case Status",
       "placeholder": "CASE_STATUS"
+    },
+    {
+      "field": "cif_no",
+      "model_field": "cif_no",
+      "excel_header": "Cif No",
+      "placeholder": "CIF_NO"
+    },
+    {
+      "field": "borrower_email",
+      "model_field": "borrower_email",
+      "excel_header": "Borrower Email Id",
+      "placeholder": "BORROWER_EMAIL"
+    },
+    {
+      "field": "borrower_number",
+      "model_field": "borrower_number",
+      "excel_header": "Borrower Number",
+      "placeholder": "BORROWER_NUMBER"
+    },
+    {
+      "field": "borrower_range",
+      "model_field": "borrower_range",
+      "excel_header": "Borrower Range",
+      "placeholder": "BORROWER_RANGE"
+    },
+    {
+      "field": "co_borrower_1_email",
+      "model_field": "co_borrower_1_email",
+      "excel_header": "Co-Borrower Email 1",
+      "placeholder": "CO_BORROWER_EMAIL_1"
+    },
+    {
+      "field": "co_borrower_1_number",
+      "model_field": "co_borrower_1_number",
+      "excel_header": "Co-Borrower Number 1",
+      "placeholder": "CO_BORROWER_NUMBER_1"
+    },
+    {
+      "field": "co_borrower_2_email",
+      "model_field": "co_borrower_2_email",
+      "excel_header": "Co-Borrower Email 2",
+      "placeholder": "CO_BORROWER_EMAIL_2"
+    },
+    {
+      "field": "co_borrower_2_number",
+      "model_field": "co_borrower_2_number",
+      "excel_header": "Co-Borrower Number 2",
+      "placeholder": "CO_BORROWER_NUMBER_2"
+    },
+    {
+      "field": "co_borrower_3_email",
+      "model_field": "co_borrower_3_email",
+      "excel_header": "Co-Borrower Email 3",
+      "placeholder": "CO_BORROWER_EMAIL_3"
+    },
+    {
+      "field": "co_borrower_3_number",
+      "model_field": "co_borrower_3_number",
+      "excel_header": "Co-Borrower Number 3",
+      "placeholder": "CO_BORROWER_NUMBER_3"
+    },
+    {
+      "field": "co_borrower_4_email",
+      "model_field": "co_borrower_4_email",
+      "excel_header": "Co-Borrower Email 4",
+      "placeholder": "CO_BORROWER_EMAIL_4"
+    },
+    {
+      "field": "co_borrower_4_number",
+      "model_field": "co_borrower_4_number",
+      "excel_header": "Co-Borrower Number 4",
+      "placeholder": "CO_BORROWER_NUMBER_4"
+    },
+    {
+      "field": "co_borrower_5_email",
+      "model_field": "co_borrower_5_email",
+      "excel_header": "Co-Borrower Email 5",
+      "placeholder": "CO_BORROWER_EMAIL_5"
+    },
+    {
+      "field": "co_borrower_5_number",
+      "model_field": "co_borrower_5_number",
+      "excel_header": "Co-Borrower Number 5",
+      "placeholder": "CO_BORROWER_NUMBER_5"
+    },
+    {
+      "field": "co_borrower_6_email",
+      "model_field": "co_borrower_6_email",
+      "excel_header": "Co-Borrower Email 6",
+      "placeholder": "CO_BORROWER_EMAIL_6"
+    },
+    {
+      "field": "co_borrower_6_number",
+      "model_field": "co_borrower_6_number",
+      "excel_header": "Co-Borrower Number 6",
+      "placeholder": "CO_BORROWER_NUMBER_6"
+    },
+    {
+      "field": "co_borrower_range",
+      "model_field": "co_borrower_range",
+      "excel_header": "Co-Borrower Range",
+      "placeholder": "CO_BORROWER_RANGE"
+    },
+    {
+      "field": "mortager_name_1",
+      "model_field": "mortager_name_1",
+      "excel_header": "Mortgagor Name 1",
+      "placeholder": "Mortager_Name_1"
+    },
+    {
+      "field": "mortager_address_1",
+      "model_field": "mortager_address_1",
+      "excel_header": "Mortgagor Address 1",
+      "placeholder": "Mortager_Address_1"
+    },
+    {
+      "field": "mortager_name_2",
+      "model_field": "mortager_name_2",
+      "excel_header": "Mortgagor Name 2",
+      "placeholder": "Mortager_Name_2"
+    },
+    {
+      "field": "mortager_address_2",
+      "model_field": "mortager_address_2",
+      "excel_header": "Mortgagor Address 2",
+      "placeholder": "Mortager_Address_2"
+    },
+    {
+      "field": "collateral_property_description",
+      "model_field": "collateral_property_description",
+      "excel_header": "Collateral Property Description (Sanction)",
+      "placeholder": "Collateral_Property_Description"
+    },
+    {
+      "field": "model_of_machinery",
+      "model_field": "model_of_machinery",
+      "excel_header": "Model Of Machinery",
+      "placeholder": "MODEL_OF_MACHINERY"
+    },
+    {
+      "field": "manufacturer",
+      "model_field": "manufacturer",
+      "excel_header": "Manufacturer",
+      "placeholder": "MANUFACTURER"
+    },
+    {
+      "field": "category_of_machinery",
+      "model_field": "category_of_machinery",
+      "excel_header": "Category Of Machinery",
+      "placeholder": "CATEGORY_OF_MACHINERY"
+    },
+    {
+      "field": "dealer_name",
+      "model_field": "dealer_name",
+      "excel_header": "Dealer Name",
+      "placeholder": "DEALER_NAME"
+    },
+    {
+      "field": "type_of_machine",
+      "model_field": "type_of_machine",
+      "excel_header": "Type Of Machine",
+      "placeholder": "TYPE_OF_MACHINE"
+    },
+    {
+      "field": "property_name",
+      "model_field": "property_name",
+      "excel_header": "Property Name",
+      "placeholder": "PROPERTY_NAME"
+    },
+    {
+      "field": "sanction_date",
+      "model_field": "sanction_date",
+      "excel_header": "Sanction Date",
+      "placeholder": "SANCTION_DATE"
+    },
+    {
+      "field": "sanction_date_words",
+      "model_field": "sanction_date_words",
+      "excel_header": "Sanction Date In Words",
+      "placeholder": "SANCTION_DATE_WORDS"
+    },
+    {
+      "field": "sanction_amount",
+      "model_field": "sanction_amount",
+      "excel_header": "Sanction Amount",
+      "placeholder": "SANCTION_Amount"
+    },
+    {
+      "field": "pending_emi",
+      "model_field": "pending_emi",
+      "excel_header": "Pending Emi",
+      "placeholder": "PENDING_EMI"
+    },
+    {
+      "field": "interest_for_the_month",
+      "model_field": "interest_for_the_month",
+      "excel_header": "Interest For The Month",
+      "placeholder": "INTEREST_FOR_THE_MONTH"
+    },
+    {
+      "field": "lrn_date",
+      "model_field": "lrn_date",
+      "excel_header": "Lrn Date",
+      "placeholder": "LRN_DATE"
+    },
+    {
+      "field": "lrn_date_words",
+      "model_field": "lrn_date_words",
+      "excel_header": "Lrn Date In Words",
+      "placeholder": "LRN_DATE_WORDS"
+    },
+    {
+      "field": "lrn_dispatch_date",
+      "model_field": "lrn_dispatch_date",
+      "excel_header": "Lrn Dispatch Date",
+      "placeholder": "LRN_DISPATCH_DATE"
+    },
+    {
+      "field": "pre_sarfeasi_date",
+      "model_field": "pre_sarfeasi_date",
+      "excel_header": "Pre Sarfaesi Date",
+      "placeholder": "PRE SARFEASI DATE"
+    },
+    {
+      "field": "pre_sarfeasi_date_words",
+      "model_field": "pre_sarfeasi_date_words",
+      "excel_header": "Pre Sarfaesi Date In Words",
+      "placeholder": "PRE_SARFEASI_DATE_WORDS"
+    },
+    {
+      "field": "pre_sarfeasi_dispatch_date",
+      "model_field": "pre_sarfeasi_dispatch_date",
+      "excel_header": "Pre Sarfaesi Dispatch Date",
+      "placeholder": "PRE_SARFEASI_DISPATCH_DATE"
+    },
+    {
+      "field": "demand_notice_date_words",
+      "model_field": "demand_notice_date_words",
+      "excel_header": "Demand Notice Date In Words",
+      "placeholder": "DEMAND_NOTICE_DATE_WORDS"
     }
   ],
   "notice_template_aliases": [
+    {
+      "alias": "CO_BORROWER_EMAIL_1",
+      "target": "CO_BORROWER_1_EMAIL"
+    },
+    {
+      "alias": "CO_BORROWER_NUMBER_1",
+      "target": "CO_BORROWER_1_NUMBER"
+    },
+    {
+      "alias": "CO_BORROWER_EMAIL_2",
+      "target": "CO_BORROWER_2_EMAIL"
+    },
+    {
+      "alias": "CO_BORROWER_NUMBER_2",
+      "target": "CO_BORROWER_2_NUMBER"
+    },
+    {
+      "alias": "CO_BORROWER_EMAIL_3",
+      "target": "CO_BORROWER_3_EMAIL"
+    },
+    {
+      "alias": "CO_BORROWER_NUMBER_3",
+      "target": "CO_BORROWER_3_NUMBER"
+    },
+    {
+      "alias": "CO_BORROWER_EMAIL_4",
+      "target": "CO_BORROWER_4_EMAIL"
+    },
+    {
+      "alias": "CO_BORROWER_NUMBER_4",
+      "target": "CO_BORROWER_4_NUMBER"
+    },
+    {
+      "alias": "CO_BORROWER_EMAIL_5",
+      "target": "CO_BORROWER_5_EMAIL"
+    },
+    {
+      "alias": "CO_BORROWER_NUMBER_5",
+      "target": "CO_BORROWER_5_NUMBER"
+    },
+    {
+      "alias": "CO_BORROWER_EMAIL_6",
+      "target": "CO_BORROWER_6_EMAIL"
+    },
+    {
+      "alias": "CO_BORROWER_NUMBER_6",
+      "target": "CO_BORROWER_6_NUMBER"
+    },
     {
       "alias": "ADDRESS_OF_THE_BORROWER",
       "target": "BORROWER_ADDRESS"

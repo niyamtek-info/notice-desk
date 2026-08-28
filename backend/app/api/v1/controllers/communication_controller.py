@@ -1209,7 +1209,6 @@ class CommunicationController:
             if child.name == "table" and (
                 "s.no" in text.lower()
                 or "co-borrower no" in text.lower()
-                or ("borrower" in text.lower() and "co-borrower" in text.lower())
                 or "{{borrower_name}}" in text.lower()
                 or "{{co_borrower_name}}" in text.lower()
             ):
