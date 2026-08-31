@@ -1133,9 +1133,24 @@ table {{
 }}
 
 tr {{
+  page-break-after: auto;
+}}
+
+/* Rule: a table with visible cell borders must stay whole across a page
+   boundary; a border-less table may break anywhere.
+   _prevent_visible_table_page_breaks() detects a real painted border
+   (visible style + non-zero width + non-transparent colour) and wraps only
+   those tables in <div class="js-avoid-split">. Everything else keeps the
+   default `table {{ break-inside: auto }}` above and splits freely - which
+   is why there is deliberately no global `tr {{ break-inside: avoid }}`. */
+.js-avoid-split,
+.js-avoid-split table,
+.js-avoid-split tbody,
+.js-avoid-split tr,
+.js-avoid-split td,
+.js-avoid-split th {{
   page-break-inside: avoid;
   break-inside: avoid-page;
-  page-break-after: auto;
 }}
 
 img {{
@@ -1150,21 +1165,83 @@ img {{
         self._prevent_visible_table_page_breaks(soup)
         return str(soup)
 
-    def _table_cell_has_visible_border(self, cell: Tag) -> bool:
-        style = (cell.get("style") or "").lower()
-        border_style_match = re.search(r"border(?:-top)?-style\s*:\s*([a-z]+)", style)
-        if border_style_match:
-            return border_style_match.group(1) != "none"
-        border_match = re.search(r"(?<!-)border\s*:\s*([^;]+)", style)
-        if border_match:
-            value = border_match.group(1)
-            if "none" in value:
-                return False
-            return any(
-                keyword in value
-                for keyword in ("solid", "dashed", "dotted", "double", "groove", "ridge", "inset", "outset")
-            )
+    _VISIBLE_BORDER_STYLES = ("solid", "dashed", "dotted", "double", "groove", "ridge", "inset", "outset")
+    _ZERO_WIDTH_RE = re.compile(r"^0(?:\.0+)?(?:px|pt|pc|em|rem|ex|ch|vw|vh|%)?$")
+    _LENGTH_TOKEN_RE = re.compile(r"^[\d.]+(?:px|pt|pc|em|rem|ex|ch|vw|vh|%)?$")
+
+    def _color_is_invisible(self, value: str | None) -> bool:
+        value = (value or "").strip()
+        if not value:
+            return False
+        if value == "transparent":
+            return True
+        match = re.match(r"rgba?\(([^)]+)\)", value)
+        if match:
+            comps = [c.strip() for c in re.split(r"[,/]", match.group(1)) if c.strip()]
+            if len(comps) == 4:
+                try:
+                    return float(comps[3].rstrip("%")) == 0
+                except ValueError:
+                    return False
         return False
+
+    def _table_cell_has_visible_border(self, cell: Tag) -> bool:
+        """
+        True only when a cell declares a border that would actually paint a
+        line: a visible border-style AND a non-zero width AND a
+        non-transparent colour. A cell that carries e.g. `border-style: solid`
+        together with `border-width: 0`, `border-color: transparent`, or
+        `border: none` reads as border-less and must NOT lock its table
+        against page breaks.
+        """
+        style = (cell.get("style") or "").lower()
+        if not style:
+            return False
+
+        decls: dict[str, str] = {}
+        for part in style.split(";"):
+            name, sep, val = part.partition(":")
+            if sep:
+                decls[name.strip()] = val.strip()
+
+        def side_paints(side: str) -> bool:
+            prefix = f"border-{side}-" if side else "border-"
+            shorthand_key = f"border-{side}" if side else "border"
+
+            style_val = decls.get(prefix + "style")
+            width_val = decls.get(prefix + "width")
+            color_val = decls.get(prefix + "color")
+
+            shorthand = decls.get(shorthand_key)
+            if shorthand is not None:
+                tokens = shorthand.split()
+                if any(tok in ("none", "hidden") for tok in tokens):
+                    style_val = "none"
+                elif any(tok in self._VISIBLE_BORDER_STYLES for tok in tokens):
+                    style_val = next(tok for tok in tokens if tok in self._VISIBLE_BORDER_STYLES)
+                if width_val is None and any(self._ZERO_WIDTH_RE.match(tok) for tok in tokens):
+                    width_val = "0"
+                if color_val is None:
+                    color_val = next(
+                        (
+                            tok
+                            for tok in tokens
+                            if tok not in self._VISIBLE_BORDER_STYLES
+                            and tok not in ("none", "hidden", "thin", "medium", "thick")
+                            and not self._LENGTH_TOKEN_RE.match(tok)
+                        ),
+                        None,
+                    )
+
+            if style_val is None or style_val not in self._VISIBLE_BORDER_STYLES:
+                return False
+            if width_val is not None and self._ZERO_WIDTH_RE.match(width_val.strip()):
+                return False
+            if self._color_is_invisible(color_val):
+                return False
+            return True
+
+        return any(side_paints(side) for side in ("", "top", "right", "bottom", "left"))
 
     def _prevent_visible_table_page_breaks(self, soup: BeautifulSoup) -> None:
         for table in soup.find_all("table"):

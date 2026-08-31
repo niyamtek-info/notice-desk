@@ -617,32 +617,16 @@ class CommunicationController:
 
         style = soup.new_tag("style")
         style.string = """
-.notice-layout *,
-.notice-layout table,
-.notice-layout tbody,
-.notice-layout tr,
-.notice-layout td,
-.notice-layout th,
-.notice-layout div,
-.notice-layout p {
-  page-break-inside: auto !important;
-  break-inside: auto !important;
-}
-
-.notice-layout table.docx-table,
-.notice-layout tbody,
-.notice-layout tr,
-.notice-layout td {
-  page-break-inside: auto !important;
-  break-inside: auto !important;
-}
-
+/* Page-break behaviour is decided centrally in
+   pdf_service._prevent_visible_table_page_breaks() / _inject_print_styles:
+   a table with real visible cell borders is wrapped in
+   <div class="js-avoid-split"> and kept whole, everything else breaks
+   freely. This template no longer overrides that - it only carries the
+   visual tweaks below. */
 .notice-layout table.party-table,
 .notice-layout table.notice-party-block,
 .notice-layout table.notice-subject-block,
 .notice-layout table.notice-signature-block {
-  page-break-inside: avoid !important;
-  break-inside: avoid-page !important;
   table-layout: fixed !important;
 }
 
