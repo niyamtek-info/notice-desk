@@ -121,7 +121,7 @@ const DashboardFilter: React.FC<DashboardFilterProps> = ({ onFilter, onClear, in
                 </div>
             </Form>
 
-            <style jsx global>{`
+            <style>{`
                 .ant-form-item-label > label {
                     font-size: 13px !important;
                     color: #6b7280 !important;

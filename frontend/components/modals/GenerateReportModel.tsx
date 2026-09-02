@@ -46,7 +46,7 @@ export default function GenerateReportModel({ visible, onSuccess, onCancel,type 
       className="generate-report-modal"
       style={{ paddingTop: '24px', paddingRight: '24px', paddingBottom: '24px', paddingLeft: '24px' }}
     >
-      <style jsx global>{`
+      <style>{`
         .generate-report-modal .ant-modal-content {
           border-radius: 12px;
           box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);

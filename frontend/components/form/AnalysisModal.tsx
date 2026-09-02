@@ -487,13 +487,23 @@ const renderFields = (
 /**
  * Normalise a document URL so the browser can actually fetch it.
  *
- * On GCP the backend may store or return gs:// URIs or raw
- * storage.googleapis.com public URLs for private-bucket objects.
- * Both fail in the browser.  When we detect either pattern we rewrite
- * the URL to the backend /files/serve endpoint which uses the VM's ADC
- * credentials and therefore always has read access.
+ * The backend's S3 presigned URLs (X-Amz-Signature=...) are already
+ * browser-fetchable directly - boto3 signs them locally, so unlike GCS
+ * there's no IAM-permission failure mode that produces unsigned URLs.
+ * Legacy gs:// URIs / unsigned GCS URLs from before the AWS revert, and
+ * backend /files/serve URLs (STORAGE_PROVIDER=local), still need the
+ * Next.js proxy below.
  */
 function normalizeDocumentUrl(url: string): string {
+  // Presigned S3 URL — has X-Amz-Algorithm/X-Amz-Signature query params,
+  // already browser-accessible directly from *.amazonaws.com. Pass through.
+  if (
+    url.match(/^https?:\/\/[^/]+\.amazonaws\.com\//) &&
+    url.includes("X-Amz-Signature=")
+  ) {
+    return url;
+  }
+
   // V4 signed URL — has X-Goog-Algorithm query param, already browser-accessible
   // directly from storage.googleapis.com. Pass through unchanged.
   if (
@@ -503,10 +513,10 @@ function normalizeDocumentUrl(url: string): string {
     return url;
   }
 
-  // Everything else (gs:// URIs, unsigned GCS URLs, backend serve URLs with any host)
-  // is routed through the Next.js server-side proxy.  This keeps port 8000 private
-  // (GCP firewall does not need to expose it) and ensures the proxy can always reach
-  // the backend via localhost on the same VM.
+  // Everything else (gs:// URIs, unsigned GCS/S3 URLs, backend serve URLs
+  // with any host) is routed through the Next.js server-side proxy. This
+  // keeps port 8000 private (firewall does not need to expose it) and
+  // ensures the proxy can always reach the backend via localhost on the VM.
   return `/api/proxy?url=${encodeURIComponent(url)}`;
 }
 

@@ -237,7 +237,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({
       }
 
       const data: any = await ApplicationApi.getAll(
-        !["all", "All Client"].includes(bankToFilter) && sanitizeParams(params),
+        !["all", "All Client"].includes(bankToFilter) ? sanitizeParams(params) : undefined,
       );
       const items = data.data || [];
       dispatch(setApplications(items));

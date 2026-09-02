@@ -15,7 +15,6 @@ interface Application {
   loan_amount?: number | null;
   created_at?: string;
   batch_code?: string | null;
-
 }
 
 interface ApplicationsState {
@@ -42,5 +41,6 @@ const applicationsSlice = createSlice({
   },
 });
 
-export const { addApplication, setApplications, removeApplication } = applicationsSlice.actions;
+export const { addApplication, setApplications, removeApplication } =
+  applicationsSlice.actions;
 export default applicationsSlice.reducer;

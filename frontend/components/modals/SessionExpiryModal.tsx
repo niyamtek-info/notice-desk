@@ -52,7 +52,7 @@ const SessionExpiryModal: React.FC = () => {
                 </Button>
             </div>
 
-            <style jsx global>{`
+            <style>{`
                 .session-expiry-modal .ant-modal-content {
                     border-radius: 16px;
                     overflow: hidden;

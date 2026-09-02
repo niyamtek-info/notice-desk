@@ -511,7 +511,7 @@ const CreateApplicationModal: React.FC<CreateApplicationModalProps> = ({
           }
         </>
       )}
-      <style jsx global>{`
+      <style>{`
         .custom-select-height .ant-select-selector {
           height: 40px !important;
           display: flex;

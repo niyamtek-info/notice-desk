@@ -61,10 +61,11 @@ export async function GET(request: NextRequest) {
     backendHost = new URL(backendBase).hostname;
   } catch {}
 
+  const isS3 = parsed.hostname.endsWith("amazonaws.com");
   const isGCS = parsed.hostname.endsWith("googleapis.com");
   const isBackend = backendHost !== "" && parsed.hostname === backendHost;
 
-  if (!isGCS && !isBackend) {
+  if (!isS3 && !isGCS && !isBackend) {
     return NextResponse.json({ error: "URL not allowed" }, { status: 403 });
   }
 

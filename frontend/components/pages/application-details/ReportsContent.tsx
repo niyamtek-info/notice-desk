@@ -162,14 +162,16 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
   };
 
   useEffect(() => {
-    if (applicationNumber) {
+    const appNo = applicationId || applicationNumber;
+    if (appNo) {
       fetchReportData();
     }
-  }, [applicationNumber, trigger, triggerReport]);
+  }, [applicationId, applicationNumber, trigger, triggerReport]);
 
   const fetchReportData = async () => {
+    const appNo = applicationId || applicationNumber;
     try {
-      const data: any = await ReportApi.getMaster(applicationNumber);
+      const data: any = await ReportApi.getMaster(appNo);
       if (data) {
         // Determine whether to show generate button based on the SARFAESI report flag.
         setShowGenerateButton(data?.rerun_report || 0);
@@ -177,7 +179,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
         // Format dates for Form
         const formattedData = {
           ...data,
-          propertyDescription: data?.loan_details?.property_description ?? data?.loan_details?.description_of_schedule_property,
+          propertyDescription:
+            data?.loan_details?.property_description ??
+            data?.loan_details?.description_of_schedule_property,
 
           appNumber: data?.loan_details?.application_number,
           aoName: data?.loan_details?.ao_name,
@@ -200,7 +204,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
             : null,
           disbursementType: data?.loan_details?.disbursement_type,
           dpd: data?.loan_details?.dpd,
-          fclAsOnDate: data?.loan_details?.fcl_as_on_date ? parseToDayjs(data?.loan_details?.fcl_as_on_date) : null,
+          fclAsOnDate: data?.loan_details?.fcl_as_on_date
+            ? parseToDayjs(data?.loan_details?.fcl_as_on_date)
+            : null,
           foreClosureCharges: data?.loan_details?.foreclosure_charges,
           futurePrincipal: data?.loan_details?.future_principal,
           instalmentOverdue: data?.loan_details?.instalment_overdue,
@@ -248,8 +254,18 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           borrowerEmail: data?.loan_details?.borrower_email,
           borrowerNumber: data?.loan_details?.borrower_number,
           borrowerRange: data?.loan_details?.borrower_range,
-          coBorrowerEmail: data?.loan_details?.co_borrower_email,
-          coBorrowerNumber: data?.loan_details?.co_borrower_number,
+          coBorrowerEmail1: data?.loan_details?.co_borrower_1_email,
+          coBorrowerNumber1: data?.loan_details?.co_borrower_1_number,
+          coBorrowerEmail2: data?.loan_details?.co_borrower_2_email,
+          coBorrowerNumber2: data?.loan_details?.co_borrower_2_number,
+          coBorrowerEmail3: data?.loan_details?.co_borrower_3_email,
+          coBorrowerNumber3: data?.loan_details?.co_borrower_3_number,
+          coBorrowerEmail4: data?.loan_details?.co_borrower_4_email,
+          coBorrowerNumber4: data?.loan_details?.co_borrower_4_number,
+          coBorrowerEmail5: data?.loan_details?.co_borrower_5_email,
+          coBorrowerNumber5: data?.loan_details?.co_borrower_5_number,
+          coBorrowerEmail6: data?.loan_details?.co_borrower_6_email,
+          coBorrowerNumber6: data?.loan_details?.co_borrower_6_number,
           coBorrowerRange: data?.loan_details?.co_borrower_range,
           reportSource: data?.loan_details?.report_source,
           hasDocument: data?.loan_details?.has_document,
@@ -290,7 +306,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           propertyName: data?.loan_details?.property_name,
           deliveredAddress: data?.["13_2_details"]?.delivered_address,
           deliveryStatus: data?.["13_2_details"]?.delivery_status,
-          deliveryStatusDate: data?.["13_2_details"]?.delivery_status_date ? parseToDayjs(data?.["13_2_details"]?.delivery_status_date) : null,
+          deliveryStatusDate: data?.["13_2_details"]?.delivery_status_date
+            ? parseToDayjs(data?.["13_2_details"]?.delivery_status_date)
+            : null,
           notice132Amount: data?.["13_2_details"]?.notice_13_2_amount,
           notice132Date: data?.["13_2_details"]?.notice_13_2_date
             ? parseToDayjs(data?.["13_2_details"]?.notice_13_2_date)
@@ -308,10 +326,16 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           publicationLocal: data?.["13_2_details"]?.publication_local,
           totalAddress: data?.["13_2_details"]?.total_address,
           undeliveredAddress: data?.["13_2_details"]?.undelivered_address,
+          demandNoticeDateWords: data?.["13_2_details"]?.demand_notice_date_words,
 
           symbolicDeliveryStatus:
             data?.["13_4_details"]?.symbolic_delivery_status,
-          symbolicDeliveryStatusDate: data?.["13_4_details"]?.symbolic_delivery_status_date ? parseToDayjs(data?.["13_4_details"]?.symbolic_delivery_status_date) : null,
+          symbolicDeliveryStatusDate: data?.["13_4_details"]
+            ?.symbolic_delivery_status_date
+            ? parseToDayjs(
+                data?.["13_4_details"]?.symbolic_delivery_status_date,
+              )
+            : null,
           symbolicDispatchDate: data?.["13_4_details"]?.symbolic_dispatch_date
             ? parseToDayjs(data?.["13_4_details"]?.symbolic_dispatch_date)
             : null,
@@ -329,69 +353,159 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           maturedDate13_4: data?.["13_4_details"]?.matured_date_13_4
             ? parseToDayjs(data?.["13_4_details"]?.matured_date_13_4)
             : null,
-          symbolicVacationNoticeMoveable: data?.symbolic_vacation_notice_details?.vacation_notice_moveable,
-          symbolicVacationNoticeImmoveable: data?.symbolic_vacation_notice_details?.vacation_notice_immoveable,
-          cjmFilingDate: (data?.cjm_details?.cjm_filing_date || data?.cjm_details?.cjm_date) ? parseToDayjs(data?.cjm_details?.cjm_filing_date || data?.cjm_details?.cjm_date) : null,
+          symbolicVacationNoticeMoveable:
+            data?.symbolic_vacation_notice_details?.vacation_notice_moveable,
+          symbolicVacationNoticeImmoveable:
+            data?.symbolic_vacation_notice_details?.vacation_notice_immoveable,
+          cjmFilingDate:
+            data?.cjm_details?.cjm_filing_date || data?.cjm_details?.cjm_date
+              ? parseToDayjs(
+                  data?.cjm_details?.cjm_filing_date ||
+                    data?.cjm_details?.cjm_date,
+                )
+              : null,
           courtName: data?.cjm_details?.court_name,
           caseNumber: data?.cjm_details?.case_number,
-          crmPLDate: data?.cjm_details?.crm_pl_date ? parseToDayjs(data?.cjm_details?.crm_pl_date) : null,
+          crmPLDate: data?.cjm_details?.crm_pl_date
+            ? parseToDayjs(data?.cjm_details?.crm_pl_date)
+            : null,
           crmPLNo: data?.cjm_details?.crm_pl_no,
-          nextHearingDate: data?.cjm_details?.next_hearing_date ? parseToDayjs(data?.cjm_details?.next_hearing_date) : null,
-          ovDate: data?.cjm_details?.ov_date ? parseToDayjs(data?.cjm_details?.ov_date) : null,
-          orderDate: data?.cjm_details?.order_date ? parseToDayjs(data?.cjm_details?.order_date) : null,
+          nextHearingDate: data?.cjm_details?.next_hearing_date
+            ? parseToDayjs(data?.cjm_details?.next_hearing_date)
+            : null,
+          ovDate: data?.cjm_details?.ov_date
+            ? parseToDayjs(data?.cjm_details?.ov_date)
+            : null,
+          orderDate: data?.cjm_details?.order_date
+            ? parseToDayjs(data?.cjm_details?.order_date)
+            : null,
           courtAOName: data?.cjm_details?.court_ao_name,
           advocateDetails: data?.cjm_details?.advocate_details,
           advComName: data?.cjm_details?.adv_com_name,
           inventoryStatus: data?.cjm_details?.inventory_status,
 
-          physicalPossessionDate: data?.physical_possession_details?.physical_possession_date ? parseToDayjs(data?.physical_possession_details?.physical_possession_date) : null,
-          physicalDispatchDate: data?.physical_possession_details?.physical_dispatch_date ? parseToDayjs(data?.physical_possession_details?.physical_dispatch_date) : null,
-          physicalDeliveryStatus: data?.physical_possession_details?.physical_delivery_status,
-          physicalDeliveryStatusDate: data?.physical_possession_details?.physical_delivery_status_date ? parseToDayjs(data?.physical_possession_details?.physical_delivery_status_date) : null,
+          physicalPossessionDate: data?.physical_possession_details
+            ?.physical_possession_date
+            ? parseToDayjs(
+                data?.physical_possession_details?.physical_possession_date,
+              )
+            : null,
+          physicalDispatchDate: data?.physical_possession_details
+            ?.physical_dispatch_date
+            ? parseToDayjs(
+                data?.physical_possession_details?.physical_dispatch_date,
+              )
+            : null,
+          physicalDeliveryStatus:
+            data?.physical_possession_details?.physical_delivery_status,
+          physicalDeliveryStatusDate: data?.physical_possession_details
+            ?.physical_delivery_status_date
+            ? parseToDayjs(
+                data?.physical_possession_details
+                  ?.physical_delivery_status_date,
+              )
+            : null,
           physicalPhoto: data?.physical_possession_details?.physical_photo,
-          physicalPublicationDate: data?.physical_possession_details?.physical_publication_date ? parseToDayjs(data?.physical_possession_details?.physical_publication_date) : null,
-          physicalPubEnglish: data?.physical_possession_details?.physical_pub_english,
-          physicalPubLocal: data?.physical_possession_details?.physical_pub_local,
-          physicalPossessionVacationNoticeMoveable: data?.physical_possession_details?.vacation_notice_moveable,
-          physicalPossessionVacationNoticeImmoveable: data?.physical_possession_details?.vacation_notice_immoveable,
+          physicalPublicationDate: data?.physical_possession_details
+            ?.physical_publication_date
+            ? parseToDayjs(
+                data?.physical_possession_details?.physical_publication_date,
+              )
+            : null,
+          physicalPubEnglish:
+            data?.physical_possession_details?.physical_pub_english,
+          physicalPubLocal:
+            data?.physical_possession_details?.physical_pub_local,
+          physicalPossessionVacationNoticeMoveable:
+            data?.physical_possession_details?.vacation_notice_moveable,
+          physicalPossessionVacationNoticeImmoveable:
+            data?.physical_possession_details?.vacation_notice_immoveable,
 
-          auctionNoticeDate: data?.auction_notice_details?.auction_notice_date ? parseToDayjs(data?.auction_notice_details?.auction_notice_date) : null,
-          auctionDate: data?.auction_notice_details?.auction_date ? parseToDayjs(data?.auction_notice_details?.auction_date) : null,
-          auctionPublicationDate: data?.auction_notice_details?.auction_publication_date ? parseToDayjs(data?.auction_notice_details?.auction_publication_date) : null,
+          auctionNoticeDate: data?.auction_notice_details?.auction_notice_date
+            ? parseToDayjs(data?.auction_notice_details?.auction_notice_date)
+            : null,
+          auctionDate: data?.auction_notice_details?.auction_date
+            ? parseToDayjs(data?.auction_notice_details?.auction_date)
+            : null,
+          auctionPublicationDate: data?.auction_notice_details
+            ?.auction_publication_date
+            ? parseToDayjs(
+                data?.auction_notice_details?.auction_publication_date,
+              )
+            : null,
           auctionPubEnglish: data?.auction_notice_details?.auction_pub_english,
           auctionPubLocal: data?.auction_notice_details?.auction_pub_local,
           reservePrice: data?.auction_notice_details?.reserve_price,
 
-          auctionDatePortal: data?.auction_portal_details?.auction_date ? parseToDayjs(data?.auction_portal_details?.auction_date) : null,
+          auctionDatePortal: data?.auction_portal_details?.auction_date
+            ? parseToDayjs(data?.auction_portal_details?.auction_date)
+            : null,
           reservePricePortal: data?.auction_portal_details?.reserve_price,
           soldPricePortal: data?.auction_portal_details?.sold_price,
           auctionStatusPortal: data?.auction_portal_details?.auction_status,
-          inspectionStartPortal: data?.auction_portal_details?.inspection_start ? parseToDayjs(data?.auction_portal_details?.inspection_start) : null,
-          inspectionEndPortal: data?.auction_portal_details?.inspection_end ? parseToDayjs(data?.auction_portal_details?.inspection_end) : null,
-          emdLastDatePortal: data?.auction_portal_details?.emd_last_date ? parseToDayjs(data?.auction_portal_details?.emd_last_date) : null,
-          auctionStartPortal: data?.auction_portal_details?.auction_start ? parseToDayjs(data?.auction_portal_details?.auction_start) : null,
-          auctionEndPortal: data?.auction_portal_details?.auction_end ? parseToDayjs(data?.auction_portal_details?.auction_end) : null,
-          bidExtensionTimePortal: data?.auction_portal_details?.bid_extension_time,
+          inspectionStartPortal: data?.auction_portal_details?.inspection_start
+            ? parseToDayjs(data?.auction_portal_details?.inspection_start)
+            : null,
+          inspectionEndPortal: data?.auction_portal_details?.inspection_end
+            ? parseToDayjs(data?.auction_portal_details?.inspection_end)
+            : null,
+          emdLastDatePortal: data?.auction_portal_details?.emd_last_date
+            ? parseToDayjs(data?.auction_portal_details?.emd_last_date)
+            : null,
+          auctionStartPortal: data?.auction_portal_details?.auction_start
+            ? parseToDayjs(data?.auction_portal_details?.auction_start)
+            : null,
+          auctionEndPortal: data?.auction_portal_details?.auction_end
+            ? parseToDayjs(data?.auction_portal_details?.auction_end)
+            : null,
+          bidExtensionTimePortal:
+            data?.auction_portal_details?.bid_extension_time,
           totalExtensionsPortal: data?.auction_portal_details?.total_extensions,
-          outstandingAmountPortal: data?.auction_portal_details?.outstanding_amount,
+          outstandingAmountPortal:
+            data?.auction_portal_details?.outstanding_amount,
           emdAmountPortal: data?.auction_portal_details?.emd_amount,
           bidIncrementPortal: data?.auction_portal_details?.bid_increment,
           totalBidCountPortal: data?.auction_portal_details?.total_bid_count,
-          authorisedOfficerPortal: data?.auction_portal_details?.authorised_officer,
+          authorisedOfficerPortal:
+            data?.auction_portal_details?.authorised_officer,
 
           postSaleNotice: data?.post_sale_details?.post_sale_notice,
           soldPrice: data?.post_sale_details?.sold_price,
-          soldRegDate: data?.post_sale_details?.sold_reg_date ? parseToDayjs(data?.post_sale_details?.sold_reg_date) : null,
+          soldRegDate: data?.post_sale_details?.sold_reg_date
+            ? parseToDayjs(data?.post_sale_details?.sold_reg_date)
+            : null,
 
-          saleConfirmationDate: data?.sale_certificate_details?.sale_confirmation_date ? parseToDayjs(data?.sale_certificate_details?.sale_confirmation_date) : null,
-          saleCertificateDate: data?.sale_certificate_details?.sale_certificate_date ? parseToDayjs(data?.sale_certificate_details?.sale_certificate_date) : null,
+          saleConfirmationDate: data?.sale_certificate_details
+            ?.sale_confirmation_date
+            ? parseToDayjs(
+                data?.sale_certificate_details?.sale_confirmation_date,
+              )
+            : null,
+          saleCertificateDate: data?.sale_certificate_details
+            ?.sale_certificate_date
+            ? parseToDayjs(
+                data?.sale_certificate_details?.sale_certificate_date,
+              )
+            : null,
 
-          availableDocumentsNiyamtek: data?.niyamtek_remarks_details?.available_documents || data?.niyamtek_remarks?.available_documents,
-          nonAvailableDocumentsNiyamtek: data?.niyamtek_remarks_details?.non_available_documents || data?.niyamtek_remarks?.non_available_documents,
-          discrepancyDocNiyamtek: data?.niyamtek_remarks_details?.discrepancy_doc || data?.niyamtek_remarks?.discrepancy_doc,
-          discrepancyReasonNiyamtek: data?.niyamtek_remarks_details?.discrepancy_reason || data?.niyamtek_remarks?.discrepancy_reason,
-          nextActionableStageNiyamtek: data?.niyamtek_remarks_details?.next_actionable_stage || data?.niyamtek_remarks?.next_actionable_stage,
-          nextStepRecommendedNiyamtek: data?.niyamtek_remarks_details?.next_step_recommended || data?.niyamtek_remarks?.next_step_recommended,
+          availableDocumentsNiyamtek:
+            data?.niyamtek_remarks_details?.available_documents ||
+            data?.niyamtek_remarks?.available_documents,
+          nonAvailableDocumentsNiyamtek:
+            data?.niyamtek_remarks_details?.non_available_documents ||
+            data?.niyamtek_remarks?.non_available_documents,
+          discrepancyDocNiyamtek:
+            data?.niyamtek_remarks_details?.discrepancy_doc ||
+            data?.niyamtek_remarks?.discrepancy_doc,
+          discrepancyReasonNiyamtek:
+            data?.niyamtek_remarks_details?.discrepancy_reason ||
+            data?.niyamtek_remarks?.discrepancy_reason,
+          nextActionableStageNiyamtek:
+            data?.niyamtek_remarks_details?.next_actionable_stage ||
+            data?.niyamtek_remarks?.next_actionable_stage,
+          nextStepRecommendedNiyamtek:
+            data?.niyamtek_remarks_details?.next_step_recommended ||
+            data?.niyamtek_remarks?.next_step_recommended,
         };
         form.setFieldsValue(formattedData);
       }
@@ -434,16 +548,15 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
   };
 
   const handleSave = async () => {
-    console.log("click")
-    // try {
-    //   await form.validateFields();
-    // } catch (info) {
-    //   console.log(info, 'info');
-    // }
-
     const values = form.getFieldsValue();
+    const appNo = applicationId || applicationNumber;
     setLoading(true);
     setConfirmVisible(false);
+    if (!appNo) {
+      messageApi.error("Application ID is missing. Please refresh the page.");
+      setLoading(false);
+      return;
+    }
     try {
       const payload = {
         loan_details: {
@@ -459,7 +572,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           property_description: values?.propertyDescription,
           property_address: values?.propertyAddress,
           trust_number: values?.trustNumber,
-          assignment_agreement_date: values?.assignmentAgreementDate?.format("YYYY-MM-DD") || null,
+          assignment_agreement_date:
+            values?.assignmentAgreementDate?.format("YYYY-MM-DD") || null,
           disbursal_amount: values?.disbursalAmount,
           disbursal_date: values?.disbursalDate?.format("YYYY-MM-DD") || null,
           disbursement_type: values?.disbursementType,
@@ -471,7 +585,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           interest_on_termination: values?.interestOnTermination,
           late_payment_penalty: values?.latePaymentPenalty,
           loan_account_no: values?.loanAccountNo,
-          loan_agreement_date: values?.loanAgreementDate?.format("YYYY-MM-DD") || null,
+          loan_agreement_date:
+            values?.loanAgreementDate?.format("YYYY-MM-DD") || null,
           loan_amount: values?.loanAmount,
           loan_amount_words: values?.loanAmountWords,
           niyamtek_user: values?.niyamtekUser,
@@ -508,8 +623,18 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           borrower_email: values?.borrowerEmail,
           borrower_number: values?.borrowerNumber,
           borrower_range: values?.borrowerRange,
-          co_borrower_email: values?.coBorrowerEmail,
-          co_borrower_number: values?.coBorrowerNumber,
+          co_borrower_1_email: values?.coBorrowerEmail1,
+          co_borrower_1_number: values?.coBorrowerNumber1,
+          co_borrower_2_email: values?.coBorrowerEmail2,
+          co_borrower_2_number: values?.coBorrowerNumber2,
+          co_borrower_3_email: values?.coBorrowerEmail3,
+          co_borrower_3_number: values?.coBorrowerNumber3,
+          co_borrower_4_email: values?.coBorrowerEmail4,
+          co_borrower_4_number: values?.coBorrowerNumber4,
+          co_borrower_5_email: values?.coBorrowerEmail5,
+          co_borrower_5_number: values?.coBorrowerNumber5,
+          co_borrower_6_email: values?.coBorrowerEmail6,
+          co_borrower_6_number: values?.coBorrowerNumber6,
           co_borrower_range: values?.coBorrowerRange,
           report_source: values?.reportSource,
           has_document: values?.hasDocument,
@@ -542,22 +667,26 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
         ["13_2_details"]: {
           delivered_address: values?.deliveredAddress,
           delivery_status: values?.deliveryStatus,
-          delivery_status_date: values?.deliveryStatusDate?.format("YYYY-MM-DD") || null,
+          delivery_status_date:
+            values?.deliveryStatusDate?.format("YYYY-MM-DD") || null,
           notice_13_2_amount: values?.notice132Amount,
           notice_13_2_date: values?.notice132Date?.format("YYYY-MM-DD") || null,
           notice_dispatch_date:
             values?.noticeDispatchDate?.format("YYYY-MM-DD") || null,
           notice_pasting_date:
             values?.noticePastingDate?.format("YYYY-MM-DD") || null,
-          publication_date_13_2: values?.publicationDate?.format("YYYY-MM-DD") || null,
+          publication_date_13_2:
+            values?.publicationDate?.format("YYYY-MM-DD") || null,
           publication_english_13_2: values?.publicationEnglish,
           publication_local_13_2: values?.publicationLocal,
           total_address: values?.totalAddress,
           undelivered_address: values?.undeliveredAddress,
+          demand_notice_date_words: values?.demandNoticeDateWords,
         },
         ["13_4_details"]: {
           symbolic_delivery_status_13_4: values?.symbolicDeliveryStatus,
-          symbolic_delivery_status_date_13_4: values?.symbolicDeliveryStatusDate?.format("YYYY-MM-DD") || null,
+          symbolic_delivery_status_date_13_4:
+            values?.symbolicDeliveryStatusDate?.format("YYYY-MM-DD") || null,
           symbolic_dispatch_date_13_4:
             values?.symbolicDispatchDate?.format("YYYY-MM-DD") || null,
           symbolic_photo_13_4: values?.symbolicPhoto,
@@ -567,7 +696,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           symbolic_pub_local_13_4: values?.symbolicPubLocal,
           symbolic_publication_date_13_4:
             values?.symbolicPublicationDate?.format("YYYY-MM-DD") || null,
-          matured_date_13_4: values?.maturedDate13_4?.format("YYYY-MM-DD") || null,
+          matured_date_13_4:
+            values?.maturedDate13_4?.format("YYYY-MM-DD") || null,
         },
         symbolic_vacation_notice_details: {
           vacation_notice_moveable: values?.symbolicVacationNoticeMoveable,
@@ -579,7 +709,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           case_number: values?.caseNumber,
           crm_pl_date: values?.crmPLDate?.format("YYYY-MM-DD") || null,
           crm_pl_no: values?.crmPLNo,
-          next_hearing_date: values?.nextHearingDate?.format("YYYY-MM-DD") || null,
+          next_hearing_date:
+            values?.nextHearingDate?.format("YYYY-MM-DD") || null,
           ov_date: values?.ovDate?.format("YYYY-MM-DD") || null,
           order_date: values?.orderDate?.format("YYYY-MM-DD") || null,
           court_ao_name: values?.courtAOName,
@@ -588,22 +719,30 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           inventory_status: values?.inventoryStatus,
         },
         physical_possession_details: {
-          physical_possession_date: values?.physicalPossessionDate?.format("YYYY-MM-DD") || null,
-          physical_dispatch_date: values?.physicalDispatchDate?.format("YYYY-MM-DD") || null,
+          physical_possession_date:
+            values?.physicalPossessionDate?.format("YYYY-MM-DD") || null,
+          physical_dispatch_date:
+            values?.physicalDispatchDate?.format("YYYY-MM-DD") || null,
           physical_delivery_status: values?.physicalDeliveryStatus,
-          physical_delivery_status_date: values?.physicalDeliveryStatusDate?.format("YYYY-MM-DD") || null,
+          physical_delivery_status_date:
+            values?.physicalDeliveryStatusDate?.format("YYYY-MM-DD") || null,
           physical_photo: values?.physicalPhoto,
-          physical_publication_date: values?.physicalPublicationDate?.format("YYYY-MM-DD") || null,
+          physical_publication_date:
+            values?.physicalPublicationDate?.format("YYYY-MM-DD") || null,
           physical_pub_english: values?.physicalPubEnglish,
           physical_pub_local: values?.physicalPubLocal,
-          vacation_notice_moveable: values?.physicalPossessionVacationNoticeMoveable,
-          vacation_notice_immoveable: values?.physicalPossessionVacationNoticeImmoveable,
+          vacation_notice_moveable:
+            values?.physicalPossessionVacationNoticeMoveable,
+          vacation_notice_immoveable:
+            values?.physicalPossessionVacationNoticeImmoveable,
         },
 
         auction_notice_details: {
-          auction_notice_date: values?.auctionNoticeDate?.format("YYYY-MM-DD") || null,
+          auction_notice_date:
+            values?.auctionNoticeDate?.format("YYYY-MM-DD") || null,
           auction_date: values?.auctionDate?.format("YYYY-MM-DD") || null,
-          auction_publication_date: values?.auctionPublicationDate?.format("YYYY-MM-DD") || null,
+          auction_publication_date:
+            values?.auctionPublicationDate?.format("YYYY-MM-DD") || null,
           auction_pub_english: values?.auctionPubEnglish,
           auction_pub_local: values?.auctionPubLocal,
           reserve_price: values?.reservePrice,
@@ -614,10 +753,14 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           reserve_price: values?.reservePricePortal,
           sold_price: values?.soldPricePortal,
           auction_status: values?.auctionStatusPortal,
-          inspection_start: values?.inspectionStartPortal?.format("YYYY-MM-DD") || null,
-          inspection_end: values?.inspectionEndPortal?.format("YYYY-MM-DD") || null,
-          emd_last_date: values?.emdLastDatePortal?.format("YYYY-MM-DD") || null,
-          auction_start: values?.auctionStartPortal?.format("YYYY-MM-DD") || null,
+          inspection_start:
+            values?.inspectionStartPortal?.format("YYYY-MM-DD") || null,
+          inspection_end:
+            values?.inspectionEndPortal?.format("YYYY-MM-DD") || null,
+          emd_last_date:
+            values?.emdLastDatePortal?.format("YYYY-MM-DD") || null,
+          auction_start:
+            values?.auctionStartPortal?.format("YYYY-MM-DD") || null,
           auction_end: values?.auctionEndPortal?.format("YYYY-MM-DD") || null,
           bid_extension_time: values?.bidExtensionTimePortal,
           total_extensions: values?.totalExtensionsPortal,
@@ -635,8 +778,10 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
         },
 
         sale_certificate_details: {
-          sale_confirmation_date: values?.saleConfirmationDate?.format("YYYY-MM-DD") || null,
-          sale_certificate_date: values?.saleCertificateDate?.format("YYYY-MM-DD") || null,
+          sale_confirmation_date:
+            values?.saleConfirmationDate?.format("YYYY-MM-DD") || null,
+          sale_certificate_date:
+            values?.saleCertificateDate?.format("YYYY-MM-DD") || null,
         },
 
         niyamtek_remarks_details: {
@@ -646,10 +791,10 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
           discrepancy_reason: values?.discrepancyReasonNiyamtek,
           next_actionable_stage: values?.nextActionableStageNiyamtek,
           next_step_recommended: values?.nextStepRecommendedNiyamtek,
-        }
+        },
       };
-      console.log(payload, 'payload')
-      await ReportApi.updateReportMaster(applicationNumber, payload);
+      console.log(payload, "payload");
+      await ReportApi.updateReportMaster(appNo, payload);
       setIsChanged(false);
       setTrigger((pre) => pre + 1);
       messageApi.success("Changes saved successfully");
@@ -661,12 +806,21 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
     }
   };
 
-
   const loanDetails: any = [
-    { name: "niyamtekUser", label: "Niyamtek User Name", type: "text", edit: true },
+    {
+      name: "niyamtekUser",
+      label: "Niyamtek User Name",
+      type: "text",
+      edit: true,
+    },
     { name: "clientCode", label: "Client ID", type: "text", edit: true },
     { name: "companyName", label: "Company Name", type: "text", edit: true },
-    { name: "loanAccountNo", label: "Loan Account No", type: "text", required: true },
+    {
+      name: "loanAccountNo",
+      label: "Loan Account No",
+      type: "text",
+      required: true,
+    },
     { name: "trustNumber", label: "Trust Number", type: "text" },
     {
       name: "assignmentAgreementDate",
@@ -684,79 +838,164 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
     },
     { name: "disbursalDate", label: "Disbursal Date", type: "date" },
     { name: "disbursalAmount", label: "Disbursal Amount", type: "number" },
-    { name: "loanAgreementDate", label: "Loan Agreement Date", type: "date", required: true },
-    { name: "loanAmount", label: "Loan Amount", type: "number", required: true },
-    { name: "loanAmountWords", label: "Loan Amount in Words", type: "text", required: true },
+    {
+      name: "loanAgreementDate",
+      label: "Loan Agreement Date",
+      type: "date",
+      required: true,
+    },
+    {
+      name: "loanAmount",
+      label: "Loan Amount",
+      type: "number",
+      required: true,
+    },
+    {
+      name: "loanAmountWords",
+      label: "Loan Amount in Words",
+      type: "text",
+      required: true,
+    },
     { name: "npaDate", label: "Date of NPA", type: "date", required: true },
     { name: "dpd", label: "DPD as on Notice", type: "number" },
-    { name: "futurePrincipal", label: "Future Principle", type: "number", required: true },
+    {
+      name: "futurePrincipal",
+      label: "Future Principle",
+      type: "number",
+      required: true,
+    },
     {
       name: "principalOutstanding",
       label: "Principal Outstanding",
       type: "number",
-      required: true
+      required: true,
     },
     {
       name: "instalmentOverdue",
       label: "Instalment Overdue Amount",
       type: "number",
-      required: true
+      required: true,
     },
     {
       name: "interestOnTermination",
       label: "Interest on Termination",
       type: "number",
-      required: true
+      required: true,
     },
     {
       name: "latePaymentPenalty",
       label: "Late Payment Penalty",
       type: "number",
-      required: true
+      required: true,
     },
     {
       name: "chequeBounceCharges",
       label: "Cheque Bounce Charges",
       type: "number",
-      required: true
+      required: true,
     },
-    { name: "otherAmount", label: "Other Amount", type: "number", required: true },
+    {
+      name: "otherAmount",
+      label: "Other Amount",
+      type: "number",
+      required: true,
+    },
     {
       name: "foreClosureCharges",
       label: "Foreclosure Charges",
       type: "number",
-      required: true
+      required: true,
     },
-    { name: "totalOutstanding", label: "Total Outstanding", type: "number", required: true },
-    { name: "fclAsOnDate", label: "FCL (As on Date)", type: "date", required: true },
+    {
+      name: "totalOutstanding",
+      label: "Total Outstanding",
+      type: "number",
+      required: true,
+    },
+    {
+      name: "fclAsOnDate",
+      label: "FCL (As on Date)",
+      type: "date",
+      required: true,
+    },
     {
       name: "totalOutstandingWords",
       label: "Total Outstanding in words",
       type: "text",
-      required: true
+      required: true,
     },
 
     { name: "batchCode", label: "Batch Code", type: "text" },
-    { name: "propertyAddress", label: "Property Address", type: "longtext", required: true },
-
+    {
+      name: "propertyAddress",
+      label: "Property Address",
+      type: "longtext",
+      required: true,
+    },
+    { name: "propertyName", label: "Property Name", type: "text" },
+    {
+      name: "collateralPropertyDescription",
+      label: "Collateral Property Description",
+      type: "longtext",
+    },
+    { name: "reportSource", label: "Report Source", type: "text" },
+    { name: "pos", label: "POS", type: "text" },
+    { name: "sarfaesiCategory", label: "SARFAESI Category", type: "text" },
+    { name: "caseStatus", label: "Case Status", type: "text" },
+    { name: "cifNo", label: "CIF No", type: "text" },
+    { name: "sanctionDate", label: "Sanction Date", type: "date" },
+    { name: "sanctionDateWords", label: "Sanction Date (Words)", type: "text" },
+    { name: "sanctionAmount", label: "Sanction Amount", type: "number" },
+    { name: "pendingEmi", label: "Pending EMI", type: "number" },
+    { name: "interestForTheMonth", label: "Interest for the Month", type: "number" },
+    { name: "lrnDate", label: "LRN Date", type: "date" },
+    { name: "lrnDateWords", label: "LRN Date (Words)", type: "text" },
+    { name: "lrnDispatchDate", label: "LRN Dispatch Date", type: "date" },
+    { name: "preSarfeasiDate", label: "Pre-SARFAESI Date", type: "date" },
+    { name: "preSarfeasiDateWords", label: "Pre-SARFAESI Date (Words)", type: "text" },
+    { name: "preSarfeasiDispatchDate", label: "Pre-SARFAESI Dispatch Date", type: "date" },
+    { name: "modelOfMachinery", label: "Model of Machinery", type: "text" },
+    { name: "manufacturer", label: "Manufacturer", type: "text" },
+    { name: "categoryOfMachinery", label: "Category of Machinery", type: "text" },
+    { name: "dealerName", label: "Dealer Name", type: "text" },
+    { name: "typeOfMachine", label: "Type of Machine", type: "text" },
   ];
 
   const borrowerAdd: any = [
-    { name: "borrowerName", label: "Name  Of Borrower", type: "text", required: true },
-    { name: "borrowerAddress", label: "Borrower Address", type: "text", required: true },
+    {
+      name: "borrowerName",
+      label: "Name  Of Borrower",
+      type: "text",
+      required: true,
+    },
+    {
+      name: "borrowerAddress",
+      label: "Borrower Address",
+      type: "text",
+      required: true,
+    },
     {
       name: "borrowerAddressAlt",
       label: "Borrower Address (Also At)",
       type: "text",
     },
+    { name: "borrowerEmail", label: "Borrower Email", type: "text" },
+    { name: "borrowerNumber", label: "Borrower Number", type: "text" },
+    { name: "borrowerRange", label: "Borrower Range", type: "text" },
   ];
 
   const CoborrowerAdd: any = [
-    { name: "coBorrowerName1", label: "Co-Borrower Name 1", type: "text", required: true },
+    {
+      name: "coBorrowerName1",
+      label: "Co-Borrower Name 1",
+      type: "text",
+      required: true,
+    },
     {
       name: "coBorrowerAddress1",
       label: "Co-Borrower Address 1",
-      type: "text", required: true
+      type: "text",
+      required: true,
     },
     {
       name: "coBorrowerAddressAlt1",
@@ -818,8 +1057,18 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
       label: "Co-Borrower Address 6",
       type: "text",
     },
-    { name: "coBorrowerEmail", label: "Co-Borrower Email", type: "text" },
-    { name: "coBorrowerNumber", label: "Co-Borrower Number", type: "text" },
+    { name: "coBorrowerEmail1", label: "Co-Borrower 1 Email", type: "text" },
+    { name: "coBorrowerNumber1", label: "Co-Borrower 1 Number", type: "text" },
+    { name: "coBorrowerEmail2", label: "Co-Borrower 2 Email", type: "text" },
+    { name: "coBorrowerNumber2", label: "Co-Borrower 2 Number", type: "text" },
+    { name: "coBorrowerEmail3", label: "Co-Borrower 3 Email", type: "text" },
+    { name: "coBorrowerNumber3", label: "Co-Borrower 3 Number", type: "text" },
+    { name: "coBorrowerEmail4", label: "Co-Borrower 4 Email", type: "text" },
+    { name: "coBorrowerNumber4", label: "Co-Borrower 4 Number", type: "text" },
+    { name: "coBorrowerEmail5", label: "Co-Borrower 5 Email", type: "text" },
+    { name: "coBorrowerNumber5", label: "Co-Borrower 5 Number", type: "text" },
+    { name: "coBorrowerEmail6", label: "Co-Borrower 6 Email", type: "text" },
+    { name: "coBorrowerNumber6", label: "Co-Borrower 6 Number", type: "text" },
     { name: "coBorrowerRange", label: "Co-Borrower Range", type: "text" },
   ];
 
@@ -828,6 +1077,13 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
     { name: "guarantorAddress1", label: "Guarantor Address 1", type: "text" },
     { name: "guarantorName2", label: "Guarantor Name 2", type: "text" },
     { name: "guarantorAddress2", label: "Guarantor Address 2", type: "text" },
+  ];
+
+  const MortgagorAdd: any = [
+    { name: "mortagerName1", label: "Mortgagor Name 1", type: "text" },
+    { name: "mortagerAddress1", label: "Mortgagor Address 1", type: "text" },
+    { name: "mortagerName2", label: "Mortgagor Name 2", type: "text" },
+    { name: "mortagerAddress2", label: "Mortgagor Address 2", type: "text" },
   ];
 
   const guarantorGroups = [GuarantorAdd.slice(0, 2), GuarantorAdd.slice(2, 4)];
@@ -875,6 +1131,11 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
     {
       name: "publicationLocal",
       label: "Publication Details (Vernacular)",
+      type: "text",
+    },
+    {
+      name: "demandNoticeDateWords",
+      label: "Demand Notice Date (Words)",
       type: "text",
     },
   ];
@@ -926,7 +1187,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
       name: "maturedDate13_4",
       label: "Matured Date 13 (4)",
       type: "date",
-    }
+    },
   ];
 
   const formFieldsSymbolic: any = [
@@ -1002,8 +1263,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
       name: "inventoryStatus",
       label: "Inventory Status",
       type: "text",
-    }
-  ]
+    },
+  ];
 
   const formFieldPhysicalPossession: any = [
     {
@@ -1056,8 +1317,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
       name: "physicalPossessionVacationNoticeImmoveable",
       label: "Vacation Notice (Immoveable)",
       type: "text",
-    }
-  ]
+    },
+  ];
 
   const formFieldAuctionNotice: any = [
     {
@@ -1089,8 +1350,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
       name: "reservePrice",
       label: "Reserve Price",
       type: "number",
-    }
-  ]
+    },
+  ];
 
   const formFieldAuctionPortal: any = [
     {
@@ -1172,8 +1433,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
       name: "authorisedOfficerPortal",
       label: "Authorised Officer",
       type: "text",
-    }
-  ]
+    },
+  ];
 
   const formFieldPostSale: any = [
     {
@@ -1190,8 +1451,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
       name: "soldRegDate",
       label: "Sold Registration Date",
       type: "date",
-    }
-  ]
+    },
+  ];
 
   const formFieldSaleCertificate: any = [
     {
@@ -1203,8 +1464,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
       name: "saleCertificateDate",
       label: "Sale Certificate Date",
       type: "date",
-    }
-  ]
+    },
+  ];
 
   const formFieldNiyamtekRemarks: any = [
     {
@@ -1236,8 +1497,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
       name: "nextStepRecommendedNiyamtek",
       label: "Next Step Recommended",
       type: "text",
-    }
-  ]
+    },
+  ];
 
   const handleConfirmCancel = () => {
     setConfirmVisible(false);
@@ -1292,7 +1553,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
               <div className="flex items-center gap-2 p-3 bg-[#e6f4ff] border-l-[4px] border-[#1677ff] rounded-r-md text-[14px] text-[#0958d9] w-full">
                 <InfoCircleOutlined className="text-[#1677ff] text-[16px] flex-shrink-0" />
                 <span className="font-normal text-[#0958d9] whitespace-normal">
-                  <strong className="font-bold">Note:</strong> Please ensure that all required fields are filled before generating the notice.
+                  <strong className="font-bold">Note:</strong> Please ensure
+                  that all required fields are filled before generating the
+                  notice.
                 </span>
               </div>
             </div>
@@ -1343,7 +1606,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         getValueFromEvent: (e) =>
                           e.target.value.replace(/^\s+/, ""),
                       })}
-                      rules={field?.required ? [{ required: true, message: `` }] : []}
+                      rules={
+                        field?.required ? [{ required: true, message: `` }] : []
+                      }
                     >
                       {field.type === "date" ? (
                         <DatePicker
@@ -1354,7 +1619,10 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
                             form.setFieldsValue({ [field.name]: value });
                           }}
                           placeholder={`Enter ${field.label}`}
@@ -1369,7 +1637,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                           className={`${field?.edit ? "!bg-gray-20 cursor-not-allowed" : ""}`}
                         />
                       ) : (
-                        <Input placeholder={`Enter ${field.label}`}
+                        <Input
+                          placeholder={`Enter ${field.label}`}
                           readOnly={field?.edit}
                           className={`${field?.edit ? "!bg-gray-20 cursor-not-allowed" : ""}`}
                         />
@@ -1393,7 +1662,7 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                       name="propertyDescription"
                       required
                     >
-                      {showGenerateButton == 1 ?
+                      {showGenerateButton == 1 ? (
                         <div
                           style={{
                             height: "200px",
@@ -1401,18 +1670,17 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                             padding: "8px",
                             borderRadius: "6px",
                             background: "#f5f5f5",
-                            overflowY: "auto"
+                            overflowY: "auto",
                           }}
                           dangerouslySetInnerHTML={{
-                            __html: form.getFieldValue("propertyDescription") || ""
+                            __html:
+                              form.getFieldValue("propertyDescription") || "",
                           }}
                         />
-                        :
+                      ) : (
                         <TiptapEditor
                           value={(
-                            form.getFieldValue(
-                              "propertyDescription",
-                            ) ?? ""
+                            form.getFieldValue("propertyDescription") ?? ""
                           )
                             .replace(/<ins[^>]*>/g, "<u>")
                             .replace(/<\/ins>/g, "</u>")}
@@ -1421,7 +1689,8 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                               propertyDescription: value,
                             })
                           }
-                        />}
+                        />
+                      )}
                     </Form.Item>
                   </div>
                 </div>
@@ -1445,8 +1714,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         getValueFromEvent={(e) =>
                           e.target.value.replace(/^\s+/, "")
                         }
-                        rules={add?.required ? [{ required: true, message: `` }] : []}
-
+                        rules={
+                          add?.required ? [{ required: true, message: `` }] : []
+                        }
                       >
                         <TextArea
                           rows={2}
@@ -1477,7 +1747,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         getValueFromEvent={(e) =>
                           e.target.value.replace(/^\s+/, "")
                         }
-                        rules={add?.required ? [{ required: true, message: `` }] : []}
+                        rules={
+                          add?.required ? [{ required: true, message: `` }] : []
+                        }
                       >
                         <TextArea
                           rows={2}
@@ -1500,6 +1772,41 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
 
                 <div className="flex flex-col gap-4 !p-4 !pt-0">
                   {guarantorGroups.map((group, groupIndex) => (
+                    <div
+                      key={groupIndex}
+                      className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    >
+                      {group.map((add: any) => (
+                        <Form.Item
+                          key={add?.name}
+                          label={add?.label}
+                          name={add?.name}
+                          getValueFromEvent={(e) =>
+                            e.target.value.replace(/^\s+/, "")
+                          }
+                        >
+                          <TextArea
+                            rows={2}
+                            placeholder={`Enter ${add?.label}`}
+                          />
+                        </Form.Item>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mortgagor Information Section */}
+              <div className="mb-6 border border-gray-100 !rounded-lg">
+                <Text
+                  strong
+                  className="!text-gray-800 !p-3 !text-[17px] !font-bold !block !mb-5 border-b border-gray-100 bg-gray-20"
+                >
+                  Mortgagor Information
+                </Text>
+
+                <div className="flex flex-col gap-4 !p-4 !pt-0">
+                  {[MortgagorAdd.slice(0, 2), MortgagorAdd.slice(2, 4)].map((group, groupIndex) => (
                     <div
                       key={groupIndex}
                       className="grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -1566,7 +1873,10 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
                             form.setFieldsValue({ [field.name]: value });
                           }}
                           placeholder={`Enter ${field.label}`}
@@ -1583,7 +1893,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
               {/* 13.4 Details Start */}
               <div id="13.4-details" className="mb-4">
                 <div className="font-semibold text-[14px] flex items-center gap-1 bg-[#4e82f1] text-white rounded-lg p-2">
-                  <span><IoDocumentTextOutline size={20} /></span>
+                  <span>
+                    <IoDocumentTextOutline size={20} />
+                  </span>
                   <span>13.4 Details</span>
                 </div>
               </div>
@@ -1597,35 +1909,47 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                 </Text>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 !p-4 !pt-0">
                   {formFields134.map((field: any) => (
-                    <Form.Item key={field.name} name={field.name} label={field.label}
+                    <Form.Item
+                      key={field.name}
+                      name={field.name}
+                      label={field.label}
                       {...(field.type !== "date" && {
-                        getValueFromEvent: (e) => e.target.value.replace(/^\s+/, ""),
-                      })}>
+                        getValueFromEvent: (e) =>
+                          e.target.value.replace(/^\s+/, ""),
+                      })}
+                    >
                       {field.type === "date" ? (
-                        <DatePicker className="w-full w-full h-[40px] rounded-md" format="DD-MM-YYYY" />
+                        <DatePicker
+                          className="w-full w-full h-[40px] rounded-md"
+                          format="DD-MM-YYYY"
+                        />
                       ) : field.type === "number" ? (
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
-                            form.setFieldsValue({ [field.name]: value })
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
+                            form.setFieldsValue({ [field.name]: value });
                           }}
-                          placeholder={`Enter ${field.label}`} />
-                      )
-                        : (
-                          <Input placeholder={`Enter ${field.label}`} />
-                        )}
+                          placeholder={`Enter ${field.label}`}
+                        />
+                      ) : (
+                        <Input placeholder={`Enter ${field.label}`} />
+                      )}
                     </Form.Item>
                   ))}
                 </div>
               </div>
               {/* 13.4 Details End */}
 
-
               {/* Symbolic Vacation */}
               <div id="symbolic-vacation" className="mb-4">
                 <div className="font-semibold text-[14px] flex items-center gap-1 bg-[#4e82f1] text-white rounded-lg p-2">
-                  <span><IoDocumentTextOutline size={20} /></span>
+                  <span>
+                    <IoDocumentTextOutline size={20} />
+                  </span>
                   <span>Symbolic Vacation</span>
                 </div>
               </div>
@@ -1639,24 +1963,35 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                 </Text>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 !p-4 !pt-0">
                   {formFieldsSymbolic.map((field: any) => (
-                    <Form.Item key={field.name} name={field.name} label={field.label}
+                    <Form.Item
+                      key={field.name}
+                      name={field.name}
+                      label={field.label}
                       {...(field.type !== "date" && {
-                        getValueFromEvent: (e) => e.target.value.replace(/^\s+/, ""),
-                      })}>
+                        getValueFromEvent: (e) =>
+                          e.target.value.replace(/^\s+/, ""),
+                      })}
+                    >
                       {field.type === "date" ? (
-                        <DatePicker className="w-full w-full h-[40px] rounded-md" format="DD-MM-YYYY" />
+                        <DatePicker
+                          className="w-full w-full h-[40px] rounded-md"
+                          format="DD-MM-YYYY"
+                        />
                       ) : field.type === "number" ? (
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
-                            form.setFieldsValue({ [field.name]: value })
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
+                            form.setFieldsValue({ [field.name]: value });
                           }}
-                          placeholder={`Enter ${field.label}`} />
-                      )
-                        : (
-                          <Input placeholder={`Enter ${field.label}`} />
-                        )}
+                          placeholder={`Enter ${field.label}`}
+                        />
+                      ) : (
+                        <Input placeholder={`Enter ${field.label}`} />
+                      )}
                     </Form.Item>
                   ))}
                 </div>
@@ -1666,7 +2001,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
               {/* CJM Details */}
               <div id="cjm-details" className="mb-4">
                 <div className="font-semibold text-[14px] flex items-center gap-1 bg-[#4e82f1] text-white rounded-lg p-2">
-                  <span><IoDocumentTextOutline size={20} /></span>
+                  <span>
+                    <IoDocumentTextOutline size={20} />
+                  </span>
                   <span>CJM Details </span>
                 </div>
               </div>
@@ -1680,24 +2017,35 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                 </Text>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 !p-4 !pt-0">
                   {formFieldsCMJ.map((field: any) => (
-                    <Form.Item key={field.name} name={field.name} label={field.label}
+                    <Form.Item
+                      key={field.name}
+                      name={field.name}
+                      label={field.label}
                       {...(field.type !== "date" && {
-                        getValueFromEvent: (e) => e.target.value.replace(/^\s+/, ""),
-                      })}>
+                        getValueFromEvent: (e) =>
+                          e.target.value.replace(/^\s+/, ""),
+                      })}
+                    >
                       {field.type === "date" ? (
-                        <DatePicker className="w-full w-full h-[40px] rounded-md" format="DD-MM-YYYY" />
+                        <DatePicker
+                          className="w-full w-full h-[40px] rounded-md"
+                          format="DD-MM-YYYY"
+                        />
                       ) : field.type === "number" ? (
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
-                            form.setFieldsValue({ [field.name]: value })
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
+                            form.setFieldsValue({ [field.name]: value });
                           }}
-                          placeholder={`Enter ${field.label}`} />
-                      )
-                        : (
-                          <Input placeholder={`Enter ${field.label}`} />
-                        )}
+                          placeholder={`Enter ${field.label}`}
+                        />
+                      ) : (
+                        <Input placeholder={`Enter ${field.label}`} />
+                      )}
                     </Form.Item>
                   ))}
                 </div>
@@ -1707,7 +2055,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
               {/* Physical possession_details Start*/}
               <div id="physical-possession" className="mb-4">
                 <div className="font-semibold text-[14px] flex items-center gap-1 bg-[#4e82f1] text-white rounded-lg p-2">
-                  <span><IoDocumentTextOutline size={20} /></span>
+                  <span>
+                    <IoDocumentTextOutline size={20} />
+                  </span>
                   <span>Physical Possession Details</span>
                 </div>
               </div>
@@ -1721,24 +2071,35 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                 </Text>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 !p-4 !pt-0">
                   {formFieldPhysicalPossession.map((field: any) => (
-                    <Form.Item key={field.name} name={field.name} label={field.label}
+                    <Form.Item
+                      key={field.name}
+                      name={field.name}
+                      label={field.label}
                       {...(field.type !== "date" && {
-                        getValueFromEvent: (e) => e.target.value.replace(/^\s+/, ""),
-                      })}>
+                        getValueFromEvent: (e) =>
+                          e.target.value.replace(/^\s+/, ""),
+                      })}
+                    >
                       {field.type === "date" ? (
-                        <DatePicker className="w-full w-full h-[40px] rounded-md" format="DD-MM-YYYY" />
+                        <DatePicker
+                          className="w-full w-full h-[40px] rounded-md"
+                          format="DD-MM-YYYY"
+                        />
                       ) : field.type === "number" ? (
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
-                            form.setFieldsValue({ [field.name]: value })
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
+                            form.setFieldsValue({ [field.name]: value });
                           }}
-                          placeholder={`Enter ${field.label}`} />
-                      )
-                        : (
-                          <Input placeholder={`Enter ${field.label}`} />
-                        )}
+                          placeholder={`Enter ${field.label}`}
+                        />
+                      ) : (
+                        <Input placeholder={`Enter ${field.label}`} />
+                      )}
                     </Form.Item>
                   ))}
                 </div>
@@ -1749,7 +2110,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
 
               <div id="auction-notice" className="mb-4">
                 <div className="font-semibold text-[14px] flex items-center gap-1 bg-[#4e82f1] text-white rounded-lg p-2">
-                  <span><IoDocumentTextOutline size={20} /></span>
+                  <span>
+                    <IoDocumentTextOutline size={20} />
+                  </span>
                   <span>Auction Notice</span>
                 </div>
               </div>
@@ -1763,24 +2126,35 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                 </Text>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 !p-4 !pt-0">
                   {formFieldAuctionNotice.map((field: any) => (
-                    <Form.Item key={field.name} name={field.name} label={field.label}
+                    <Form.Item
+                      key={field.name}
+                      name={field.name}
+                      label={field.label}
                       {...(field.type !== "date" && {
-                        getValueFromEvent: (e) => e.target.value.replace(/^\s+/, ""),
-                      })}>
+                        getValueFromEvent: (e) =>
+                          e.target.value.replace(/^\s+/, ""),
+                      })}
+                    >
                       {field.type === "date" ? (
-                        <DatePicker className="w-full w-full h-[40px] rounded-md" format="DD-MM-YYYY" />
+                        <DatePicker
+                          className="w-full w-full h-[40px] rounded-md"
+                          format="DD-MM-YYYY"
+                        />
                       ) : field.type === "number" ? (
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
-                            form.setFieldsValue({ [field.name]: value })
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
+                            form.setFieldsValue({ [field.name]: value });
                           }}
-                          placeholder={`Enter ${field.label}`} />
-                      )
-                        : (
-                          <Input placeholder={`Enter ${field.label}`} />
-                        )}
+                          placeholder={`Enter ${field.label}`}
+                        />
+                      ) : (
+                        <Input placeholder={`Enter ${field.label}`} />
+                      )}
                     </Form.Item>
                   ))}
                 </div>
@@ -1790,7 +2164,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
 
               <div id="auction-portal" className="mb-4">
                 <div className="font-semibold text-[14px] flex items-center gap-1 bg-[#4e82f1] text-white rounded-lg p-2">
-                  <span><IoDocumentTextOutline size={20} /></span>
+                  <span>
+                    <IoDocumentTextOutline size={20} />
+                  </span>
                   <span>Auction Portal</span>
                 </div>
               </div>
@@ -1804,24 +2180,35 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                 </Text>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 !p-4 !pt-0">
                   {formFieldAuctionPortal.map((field: any) => (
-                    <Form.Item key={field.name} name={field.name} label={field.label}
+                    <Form.Item
+                      key={field.name}
+                      name={field.name}
+                      label={field.label}
                       {...(field.type !== "date" && {
-                        getValueFromEvent: (e) => e.target.value.replace(/^\s+/, ""),
-                      })}>
+                        getValueFromEvent: (e) =>
+                          e.target.value.replace(/^\s+/, ""),
+                      })}
+                    >
                       {field.type === "date" ? (
-                        <DatePicker className="w-full w-full h-[40px] rounded-md" format="DD-MM-YYYY" />
+                        <DatePicker
+                          className="w-full w-full h-[40px] rounded-md"
+                          format="DD-MM-YYYY"
+                        />
                       ) : field.type === "number" || field.type === "int" ? (
                         <Input
                           prefix={field.type === "number" ? "₹" : ""}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
-                            form.setFieldsValue({ [field.name]: value })
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
+                            form.setFieldsValue({ [field.name]: value });
                           }}
-                          placeholder={`Enter ${field.label}`} />
-                      )
-                        : (
-                          <Input placeholder={`Enter ${field.label}`} />
-                        )}
+                          placeholder={`Enter ${field.label}`}
+                        />
+                      ) : (
+                        <Input placeholder={`Enter ${field.label}`} />
+                      )}
                     </Form.Item>
                   ))}
                 </div>
@@ -1831,7 +2218,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
               {/* Post Sale Notice */}
               <div id="post-sale-details" className="mb-4">
                 <div className="font-semibold text-[14px] flex items-center gap-1 bg-[#4e82f1] text-white rounded-lg p-2">
-                  <span><IoDocumentTextOutline size={20} /></span>
+                  <span>
+                    <IoDocumentTextOutline size={20} />
+                  </span>
                   <span>Post Sale Notice</span>
                 </div>
               </div>
@@ -1845,24 +2234,35 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                 </Text>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 !p-4 !pt-0">
                   {formFieldPostSale.map((field: any) => (
-                    <Form.Item key={field.name} name={field.name} label={field.label}
+                    <Form.Item
+                      key={field.name}
+                      name={field.name}
+                      label={field.label}
                       {...(field.type !== "date" && {
-                        getValueFromEvent: (e) => e.target.value.replace(/^\s+/, ""),
-                      })}>
+                        getValueFromEvent: (e) =>
+                          e.target.value.replace(/^\s+/, ""),
+                      })}
+                    >
                       {field.type === "date" ? (
-                        <DatePicker className="w-full w-full h-[40px] rounded-md" format="DD-MM-YYYY" />
+                        <DatePicker
+                          className="w-full w-full h-[40px] rounded-md"
+                          format="DD-MM-YYYY"
+                        />
                       ) : field.type === "number" ? (
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
-                            form.setFieldsValue({ [field.name]: value })
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
+                            form.setFieldsValue({ [field.name]: value });
                           }}
-                          placeholder={`Enter ${field.label}`} />
-                      )
-                        : (
-                          <Input placeholder={`Enter ${field.label}`} />
-                        )}
+                          placeholder={`Enter ${field.label}`}
+                        />
+                      ) : (
+                        <Input placeholder={`Enter ${field.label}`} />
+                      )}
                     </Form.Item>
                   ))}
                 </div>
@@ -1872,7 +2272,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
               {/* Sale Certificate */}
               <div id="sale-certificate" className="mb-4">
                 <div className="font-semibold text-[14px] flex items-center gap-1 bg-[#4e82f1] text-white rounded-lg p-2">
-                  <span><IoDocumentTextOutline size={20} /></span>
+                  <span>
+                    <IoDocumentTextOutline size={20} />
+                  </span>
                   <span>Sale Certificate</span>
                 </div>
               </div>
@@ -1886,24 +2288,35 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                 </Text>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 !p-4 !pt-0">
                   {formFieldSaleCertificate.map((field: any) => (
-                    <Form.Item key={field.name} name={field.name} label={field.label}
+                    <Form.Item
+                      key={field.name}
+                      name={field.name}
+                      label={field.label}
                       {...(field.type !== "date" && {
-                        getValueFromEvent: (e) => e.target.value.replace(/^\s+/, ""),
-                      })}>
+                        getValueFromEvent: (e) =>
+                          e.target.value.replace(/^\s+/, ""),
+                      })}
+                    >
                       {field.type === "date" ? (
-                        <DatePicker className="w-full w-full h-[40px] rounded-md" format="DD-MM-YYYY" />
+                        <DatePicker
+                          className="w-full w-full h-[40px] rounded-md"
+                          format="DD-MM-YYYY"
+                        />
                       ) : field.type === "number" ? (
                         <Input
                           prefix={"₹"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
-                            form.setFieldsValue({ [field.name]: value })
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
+                            form.setFieldsValue({ [field.name]: value });
                           }}
-                          placeholder={`Enter ${field.label}`} />
-                      )
-                        : (
-                          <Input placeholder={`Enter ${field.label}`} />
-                        )}
+                          placeholder={`Enter ${field.label}`}
+                        />
+                      ) : (
+                        <Input placeholder={`Enter ${field.label}`} />
+                      )}
                     </Form.Item>
                   ))}
                 </div>
@@ -1914,7 +2327,9 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
 
               <div id="niyamtek-remarks" className="mb-4">
                 <div className="font-semibold text-[14px] flex items-center gap-1 bg-[#4e82f1] text-white rounded-lg p-2">
-                  <span><IoDocumentTextOutline size={20} /></span>
+                  <span>
+                    <IoDocumentTextOutline size={20} />
+                  </span>
                   <span>Niyamtek Remarks</span>
                 </div>
               </div>
@@ -1928,24 +2343,35 @@ const ReportsContent: React.FC<LoanApplicationProps> = ({
                 </Text>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 !p-4 !pt-0">
                   {formFieldNiyamtekRemarks.map((field: any) => (
-                    <Form.Item key={field.name} name={field.name} label={field.label}
+                    <Form.Item
+                      key={field.name}
+                      name={field.name}
+                      label={field.label}
                       {...(field.type !== "date" && {
-                        getValueFromEvent: (e) => e.target.value.replace(/^\s+/, ""),
-                      })}>
+                        getValueFromEvent: (e) =>
+                          e.target.value.replace(/^\s+/, ""),
+                      })}
+                    >
                       {field.type === "date" ? (
-                        <DatePicker className="w-full w-full h-[40px] rounded-md" format="DD-MM-YYYY" />
+                        <DatePicker
+                          className="w-full w-full h-[40px] rounded-md"
+                          format="DD-MM-YYYY"
+                        />
                       ) : field.type === "number" ? (
                         <Input
                           prefix={"{field.prefix}"}
                           onChange={(e) => {
-                            const value = e.target.value.replace(/[^0-9.,]/g, "");
-                            form.setFieldsValue({ [field.name]: value })
+                            const value = e.target.value.replace(
+                              /[^0-9.,]/g,
+                              "",
+                            );
+                            form.setFieldsValue({ [field.name]: value });
                           }}
-                          placeholder={`Enter ${field.label}`} />
-                      )
-                        : (
-                          <Input placeholder={`Enter ${field.label}`} />
-                        )}
+                          placeholder={`Enter ${field.label}`}
+                        />
+                      ) : (
+                        <Input placeholder={`Enter ${field.label}`} />
+                      )}
                     </Form.Item>
                   ))}
                 </div>

@@ -3,14 +3,12 @@ import { Provider } from "react-redux";
 import { store } from "@/store";
 import { ConfigProvider } from "antd";
 import { AppProvider } from "@/context/GlobalContext";
-import { BankProvider } from "@/context/BankContext";
 
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
       <AppProvider>
-      <BankProvider>  
       <ConfigProvider
         theme={{
           token: {
@@ -44,8 +42,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       >
         {children}
       </ConfigProvider>
-      </BankProvider>
       </AppProvider>
     </Provider>
   );
-}
+}
