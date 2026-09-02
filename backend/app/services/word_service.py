@@ -17,6 +17,7 @@ from app.services.communication_service import (
 )
 from app.services.html_docx_renderer import (
     extract_body_default_style,
+    extract_page_margins_mm,
     extract_table_avoid_break,
     render_html_body,
 )
@@ -256,7 +257,15 @@ class WordService:
             if default_size_pt:
                 normal_style.font.size = Pt(default_size_pt)
 
-        content_width_twips = self._set_page_size(document)
+        # Left/right margins come from the template's own `@page { margin }`
+        # (the box the browser/PDF uses) so the two outputs line up; top and
+        # bottom keep the larger built-in values that leave room for the
+        # letterhead/seal bands placed in the section header/footer.
+        page_margins = extract_page_margins_mm(soup)
+        content_width_twips = self._set_page_size(document, page_margins)
+        side_margin_mm = SIDE_MARGIN_MM
+        if page_margins and page_margins.get("left") is not None:
+            side_margin_mm = page_margins["left"]
         max_band_width_emu = Emu(round(content_width_twips * 635))
 
         avoid_row_split = extract_table_avoid_break(soup)
@@ -272,7 +281,7 @@ class WordService:
         # the margin-narrowed content width, and cancel the side margins on
         # the band paragraph itself so the image can actually reach x=0.
         full_page_width_emu = Emu(Mm(PAGE_WIDTH_MM))
-        side_margin_emu = Emu(Mm(SIDE_MARGIN_MM))
+        side_margin_emu = Emu(Mm(side_margin_mm))
 
         for section in document.sections:
             section.header_distance = Mm(0)
@@ -422,17 +431,29 @@ class WordService:
                     continue
                 break
 
-    def _set_page_size(self, document) -> int:
+    def _set_page_size(self, document, page_margins: "dict | None" = None) -> int:
         """Returns the resulting content width in twips (page width minus
-        left/right margins), so callers can rescale table widths to match."""
+        left/right margins), so callers can rescale table widths to match.
+
+        `page_margins` (from the template's `@page` rule, in mm) overrides the
+        left/right margins when present so the .docx content box matches the
+        PDF; top/bottom stay on the built-in values that clear the header and
+        footer band art."""
+        left_mm = right_mm = SIDE_MARGIN_MM
+        if page_margins:
+            if page_margins.get("left") is not None:
+                left_mm = page_margins["left"]
+            if page_margins.get("right") is not None:
+                right_mm = page_margins["right"]
+
         for section in document.sections:
             section.page_width = Mm(PAGE_WIDTH_MM)
             section.page_height = Mm(PAGE_HEIGHT_MM)
-            section.left_margin = Mm(SIDE_MARGIN_MM)
-            section.right_margin = Mm(SIDE_MARGIN_MM)
+            section.left_margin = Mm(left_mm)
+            section.right_margin = Mm(right_mm)
             section.top_margin = Mm(TOP_MARGIN_MM)
             section.bottom_margin = Mm(BOTTOM_MARGIN_MM)
 
-        content_width = Mm(PAGE_WIDTH_MM - 2 * SIDE_MARGIN_MM)
+        content_width = Mm(PAGE_WIDTH_MM - left_mm - right_mm)
         return content_width.twips
 

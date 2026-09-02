@@ -4,6 +4,7 @@ import re
 from dataclasses import dataclass
 
 from bs4 import NavigableString, Tag
+from docx.enum.table import WD_ALIGN_VERTICAL, WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -35,8 +36,28 @@ _COLOR_RE = re.compile(r"(?<!background-)(?<!-)color\s*:\s*([^;]+)", re.I)
 _WIDTH_PX_RE = re.compile(r"width\s*:\s*([\d.]+)\s*px", re.I)
 _HEIGHT_PX_RE = re.compile(r"height\s*:\s*([\d.]+)\s*px", re.I)
 _TEXT_ALIGN_RE = re.compile(r"text-align\s*:\s*(left|right|center|justify)", re.I)
+_VERTICAL_ALIGN_RE = re.compile(r"vertical-align\s*:\s*(top|middle|bottom)", re.I)
 _BORDER_STYLE_RE = re.compile(r"border-style\s*:\s*(\w+)", re.I)
 _BORDER_WIDTH_PX_RE = re.compile(r"border-width\s*:\s*([\d.]+)\s*px", re.I)
+
+# A <col>/table `width:` in any unit - the numeric part is used only as a
+# relative weight (everything is renormalised against the row total), so px,
+# pt and % can be mixed here without converting between them.
+_WIDTH_WEIGHT_RE = re.compile(r"(?<!-)width\s*:\s*([\d.]+)\s*(?:px|pt|%)", re.I)
+# An absolute table width (`style="width: 698px"`) - only px/pt map to a real
+# twip measurement; a %-width table still fills the content box.
+_WIDTH_ABS_RE = re.compile(r"(?<!-)width\s*:\s*([\d.]+)\s*(px|pt)", re.I)
+# `margin: 0 auto` / `margin-left: auto` on a table => not full width, so it
+# is horizontally centred (or right-aligned) rather than flush left.
+_MARGIN_AUTO_RE = re.compile(r"margin(?:-left|-right)?\s*:\s*[^;]*\bauto\b", re.I)
+
+_TWIPS_PER_PX = 15  # 96 dpi: 1px = 1/96in, 1in = 1440 twips
+_TWIPS_PER_PT = 20
+
+_HEADING_SIZES_PT = {"h1": 20.0, "h2": 16.0, "h3": 13.0, "h4": 12.0, "h5": 11.0, "h6": 10.0}
+# Wrappers that carry no block semantics of their own - descend through them
+# so content nested in a layout <div> is rendered instead of skipped.
+_TRANSPARENT_CONTAINERS = {"div", "section", "article", "main"}
 
 _NAMED_COLORS = {
     "black": "000000",
@@ -48,6 +69,59 @@ _NAMED_COLORS = {
 _BODY_RULE_RE = re.compile(r"(?:^|\})\s*body\s*\{([^}]*)\}", re.I)
 _TABLE_RULE_RE = re.compile(r"(?:^|\})\s*table\s*\{([^}]*)\}", re.I)
 _PAGE_BREAK_AVOID_RE = re.compile(r"page-break-inside\s*:\s*avoid", re.I)
+_AT_PAGE_RE = re.compile(r"@page\b[^{]*\{([^}]*)\}", re.I)
+_MARGIN_DECL_RE = re.compile(r"(?<!-)margin\s*:\s*([^;}]+)", re.I)
+_LEN_RE = re.compile(r"(-?[\d.]+)\s*(mm|cm|in|px|pt)?", re.I)
+
+
+def _len_to_mm(value: str, unit: "str | None") -> "float | None":
+    try:
+        num = float(value)
+    except ValueError:
+        return None
+    unit = (unit or "").lower()
+    if unit in ("mm", ""):
+        return num
+    if unit == "cm":
+        return num * 10.0
+    if unit == "in":
+        return num * 25.4
+    if unit == "px":
+        return num * 25.4 / 96.0
+    if unit == "pt":
+        return num * 25.4 / 72.0
+    return None
+
+
+def extract_page_margins_mm(soup) -> "dict | None":
+    """Reads `@page { margin: ... }` from the template's own <style> block and
+    returns {'top','right','bottom','left'} in millimetres. This is the page
+    box the browser (and therefore the PDF) uses; the .docx side otherwise
+    falls back to its own hard-coded margins, which is what made the Word
+    output's left/right margins disagree with the PDF."""
+    for style_tag in soup.find_all("style"):
+        page_match = _AT_PAGE_RE.search(style_tag.get_text())
+        if not page_match:
+            continue
+        margin_match = _MARGIN_DECL_RE.search(page_match.group(1))
+        if not margin_match:
+            continue
+        parts = [_len_to_mm(v, u) for v, u in _LEN_RE.findall(margin_match.group(1))]
+        parts = [p for p in parts if p is not None]
+        if not parts:
+            continue
+        if len(parts) == 1:
+            top = right = bottom = left = parts[0]
+        elif len(parts) == 2:
+            top = bottom = parts[0]
+            right = left = parts[1]
+        elif len(parts) == 3:
+            top, right, bottom = parts[0], parts[1], parts[2]
+            left = right
+        else:
+            top, right, bottom, left = parts[0], parts[1], parts[2], parts[3]
+        return {"top": top, "right": right, "bottom": bottom, "left": left}
+    return None
 
 
 def extract_table_avoid_break(soup) -> bool:
@@ -226,12 +300,16 @@ def _render_inline(paragraph, node, style: _RunStyle, max_width_emu: "Emu | None
         _render_inline(paragraph, child, child_style, max_width_emu)
 
 
-def _render_paragraph(container, p_tag: Tag, max_width_emu: "Emu | None" = None):
+def _render_paragraph(container, p_tag: Tag, max_width_emu: "Emu | None" = None, default_align=None):
     paragraph = container.add_paragraph()
 
     align_match = _TEXT_ALIGN_RE.search(p_tag.get("style", "") or "")
     if align_match:
         paragraph.alignment = _ALIGN_MAP.get(align_match.group(1).lower())
+    elif default_align is not None:
+        # The <p> declares no alignment of its own - inherit the enclosing
+        # cell's `text-align` (CSS would; python-docx will not without this).
+        paragraph.alignment = default_align
 
     for child in p_tag.children:
         _render_inline(paragraph, child, _RunStyle(), max_width_emu)
@@ -239,7 +317,28 @@ def _render_paragraph(container, p_tag: Tag, max_width_emu: "Emu | None" = None)
     return paragraph
 
 
-def _col_widths_twips(table_tag: Tag, content_width_twips: int) -> "list[int] | None":
+def _render_heading(container, tag: Tag, max_width_emu: "Emu | None" = None):
+    paragraph = _render_paragraph(container, tag, max_width_emu)
+    size_pt = _HEADING_SIZES_PT.get(tag.name.lower())
+    for run in paragraph.runs:
+        run.font.bold = True
+        if size_pt is not None and run.font.size is None:
+            run.font.size = Pt(size_pt)
+    return paragraph
+
+
+def _render_list(container, list_tag: Tag, max_width_emu: "Emu | None", ordered: bool):
+    for idx, li in enumerate(list_tag.find_all("li", recursive=False), 1):
+        paragraph = container.add_paragraph()
+        paragraph.add_run(f"{idx}. " if ordered else "• ")
+        for child in li.children:
+            # A nested <ul>/<ol> is flattened inline here; deep nesting is not
+            # something the notice templates use.
+            _render_inline(paragraph, child, _RunStyle(), max_width_emu)
+        paragraph.paragraph_format.left_indent = Pt(18)
+
+
+def _col_widths_twips(table_tag: Tag, total_twips: int) -> "list[int] | None":
     colgroup = table_tag.find("colgroup")
     if colgroup is None:
         return None
@@ -247,18 +346,38 @@ def _col_widths_twips(table_tag: Tag, content_width_twips: int) -> "list[int] | 
     if not cols:
         return None
 
-    px_widths = []
+    weights = []
     for col in cols:
-        match = _WIDTH_PX_RE.search(col.get("style", "") or "")
+        match = _WIDTH_WEIGHT_RE.search(col.get("style", "") or "")
         if not match:
             return None
-        px_widths.append(float(match.group(1)))
+        weights.append(float(match.group(1)))
 
-    total_px = sum(px_widths)
-    if total_px <= 0:
+    total = sum(weights)
+    if total <= 0:
         return None
 
-    return [round(px / total_px * content_width_twips) for px in px_widths]
+    return [round(w / total * total_twips) for w in weights]
+
+
+def _int_attr(tag: Tag, name: str) -> int:
+    """A `colspan`/`rowspan` attribute as an int >= 1, tolerant of missing,
+    empty, or malformed values."""
+    try:
+        return max(1, int(tag.get(name) or 1))
+    except (TypeError, ValueError):
+        return 1
+
+
+def _table_width_twips(table_tag: Tag) -> "int | None":
+    """Absolute width declared on the <table> itself (`width: 698px`),
+    in twips - or None when it is unset or a percentage."""
+    match = _WIDTH_ABS_RE.search(table_tag.get("style", "") or "")
+    if not match:
+        return None
+    value = float(match.group(1))
+    unit = match.group(2).lower()
+    return round(value * (_TWIPS_PER_PT if unit == "pt" else _TWIPS_PER_PX))
 
 
 def _cell_border_size_eighths_pt(cell_tag: Tag) -> "int | None":
@@ -292,16 +411,43 @@ def _render_table(
     if not rows:
         return None
 
-    num_cols = len(rows[0].find_all(["td", "th"], recursive=False))
+    # True grid column count. The <colgroup> is authoritative when present;
+    # otherwise take the widest row once every cell's colspan is counted (a
+    # plain `len(first row cells)` under-counts any row that uses colspan).
+    colgroup = table_tag.find("colgroup")
+    col_tags = colgroup.find_all("col") if colgroup is not None else []
+    if col_tags:
+        num_cols = len(col_tags)
+    else:
+        num_cols = max(
+            (
+                sum(_int_attr(c, "colspan") for c in tr.find_all(["td", "th"], recursive=False))
+                for tr in rows
+            ),
+            default=0,
+        )
     if num_cols == 0:
         return None
 
     table = document.add_table(rows=len(rows), cols=num_cols)
     table.autofit = False
 
-    widths = _col_widths_twips(table_tag, content_width_twips)
+    # Respect the width the template author set on the <table> itself
+    # (`style="width: 698px"`). Only clamp it down to the page's content box
+    # if it would overflow - never stretch a deliberately-narrow table out to
+    # full width, which is what threw the right margin and column alignment
+    # off relative to the browser-rendered PDF.
+    authored_total = _table_width_twips(table_tag)
+    total_twips = content_width_twips
+    if authored_total and 0 < authored_total < content_width_twips:
+        total_twips = authored_total
+
+    widths = _col_widths_twips(table_tag, total_twips)
     if not widths or len(widths) != num_cols:
-        widths = [content_width_twips // num_cols] * num_cols
+        widths = [total_twips // num_cols] * num_cols
+
+    if _MARGIN_AUTO_RE.search(table_tag.get("style", "") or ""):
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
 
     # A table with at least one visibly-bordered cell is real content (e.g.
     # a summary table), as opposed to the borderless tables used purely for
@@ -315,6 +461,10 @@ def _render_table(
     )
     avoid_row_split = avoid_row_split or table_is_visible
 
+    # Grid coordinates already consumed by a colspan/rowspan reaching in from
+    # an earlier cell - the next cell tag in a row skips over these.
+    occupied: "set[tuple[int, int]]" = set()
+
     for row_idx, tr in enumerate(rows):
         if avoid_row_split:
             # OOXML has no whole-table "keep together" flag; w:cantSplit per
@@ -323,27 +473,58 @@ def _render_table(
             row_tr_pr = table.rows[row_idx]._tr.get_or_add_trPr()
             row_tr_pr.append(OxmlElement("w:cantSplit"))
 
-        cell_tags = tr.find_all(["td", "th"], recursive=False)
-        for col_idx, cell_tag in enumerate(cell_tags):
-            if col_idx >= num_cols:
+        grid_col = 0
+        for cell_tag in tr.find_all(["td", "th"], recursive=False):
+            while (row_idx, grid_col) in occupied:
+                grid_col += 1
+            if grid_col >= num_cols:
                 break
-            cell = table.rows[row_idx].cells[col_idx]
-            cell.width = Twips(widths[col_idx])
 
-            # drop the blank paragraph python-docx seeds every new cell with
-            default_p = cell.paragraphs[0]._element
-            default_p.getparent().remove(default_p)
+            colspan = min(_int_attr(cell_tag, "colspan"), num_cols - grid_col)
+            rowspan = min(_int_attr(cell_tag, "rowspan"), len(rows) - row_idx)
+
+            cell = table.cell(row_idx, grid_col)
+            if colspan > 1 or rowspan > 1:
+                cell = cell.merge(table.cell(row_idx + rowspan - 1, grid_col + colspan - 1))
+            for rr in range(row_idx, row_idx + rowspan):
+                for cc in range(grid_col, grid_col + colspan):
+                    occupied.add((rr, cc))
+
+            cell.width = Twips(sum(widths[grid_col:grid_col + colspan]))
+
+            cell_style = cell_tag.get("style", "") or ""
+            align_match = _TEXT_ALIGN_RE.search(cell_style)
+            cell_align = _ALIGN_MAP.get(align_match.group(1).lower()) if align_match else None
+            valign_match = _VERTICAL_ALIGN_RE.search(cell_style)
+            if valign_match:
+                cell.vertical_alignment = {
+                    "top": WD_ALIGN_VERTICAL.TOP,
+                    "middle": WD_ALIGN_VERTICAL.CENTER,
+                    "bottom": WD_ALIGN_VERTICAL.BOTTOM,
+                }[valign_match.group(1).lower()]
+
+            # Clear the paragraphs the cell arrived with - a fresh cell has one
+            # blank, a just-merged cell has one per grid column it now spans -
+            # then render the real content into it.
+            for para in list(cell.paragraphs):
+                para._element.getparent().remove(para._element)
 
             p_tags = cell_tag.find_all("p", recursive=False)
             if p_tags:
                 for p_tag in p_tags:
-                    _render_paragraph(cell, p_tag, max_width_emu)
+                    _render_paragraph(cell, p_tag, max_width_emu, default_align=cell_align)
             else:
-                _render_paragraph(cell, cell_tag, max_width_emu)
+                _render_paragraph(cell, cell_tag, max_width_emu, default_align=cell_align)
+
+            if not cell.paragraphs:
+                # OOXML requires every cell to hold at least one paragraph.
+                cell.add_paragraph()
 
             border_size = _cell_border_size_eighths_pt(cell_tag)
             if border_size is not None:
                 _set_cell_borders(cell, border_size)
+
+            grid_col += colspan
 
         if avoid_row_split and row_idx < len(rows) - 1:
             # cantSplit above only stops a single row from breaking
@@ -358,8 +539,8 @@ def _render_table(
 
     grid = table._tbl.find(qn("w:tblGrid"))
     if grid is not None:
-        for grid_col, width in zip(grid.findall(qn("w:gridCol")), widths):
-            grid_col.set(qn("w:w"), str(width))
+        for grid_col_el, width in zip(grid.findall(qn("w:gridCol")), widths):
+            grid_col_el.set(qn("w:w"), str(width))
 
     return table
 
@@ -367,11 +548,37 @@ def _render_table(
 def render_html_body(
     document, body_tag: Tag, content_width_twips: int, max_width_emu: "Emu | None" = None, avoid_row_split: bool = False
 ) -> None:
-    """Renders every top-level <p>/<table> under `body_tag` directly onto
-    `document`, in order. Call after header/footer <tag>s have already been
-    extracted from `body_tag` by the caller."""
-    for child in body_tag.find_all(["p", "table"], recursive=False):
-        if child.name == "table":
+    """Renders the block-level content under `body_tag` directly onto
+    `document`, in document order. Layout-only wrappers (`<div>` etc.) are
+    transparent - their children are rendered as if they sat at body level -
+    and headings/lists are rendered too, so a template change that adds any
+    of these is reflected in the .docx instead of silently dropped. Call
+    after header/footer <tag>s have already been extracted by the caller."""
+    for child in body_tag.children:
+        if isinstance(child, NavigableString):
+            text = str(child).strip()
+            if text:
+                document.add_paragraph().add_run(text)
+            continue
+        if not isinstance(child, Tag):
+            continue
+
+        name = (child.name or "").lower()
+        if name == "table":
             _render_table(document, child, content_width_twips, max_width_emu, avoid_row_split)
-        else:
+        elif name in _HEADING_SIZES_PT:
+            _render_heading(document, child, max_width_emu)
+        elif name in ("ul", "ol"):
+            _render_list(document, child, max_width_emu, ordered=(name == "ol"))
+        elif name == "blockquote":
+            for p_tag in child.find_all("p", recursive=False) or [child]:
+                quoted = _render_paragraph(document, p_tag, max_width_emu)
+                quoted.paragraph_format.left_indent = Pt(24)
+        elif name == "hr":
+            document.add_paragraph()
+        elif name in _TRANSPARENT_CONTAINERS:
+            render_html_body(document, child, content_width_twips, max_width_emu, avoid_row_split)
+        elif name == "p":
             _render_paragraph(document, child, max_width_emu)
+        # Any other bare inline tag at block level (e.g. a stray <strong>) is
+        # not a block container - fall through and ignore it.

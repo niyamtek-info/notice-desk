@@ -1377,6 +1377,27 @@ DocumentType:
       survey numbers, measurements, village names, and boundary details.
       This is the most important field — do not truncate or summarize it.
 
+      SPAN — where rawPropertyText STARTS and ENDS:
+        * START: the schedule heading or the first line of the description
+          (e.g. "SCHEDULE ...", "Village ...", "All that piece and parcel
+          of land ...").
+        * END: immediately BEFORE the fees/execution block. Stop when you
+          reach "Deficit Stamp Duty", "Stamp Duty of Rs", "Registration Fees",
+          "user charges", "E-challan", "In witness whereof", "Signed by",
+          "MORTGAGOR", or the witness/execution clause in any language.
+        * Everything between START and END belongs in rawPropertyText,
+          including the "and bounded by:" block and the boundary table.
+
+      BOUNDARY TABLE — must be included in rawPropertyText:
+        The boundaries are often laid out as a table with direction rows
+        (North / South / East / West). Transcribe each row inline as readable
+        text in the form "<direction>: <verbatim value from that row>;",
+        keeping the exact wording that appears in the document.
+        Do NOT invent, assume, or fill in any direction — copy only what is
+        present in the OCR. If a direction row is missing or unreadable, omit
+        it. Never drop the boundary rows just because they are formatted as a
+        table or appear after a line break.
+
       ─────────────────────────────────────────
       FIELD EXTRACTION HINTS
       ─────────────────────────────────────────
