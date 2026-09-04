@@ -542,6 +542,36 @@ class ReportRepository:
                 )
             )
 
+        # --- Sanction Letter (date / amount) ---
+        # The SL_LA "date" checklist row carries the Sanction Letter date on the
+        # document_a side (the Loan Agreement date is document_b and is mapped to
+        # loan_agreement_date separately), so it never lands in
+        # checklist_value_map for sanction_date. Pull it explicitly, preferring
+        # the checklist value, then the extracted sanction letter, then whatever
+        # the report already holds.
+        sl_date_row = next(
+            (
+                r for r in checklist_rows
+                if r.pair_code == "SL_LA" and r.attribute_code == "date"
+            ),
+            None,
+        )
+        sl_date_override = sl_date_row.document_a_value if sl_date_row else None
+        report.sanction_date = parse_datetime(
+            self._first_non_empty(
+                sl_date_override,
+                sanction.sanction_date if sanction else None,
+                report.sanction_date,
+            )
+        )
+        report.sanction_amount = self._to_decimal(
+            self._first_non_empty(
+                checklist_value_map.get("sanction_amount"),
+                sanction.sanction_amount if sanction else None,
+                report.sanction_amount,
+            )
+        )
+
         report.property_address = self._first_non_empty(
             checklist_value_map.get("property_address"),
             sanction.property_address if sanction else None,

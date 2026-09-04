@@ -49,6 +49,15 @@ _HEADING_SIZES_PT = {"h1": 20.0, "h2": 16.0, "h3": 13.0, "h4": 12.0, "h5": 11.0,
 # Wrappers that carry no block semantics of their own - descend through them
 # so content nested in a layout <div> is rendered instead of skipped.
 _TRANSPARENT_CONTAINERS = {"div", "section", "article", "main"}
+# Block-level tags a <td>/<th> can contain. When a cell holds any of these it
+# is rendered block-by-block (each <p> a paragraph, nested <table> a table,
+# etc.); a cell of purely inline content (text, <span>, <br>, <strong>) keeps
+# the single-paragraph fast path.
+_CELL_BLOCK_TAGS = (
+    {"p", "table", "ul", "ol", "blockquote", "hr"}
+    | _TRANSPARENT_CONTAINERS
+    | set(_HEADING_SIZES_PT)
+)
 
 _NAMED_COLORS = {
     "black": "000000",
@@ -241,9 +250,9 @@ def _render_inline(paragraph, node, style: _RunStyle, max_width_emu: "Emu | None
 def _render_paragraph(container, p_tag: Tag, max_width_emu: "Emu | None" = None, default_align=None):
     paragraph = container.add_paragraph()
 
-    align_match = _TEXT_ALIGN_RE.search(p_tag.get("style", "") or "")
-    if align_match:
-        paragraph.alignment = _ALIGN_MAP.get(align_match.group(1).lower())
+    own_align = _own_align(p_tag)
+    if own_align is not None:
+        paragraph.alignment = own_align
     elif default_align is not None:
         # The <p> declares no alignment of its own - inherit the enclosing
         # cell's `text-align` (CSS would; python-docx will not without this).
@@ -256,12 +265,17 @@ def _render_paragraph(container, p_tag: Tag, max_width_emu: "Emu | None" = None,
 
 
 def _own_align(tag: Tag):
-    """The `text-align` declared on this element itself, mapped to a docx
-    alignment - or None when it declares none."""
+    """The alignment declared on this element itself, mapped to a docx
+    alignment - or None when it declares none. Reads CSS `text-align` first,
+    then the legacy `align=""` HTML attribute (some editors / pasted-from-Word
+    content still emit `<p align="center">` instead of an inline style)."""
     if not isinstance(tag, Tag):
         return None
     match = _TEXT_ALIGN_RE.search(tag.get("style", "") or "")
-    return _ALIGN_MAP.get(match.group(1).lower()) if match else None
+    if match:
+        return _ALIGN_MAP.get(match.group(1).lower())
+    attr = (tag.get("align") or "").strip().lower()
+    return _ALIGN_MAP.get(attr)
 
 
 def _render_heading(container, tag: Tag, max_width_emu: "Emu | None" = None, default_align=None):
@@ -342,6 +356,48 @@ def _set_cell_borders(cell, size_eighths_pt: int) -> None:
         edge_el.set(qn("w:color"), "000000")
         borders.append(edge_el)
     tc_pr.append(borders)
+
+
+def _finalise_table_metrics(table) -> None:
+    """Two adjustments once a table's cells/grid are built:
+
+    1. `<w:tblW>` -> `type="pct" w:w="5000"` (i.e. 100% of the text column).
+       python-docx leaves a new table on `type="auto"`, which MS Word then
+       *shrink-wraps* to its content for a short layout row ("To,"/"Date:"),
+       leaving `text-align:right` stranded mid-page. "pct 5000" is the same
+       instruction Word writes for "AutoFit to window" and both Word and the
+       PDF path (`table { width:100% }`) then agree. An explicit `dxa` width
+       was tried instead and reverted - LibreOffice's importer then stops
+       honouring `<w:jc w:val="right">` in the cell (see scratchpad probes).
+    2. Replace the built-in 108-twip left/right cell margins with the
+       template stylesheet's `td { padding: 3px 5px }` (75/45 twips) so the
+       right-aligned text sits where the browser/PDF renders it.
+    """
+    tbl_pr = table._tbl.tblPr
+
+    tbl_w = tbl_pr.find(qn("w:tblW"))
+    if tbl_w is None:
+        tbl_w = OxmlElement("w:tblW")
+        tbl_pr.insert_element_before(
+            tbl_w, "w:jc", "w:tblCellSpacing", "w:tblInd", "w:tblBorders",
+            "w:shd", "w:tblLayout", "w:tblCellMar", "w:tblLook",
+            "w:tblCaption", "w:tblDescription", "w:tblPrChange",
+        )
+    tbl_w.set(qn("w:type"), "pct")
+    tbl_w.set(qn("w:w"), "5000")
+
+    existing = tbl_pr.find(qn("w:tblCellMar"))
+    if existing is not None:
+        tbl_pr.remove(existing)
+    cell_mar = OxmlElement("w:tblCellMar")
+    for edge, width in (("top", 45), ("left", 75), ("bottom", 45), ("right", 75)):
+        edge_el = OxmlElement(f"w:{edge}")
+        edge_el.set(qn("w:w"), str(width))
+        edge_el.set(qn("w:type"), "dxa")
+        cell_mar.append(edge_el)
+    tbl_pr.insert_element_before(
+        cell_mar, "w:tblLook", "w:tblCaption", "w:tblDescription", "w:tblPrChange"
+    )
 
 
 def _render_table(
@@ -434,8 +490,7 @@ def _render_table(
             cell.width = Twips(sum(widths[grid_col:grid_col + colspan]))
 
             cell_style = cell_tag.get("style", "") or ""
-            align_match = _TEXT_ALIGN_RE.search(cell_style)
-            cell_align = _ALIGN_MAP.get(align_match.group(1).lower()) if align_match else table_align
+            cell_align = _own_align(cell_tag) or table_align
             valign_match = _VERTICAL_ALIGN_RE.search(cell_style)
             if valign_match:
                 cell.vertical_alignment = {
@@ -450,10 +505,23 @@ def _render_table(
             for para in list(cell.paragraphs):
                 para._element.getparent().remove(para._element)
 
-            p_tags = cell_tag.find_all("p", recursive=False)
-            if p_tags:
-                for p_tag in p_tags:
-                    _render_paragraph(cell, p_tag, max_width_emu, default_align=cell_align)
+            cell_w_twips = sum(widths[grid_col:grid_col + colspan])
+            has_block_children = any(
+                isinstance(c, Tag) and (c.name or "").lower() in _CELL_BLOCK_TAGS
+                for c in cell_tag.children
+            )
+            if has_block_children:
+                # The cell holds real block content - paragraphs, a nested
+                # table, a list, an alignment <div>. Render each block in
+                # document order: `find_all("p", recursive=False)` alone
+                # silently dropped bare text, nested tables and
+                # <div>-wrapped paragraphs, and lost the alignment declared
+                # on those wrappers. render_html_body handles every block
+                # type and carries `text-align` down through wrapper <div>s.
+                render_html_body(
+                    cell, cell_tag, cell_w_twips, max_width_emu,
+                    avoid_row_split, cell_align,
+                )
             else:
                 _render_paragraph(cell, cell_tag, max_width_emu, default_align=cell_align)
 
@@ -482,6 +550,8 @@ def _render_table(
     if grid is not None:
         for grid_col_el, width in zip(grid.findall(qn("w:gridCol")), widths):
             grid_col_el.set(qn("w:w"), str(width))
+
+    _finalise_table_metrics(table)
 
     return table
 
