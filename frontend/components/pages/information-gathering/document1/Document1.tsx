@@ -240,7 +240,7 @@ export default function Document1({ token, setDocData, setTriggerReport }: Docum
 
   const handleEditSave = async () => {
     try {
-      const values = await form.validateFields();
+      const values = form.getFieldsValue(true);
 
       if (!applicationNumber || !selectedDoc?.id) {
         console.error("Missing applicationNumber or file_id");
@@ -278,6 +278,7 @@ export default function Document1({ token, setDocData, setTriggerReport }: Docum
       // Refresh table data
       setRefreshKey((k) => k + 1);
       setTriggerReport((prev: any) => prev + 1);
+      return updatedJson;
     } catch (err) {
       console.error("❌ Error saving edits:", err);
       setAnalysisLoading(false);

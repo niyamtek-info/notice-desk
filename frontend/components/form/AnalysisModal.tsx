@@ -71,12 +71,12 @@ export interface AnalysisModalProps {
     error?: string; // uploaded file
   } | null;
   form: FormInstance;
-  onSave: () => void;
+  onSave: () => Promise<any> | void;
   onApplyTranslation?: (args: {
     translatedBase: Record<string, unknown>;
     formValues: Record<string, unknown>;
     targetLanguage: string;
-  }) => Promise<{ task_id?: string } | void>;
+  }) => Promise<{ task_id?: string; merged?: Record<string, any> } | any>;
   editMode: boolean;
   onToggleEdit: (edit: boolean) => void;
   analysisLoading: boolean;
@@ -218,7 +218,7 @@ const renderTableView = (
 
   return (
     <Table
-      key={`table`}
+      key={`table-${parentKey}-${editMode ? "edit" : "view"}`}
       columns={columns}
       dataSource={rows}
       pagination={false}
@@ -659,27 +659,6 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
     }
   }, [analysisData, open, form]); // ✅ Proper dependencies
 
-  // ✅ NEW: Separate useEffect for translation data updates (analysisValue changes)
-  useEffect(() => {
-    if (analysisValue && open && analysisValue !== analysisData) {
-      // This handles translated data updates
-      const flatData: Record<string, unknown> = {};
-      const reorderedData = reorderObject(analysisValue);
-
-      if (typeof reorderedData === "object" && reorderedData !== null) {
-        flattenReorderedDataForForm(
-          reorderedData as Record<string, unknown>,
-        ).forEach((item) => {
-          flatData[item.key] = item.value;
-        });
-      }
-
-      // Reset and set new values in one go
-      form.resetFields();
-      form.setFieldsValue(flatData);
-    }
-  }, [analysisValue, open, form, analysisData]); // ✅ Proper dependencies
-
   useEffect(() => {
     return () => {
       if (progressTimerRef.current) {
@@ -740,16 +719,31 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
     { label: "English", value: "English" },
   ];
 
-  // ✅ FIXED: Simplified applyTranslatedData - just updates state
-  const applyTranslatedData = useCallback((translatedData: any) => {
-    setAnalysisValue(translatedData);
-    // An unsaved translation is now on screen (covers both the immediate and the
-    // async-polling completion paths).
-    setTranslationPending(true);
-    // Auto-enter edit mode so the footer button becomes an enabled "Save"
-    // (no separate "Edit Data" click needed after a translation).
-    onToggleEdit(true);
-  }, [onToggleEdit]);
+  // ✅ FIXED: Simplified applyTranslatedData - updates state and form
+  const applyTranslatedData = useCallback(
+    (translatedData: any) => {
+      setAnalysisValue(translatedData);
+      // An unsaved translation is now on screen (covers both the immediate and the
+      // async-polling completion paths).
+      setTranslationPending(true);
+      // Auto-enter edit mode so the footer button becomes an enabled "Save"
+      // (no separate "Edit Data" click needed after a translation).
+      onToggleEdit(true);
+
+      const flatData: Record<string, unknown> = {};
+      const reorderedData = reorderObject(translatedData);
+      if (typeof reorderedData === "object" && reorderedData !== null) {
+        flattenReorderedDataForForm(
+          reorderedData as Record<string, unknown>,
+        ).forEach((item) => {
+          flatData[item.key] = item.value;
+        });
+      }
+      form.resetFields();
+      form.setFieldsValue(flatData);
+    },
+    [onToggleEdit, form],
+  );
 
   const stopTranslationPolling = () => {
     if (progressTimerRef.current) {
@@ -920,8 +914,19 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
           formValues: form.getFieldsValue(true),
           targetLanguage,
         });
-        if (result?.merged) {
-          setAnalysisValue(result.merged);
+        const finalData = result?.merged || analysisValue;
+        if (finalData) {
+          setAnalysisValue(finalData);
+          const flatData: Record<string, unknown> = {};
+          const reorderedData = reorderObject(finalData);
+          if (typeof reorderedData === "object" && reorderedData !== null) {
+            flattenReorderedDataForForm(
+              reorderedData as Record<string, unknown>,
+            ).forEach((item) => {
+              flatData[item.key] = item.value;
+            });
+          }
+          form.setFieldsValue(flatData);
         }
         setTranslationPending(false);
         setHasChanges(false);
@@ -941,9 +946,30 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
       return;
     }
 
-    // Regular Edit-Data save (unchanged): PUT /extract only, modal stays open.
-    await onSave();
-    onToggleEdit(false);
+    // Regular Edit-Data save: PUT /extract only, modal stays open.
+    try {
+      const savedJson: any = await onSave();
+      const finalData = savedJson || analysisData;
+      if (finalData) {
+        setAnalysisValue(finalData);
+        const flatData: Record<string, unknown> = {};
+        const reorderedData = reorderObject(finalData);
+        if (typeof reorderedData === "object" && reorderedData !== null) {
+          flattenReorderedDataForForm(
+            reorderedData as Record<string, unknown>,
+          ).forEach((item) => {
+            flatData[item.key] = item.value;
+          });
+        }
+        form.setFieldsValue(flatData);
+      }
+      setHasChanges(false);
+      onToggleEdit(false);
+    } catch (err: any) {
+      console.error("Error saving edits:", err);
+    } finally {
+      setAnalysisLoading(false);
+    }
   };
 
   const handleConfirmCancel = () => setConfirmVisible(false);
