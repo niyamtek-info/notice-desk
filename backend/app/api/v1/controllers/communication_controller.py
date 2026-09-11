@@ -1302,6 +1302,29 @@ class CommunicationController:
             ]
             for extra_node in collective_nodes[1:]:
                 extra_node.decompose()
+
+            # A <p> that held only a placeholder (e.g. {{MORTGAGED_PROPERTY_
+            # ADDRESS_ALSO_AT}}) leaves an entirely empty paragraph once that
+            # token resolves to "" - the token is gone, but the paragraph
+            # itself, and whatever spacing it carries, still renders as a
+            # blank line the template never actually authored. A paragraph
+            # left blank on purpose (spacing) reads as non-empty here since
+            # editors mark it with a <br> or &nbsp; to keep it visible/
+            # focusable - only a paragraph with no real text AND no <br>/
+            # &nbsp;/<img> is exclusively a spent placeholder, so removing
+            # those never touches an intentional blank line. Python's
+            # str.strip() treats U+00A0 (the character &nbsp; parses to) as
+            # whitespace too, so it has to be checked for separately -
+            # get_text(strip=True) alone would silently swallow every
+            # &nbsp; spacer along with the genuinely empty ones.
+            for empty_p in soup_dedup.find_all("p"):
+                text = empty_p.get_text()
+                if text.strip(" \t\r\n\f\v") or "\xa0" in text:
+                    continue
+                if empty_p.find(["img", "br"]) is not None:
+                    continue
+                empty_p.decompose()
+
             html_source = str(soup_dedup)
 
             rendered_html = cleanup_unresolved_brace_placeholders(html_source)

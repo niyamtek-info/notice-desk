@@ -39,6 +39,10 @@ _TEXT_ALIGN_RE = re.compile(r"text-align\s*:\s*(left|right|center|justify)", re.
 _VERTICAL_ALIGN_RE = re.compile(r"vertical-align\s*:\s*(top|middle|bottom)", re.I)
 _BORDER_STYLE_RE = re.compile(r"border-style\s*:\s*(\w+)", re.I)
 _BORDER_WIDTH_PX_RE = re.compile(r"border-width\s*:\s*([\d.]+)\s*px", re.I)
+_MARGIN_SHORTHAND_RE = re.compile(r"(?<![a-z-])margin\s*:\s*([^;]+)", re.I)
+_MARGIN_TOP_RE = re.compile(r"margin-top\s*:\s*([^;]+)", re.I)
+_MARGIN_BOTTOM_RE = re.compile(r"margin-bottom\s*:\s*([^;]+)", re.I)
+_LEN_TOKEN_RE = re.compile(r"^(-?[\d.]+)\s*(px|pt)?$", re.I)
 
 # A <col> `width:` in any unit - the numeric part is used only as a relative
 # weight (renormalised against the row total), so px, pt and % can be mixed
@@ -247,6 +251,58 @@ def _render_inline(paragraph, node, style: _RunStyle, max_width_emu: "Emu | None
         _render_inline(paragraph, child, child_style, max_width_emu)
 
 
+def _len_to_pt(token: str) -> "float | None":
+    match = _LEN_TOKEN_RE.match(token.strip())
+    if not match:
+        return None
+    value = float(match.group(1))
+    unit = (match.group(2) or "px").lower()
+    return value if unit == "pt" else value * 0.75
+
+
+def _paragraph_margins_pt(tag: Tag) -> "tuple[float, float]":
+    """(space_before_pt, space_after_pt) declared on this element's own
+    inline style - `margin-top`/`margin-bottom` win over the corresponding
+    side of the `margin` shorthand. Defaults to (0, 0) when the element
+    declares no margin of its own.
+
+    python-docx's blank "Normal" style otherwise adds its own built-in
+    space-after (and >1.0 line spacing) to every new paragraph regardless of
+    what the source template authored - since the template's own Name /
+    Address / "Also At" / Property Address lines mix bare <p> tags with
+    <br>-joined lines, each with their own specific margin, that fixed extra
+    gap after every <p> is exactly what produced spacing uneven with (and
+    wider than) what the template itself defines."""
+    style = tag.get("style", "") or ""
+    top = bottom = 0.0
+
+    shorthand_match = _MARGIN_SHORTHAND_RE.search(style)
+    if shorthand_match:
+        lengths = [_len_to_pt(tok) for tok in shorthand_match.group(1).split()]
+        lengths = [length for length in lengths if length is not None]
+        if len(lengths) == 1:
+            top = bottom = lengths[0]
+        elif len(lengths) == 2:
+            top = bottom = lengths[0]
+        elif len(lengths) >= 3:
+            top = lengths[0]
+            bottom = lengths[2]
+
+    top_match = _MARGIN_TOP_RE.search(style)
+    if top_match:
+        parsed = _len_to_pt(top_match.group(1))
+        if parsed is not None:
+            top = parsed
+
+    bottom_match = _MARGIN_BOTTOM_RE.search(style)
+    if bottom_match:
+        parsed = _len_to_pt(bottom_match.group(1))
+        if parsed is not None:
+            bottom = parsed
+
+    return max(top, 0.0), max(bottom, 0.0)
+
+
 def _render_paragraph(container, p_tag: Tag, max_width_emu: "Emu | None" = None, default_align=None):
     paragraph = container.add_paragraph()
 
@@ -257,6 +313,10 @@ def _render_paragraph(container, p_tag: Tag, max_width_emu: "Emu | None" = None,
         # The <p> declares no alignment of its own - inherit the enclosing
         # cell's `text-align` (CSS would; python-docx will not without this).
         paragraph.alignment = default_align
+
+    space_before_pt, space_after_pt = _paragraph_margins_pt(p_tag)
+    paragraph.paragraph_format.space_before = Pt(space_before_pt)
+    paragraph.paragraph_format.space_after = Pt(space_after_pt)
 
     for child in p_tag.children:
         _render_inline(paragraph, child, _RunStyle(), max_width_emu)
