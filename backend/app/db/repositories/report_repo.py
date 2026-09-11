@@ -121,6 +121,14 @@ class ReportRepository:
             cleaned = str(value).strip().replace(",", "")
             cleaned = re.sub(r"(?i)rs\.?", "", cleaned)
             cleaned = re.sub(r"[^\d.\-]", "", cleaned)
+            # Strip stray leading/trailing '.' and '-':
+            #  - a currency prefix from a translated document (Tamil "ரூ.", Hindi
+            #    "रु.") isn't caught by the "rs" sub above; its letters are removed
+            #    but the abbreviation dot survives -> "ரூ. 51,78,288" becomes
+            #    ".5178288" -> 0.52.
+            #  - the common "/-" suffix ("Rs. 5,00,000/-") leaves a trailing "-".
+            # Report amounts are never negative, so this is safe.
+            cleaned = cleaned.strip(".-")
             if cleaned in {"", "-", ".", "-."}:
                 return None
 
@@ -144,6 +152,9 @@ class ReportRepository:
             cleaned = str(value).strip().replace(",", "")
             cleaned = re.sub(r"(?i)rs\.?", "", cleaned)
             cleaned = re.sub(r"[^\d.\-]", "", cleaned)
+            # See _to_int: strip stray leading/trailing '.'/'-' (non-English currency
+            # prefix, or "/-" suffix) so "ரூ. 51,78,288" -> "5178288", not "0.52".
+            cleaned = cleaned.strip(".-")
             if cleaned in {"", "-", ".", "-."}:
                 return None
             return Decimal(cleaned)
@@ -321,7 +332,7 @@ class ReportRepository:
     # =====================================================
     # GENERATE REPORT (CHECKLIST FIRST, EXTRACTED FALLBACK)
     # =====================================================
-    def generate_report(self, application_number: str):
+    def generate_report(self, application_number: str, audit_user=None):
 
         # --------------------------------------------------
         # STEP 1 → Reuse/Create live report row
@@ -669,10 +680,49 @@ class ReportRepository:
 
             if "BIGINT" in column_type_str or "INTEGER" in column_type_str:
                 value = self._to_int(value)
+            elif (
+                "NUMERIC" in column_type_str
+                or "DECIMAL" in column_type_str
+                or "FLOAT" in column_type_str
+                or "REAL" in column_type_str
+            ):
+                # Amount columns (all NUMERIC(18,2) on SarfaesiMaster). Without this
+                # branch the raw checklist string — e.g. a translated "ரூ. 51,78,288"
+                # — was setattr'd straight onto the column and coerced to 0.52 by the
+                # DB, which then fails int serialization in the response schema.
+                value = self._to_decimal(value)
             elif "DATETIME" in column_type_str or "DATE" in column_type_str:
                 value = parse_datetime(value)
 
             setattr(report, master_field, value)
+
+        # --------------------------------------------------
+        # STEP 6 → PUSH application.* FIELDS BACK TO THE APPLICATION ROW
+        # --------------------------------------------------
+        # The report re-derives some fields (notably borrower_name) from the
+        # checklist / extracted documents. Sync those into the Application record
+        # via SCD2 so the Applications screen reflects the generated report.
+        # Only fields whose FIELD_MAPPING source is `application.*` and that carry
+        # a non-empty, changed value are written; identifiers are never touched.
+        if application:
+            app_sync_targets = {
+                "borrower_name": "loan_requester_name",
+                "company_name": "client_name",
+                "state": "state",
+            }
+            app_update_data = {}
+            for report_attr, app_col in app_sync_targets.items():
+                new_value = getattr(report, report_attr, None)
+                if new_value is None or (isinstance(new_value, str) and not new_value.strip()):
+                    continue
+                if getattr(application, app_col, None) != new_value:
+                    app_update_data[app_col] = new_value
+            if app_update_data:
+                close_version(application, audit_user)
+                self.db.flush()
+                new_app = clone_version(application, audit_user, **app_update_data)
+                self.db.add(new_app)
+                self.db.flush()
 
         # --------------------------------------------------
         # FINAL SAVE

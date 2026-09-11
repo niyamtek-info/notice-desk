@@ -30,6 +30,7 @@ import {
   DocumentApi,
   ExtractDocument,
 } from "@/src/services/DocumentApi";
+import { TranslateApi } from "@/src/services/TranslateApi";
 import { RxCross2 } from "react-icons/rx";
 import { useAppContext } from "@/context/GlobalContext";
 
@@ -94,26 +95,17 @@ const formatLabel = (value: string): string => {
     .trim();
 };
 
-const getSubPathFormKey = (subPath: (string | number)[], parentKey = ""): string => {
-  if (subPath.length === 0) return parentKey;
-  const key = subPath[0];
-  if (typeof key === "number") {
-    const nextParentKey = `${parentKey}${key + 1}`;
-    return getSubPathFormKey(subPath.slice(1), nextParentKey);
-  } else {
-    const formattedKey = formatLabel(key);
-    const nextParentKey = parentKey ? `${parentKey}.${formattedKey}` : formattedKey;
-    return getSubPathFormKey(subPath.slice(1), nextParentKey);
-  }
-};
-
+// Canonical form field key for a JSON path. MUST match the keys produced by
+// AnalysisModal's flattenReorderedDataForForm / renderFields / flattenDataForTable:
+// every object key is formatLabel-ed, every array index becomes its 1-based
+// number, segments joined by ".".
 const getFormKeyForPath = (path: (string | number)[]): string => {
-  if (path.length < 2) return "";
-  const rootKey = path[0];
-  if (path.length === 2) {
-    return `${rootKey}.${formatLabel(String(path[1]))}`;
-  }
-  return getSubPathFormKey(path.slice(2), "");
+  if (path.length < 1) return "";
+  return path
+    .map((seg) =>
+      typeof seg === "number" ? String(seg + 1) : formatLabel(String(seg)),
+    )
+    .join(".");
 };
 
 const traverseAndUpdate = (
@@ -276,6 +268,9 @@ export default function Document1({ token, setDocData, setTriggerReport }: Docum
 
       const result = await res;
 
+      setSelectedDoc((prev) => (prev ? { ...prev, json: updatedJson } : prev));
+      setAnalysisData(updatedJson);
+
       // Close edit mode after save
       setEditMode(false);
       setHasChanges(false);
@@ -287,6 +282,44 @@ export default function Document1({ token, setDocData, setTriggerReport }: Docum
       console.error("❌ Error saving edits:", err);
       setAnalysisLoading(false);
     }
+  };
+
+  // Save a translated extraction payload via POST /translate/apply. Server-side
+  // this runs the same Edit-Data write path (versions extracted_* + sets
+  // rerun_validation=1) minus the sale-deed English normalization. Validation is
+  // NOT triggered here — the user runs it from the checklist, same as a normal
+  // Edit save. Errors propagate so AnalysisModal can surface them.
+  const handleApplyTranslation = async ({
+    translatedBase,
+    formValues,
+    targetLanguage,
+  }: {
+    translatedBase: Record<string, any>;
+    formValues: Record<string, any>;
+    targetLanguage: string;
+  }) => {
+    if (!applicationNumber || !selectedDoc?.id) return {};
+
+    // The translated JSON has the same shape as selectedDoc.json (only string
+    // leaves change), so the same reconstruction handleEditSave uses applies.
+    const merged = JSON.parse(JSON.stringify(translatedBase ?? {}));
+    traverseAndUpdate(merged, [], formValues); // manual field edits win
+
+    const res = await TranslateApi.applyTranslation({
+      record_id: selectedDoc.id,
+      target_language: targetLanguage,
+      translated_data: merged,
+    });
+
+    setSelectedDoc((prev) => (prev ? { ...prev, json: merged } : prev));
+    setAnalysisData(merged);
+
+    setEditMode(false);
+    setHasChanges(false);
+    setAnalysisLoading(false);
+    setRefreshKey((k) => k + 1);
+    setTriggerReport((prev: any) => prev + 1);
+    return { ...res, merged };
   };
 
   const rowSelection: TableProps<DocumentData>["rowSelection"] = {
@@ -976,8 +1009,9 @@ export default function Document1({ token, setDocData, setTriggerReport }: Docum
         selectedDoc={selectedDoc}
         form={form}
         editMode={editMode}
-        onToggleEdit={() => setEditMode(true)}
+        onToggleEdit={(edit: boolean) => setEditMode(edit)}
         onSave={handleEditSave}
+        onApplyTranslation={handleApplyTranslation}
         analysisLoading={analysisLoading}
         setAnalysisLoading={setAnalysisLoading}
         token={token}

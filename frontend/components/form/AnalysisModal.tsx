@@ -72,6 +72,11 @@ export interface AnalysisModalProps {
   } | null;
   form: FormInstance;
   onSave: () => void;
+  onApplyTranslation?: (args: {
+    translatedBase: Record<string, unknown>;
+    formValues: Record<string, unknown>;
+    targetLanguage: string;
+  }) => Promise<{ task_id?: string } | void>;
   editMode: boolean;
   onToggleEdit: (edit: boolean) => void;
   analysisLoading: boolean;
@@ -101,17 +106,13 @@ const flattenDataForTable = (
         ? `${parentKey}.${formatLabel(key)}`
         : formatLabel(key);
 
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        !Array.isArray(value)
-      ) {
+      if (value !== null && typeof value === "object") {
         flattenDataForTable(value, fieldKey, rows);
       } else {
         rows.push({
           key: fieldKey,
           field: fieldKey,
-          value: String(value),
+          value: value == null ? "" : String(value),
         });
       }
     });
@@ -119,15 +120,15 @@ const flattenDataForTable = (
 
   if (Array.isArray(data)) {
     data.forEach((item, index) => {
-      const arrayKey = `${parentKey}${index + 1}`;
+      const arrayKey = parentKey ? `${parentKey}.${index + 1}` : `${index + 1}`;
 
-      if (typeof item === "object" && item !== null) {
+      if (item !== null && typeof item === "object") {
         flattenDataForTable(item, arrayKey, rows);
       } else {
         rows.push({
           key: arrayKey,
           field: `${index + 1}. ${parentKey}`, // Change to 1-based indexing
-          value: String(item),
+          value: item == null ? "" : String(item),
         });
       }
     });
@@ -158,8 +159,9 @@ const renderTableView = (
   data: unknown,
   form: FormInstance,
   editMode: boolean,
+  parentKey = "",
 ): React.ReactNode => {
-  const rows = flattenDataForTable(data);
+  const rows = flattenDataForTable(data, parentKey);
   const columns = [
     {
       title: <div className=" p-2 rounded font-bold">Field</div>,
@@ -260,25 +262,37 @@ const reorderObject = (data: unknown): unknown => {
   return data;
 };
 
-// Helper function to flatten reordered data for form initialization
+// Helper function to flatten reordered data for form initialization.
+// Produces the SAME canonical field key as `renderFields` / `flattenDataForTable`
+// (AnalysisModal) and `getFormKeyForPath` (Document1): each object key is
+// formatLabel-ed, each array index becomes its 1-based number, joined by ".".
 const flattenReorderedDataForForm = (
-  obj: Record<string, unknown>,
+  node: unknown,
   parentPath: string[] = [],
 ): { key: string; value: unknown }[] => {
-  return Object.entries(obj).flatMap(([key, value]) => {
-    const formattedKey = formatLabel(key);
-    const currentPath = [...parentPath, formattedKey];
-    const fieldKey = currentPath.join(".");
+  if (Array.isArray(node)) {
+    return node.flatMap((value, index) => {
+      const currentPath = [...parentPath, String(index + 1)];
+      if (value && typeof value === "object") {
+        return flattenReorderedDataForForm(value, currentPath);
+      }
+      return [{ key: currentPath.join("."), value }];
+    });
+  }
 
-    if (typeof value === "object" && value !== null) {
-      return flattenReorderedDataForForm(
-        value as Record<string, unknown>,
-        currentPath,
-      );
-    }
+  if (node && typeof node === "object") {
+    return Object.entries(node as Record<string, unknown>).flatMap(
+      ([key, value]) => {
+        const currentPath = [...parentPath, formatLabel(key)];
+        if (value && typeof value === "object") {
+          return flattenReorderedDataForForm(value, currentPath);
+        }
+        return [{ key: currentPath.join("."), value }];
+      },
+    );
+  }
 
-    return [{ key: fieldKey, value }];
-  });
+  return [];
 };
 
 const renderRoot = (
@@ -349,7 +363,12 @@ const renderRoot = (
         <h3 className="mb-5 text-left text-lg font-bold text-gray-900">
           {formatLabel(rootKey)} :
         </h3>
-        {renderFields(reorderObject(rootValue), form, editMode, rootKey)}
+        {renderFields(
+          reorderObject(rootValue),
+          form,
+          editMode,
+          formatLabel(rootKey),
+        )}
       </div>
     </div>
   );
@@ -396,7 +415,8 @@ const renderFields = (
                 {
                   key: fieldKey,
                   label: formatLabel(key),
-                  children: renderTableView(value, form, editMode),
+                  forceRender: true,
+                  children: renderTableView(value, form, editMode, fieldKey),
                   className: "font-semibold",
                 },
               ]}
@@ -435,7 +455,9 @@ const renderFields = (
 
   if (Array.isArray(data)) {
     return data.map((item, index) => {
-      const arrayKey = `${parentKey}[${index}]`;
+      const arrayKey = parentKey
+        ? `${parentKey}.${index + 1}`
+        : `${index + 1}`;
 
       if (typeof item === "object") {
         return (
@@ -447,7 +469,8 @@ const renderFields = (
               {
                 key: arrayKey,
                 label: `${parentKey} #${index + 1}`,
-                children: renderTableView(item, form, editMode),
+                forceRender: true,
+                children: renderTableView(item, form, editMode, arrayKey),
                 className: "font-semibold",
               },
             ]}
@@ -461,7 +484,7 @@ const renderFields = (
           name={arrayKey}
           label={
             <span style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
-              {`${parentKey}[${index}]`}
+              {`${parentKey} #${index + 1}`}
             </span>
           }
           initialValue={item}
@@ -590,6 +613,7 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
   selectedDoc,
   form,
   onSave,
+  onApplyTranslation,
   editMode,
   onToggleEdit,
   analysisLoading,
@@ -605,6 +629,10 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
   const [translationProgress, setTranslationProgress] = useState<number>(0);
   const [translationStage, setTranslationStage] = useState<string>("");
   const [hasChanges, setHasChanges] = useState<boolean>(false);
+  // A translation is on screen but not yet persisted. Enables Save without a
+  // manual keystroke and routes the save through onApplyTranslation.
+  const [translationPending, setTranslationPending] = useState<boolean>(false);
+  const [discardConfirmVisible, setDiscardConfirmVisible] = useState<boolean>(false);
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { docProgressId, setDocProgressId } = useAppContext();
@@ -627,6 +655,7 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
 
       form.setFieldsValue(flatData);
       setAnalysisValue(analysisData); // ✅ Set analysisValue here too
+      setTranslationPending(false); // fresh data from server -> no pending translation
     }
   }, [analysisData, open, form]); // ✅ Proper dependencies
 
@@ -714,7 +743,13 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
   // ✅ FIXED: Simplified applyTranslatedData - just updates state
   const applyTranslatedData = useCallback((translatedData: any) => {
     setAnalysisValue(translatedData);
-  }, []);
+    // An unsaved translation is now on screen (covers both the immediate and the
+    // async-polling completion paths).
+    setTranslationPending(true);
+    // Auto-enter edit mode so the footer button becomes an enabled "Save"
+    // (no separate "Edit Data" click needed after a translation).
+    onToggleEdit(true);
+  }, [onToggleEdit]);
 
   const stopTranslationPolling = () => {
     if (progressTimerRef.current) {
@@ -872,18 +907,60 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
     setConfirmVisible(true);
   };
 
-  const handleConfirmOk = () => {
+  const handleConfirmOk = async () => {
     setConfirmVisible(false);
-    onSave();
+
+    // Translation branch: persist the translated JSON via the parent
+    // (POST /translate/apply). Same as a normal Edit save otherwise — modal
+    // stays open, no validation triggered here.
+    if (translationPending && onApplyTranslation) {
+      try {
+        const result: any = await onApplyTranslation({
+          translatedBase: analysisValue,
+          formValues: form.getFieldsValue(true),
+          targetLanguage,
+        });
+        if (result?.merged) {
+          setAnalysisValue(result.merged);
+        }
+        setTranslationPending(false);
+        setHasChanges(false);
+        onToggleEdit(false);
+      } catch (err: any) {
+        message.error({
+          content:
+            err?.message ||
+            err?.response?.data?.detail ||
+            "Failed to save translation.",
+          key: "applyTranslation",
+          duration: 6,
+        });
+      } finally {
+        setAnalysisLoading(false);
+      }
+      return;
+    }
+
+    // Regular Edit-Data save (unchanged): PUT /extract only, modal stays open.
+    await onSave();
     onToggleEdit(false);
   };
 
   const handleConfirmCancel = () => setConfirmVisible(false);
 
-  const handleCancel = () => {
+  const doClose = () => {
+    setTranslationPending(false);
     onToggleEdit(false);
     setExpandedSection(null);
     onClose();
+  };
+
+  const handleCancel = () => {
+    if (translationPending) {
+      setDiscardConfirmVisible(true);
+      return;
+    }
+    doClose();
   };
 
   const handleCancelEdit = () => {
@@ -1054,16 +1131,25 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
                     <div style={{ display: "flex", gap: "8px" }}>
 
                       {!editMode ? (
-                        <Button type="primary" onClick={() => onToggleEdit(true)}>
+                        <Button
+                          type="primary"
+                          onClick={() => onToggleEdit(true)}
+                          disabled={isTranslating}
+                          title={
+                            isTranslating
+                              ? "Wait for the translation to finish"
+                              : undefined
+                          }
+                        >
                           Edit Data
                         </Button>
                       ) : (
                         <Button
-                          className={`${!hasChanges ? "opacity-65" : ""} !text-white`}
+                          className={`${(!hasChanges && !translationPending) || isTranslating ? "opacity-65" : ""} !text-white`}
                           loading={analysisLoading}
                           type="primary"
                           onClick={handleSaveClick}
-                          disabled={!hasChanges}
+                          disabled={(!hasChanges && !translationPending) || isTranslating}
                         >
                           Save
                         </Button>
@@ -1092,7 +1178,28 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({
         title="Are you sure?"
         zIndex={1100}
       >
-        <p>Are you sure you want to save the changes to this file?</p>
+        <p>
+          {translationPending
+            ? "This saves the translated details to the document and re-runs checklist validation. Continue?"
+            : "Are you sure you want to save the changes to this file?"}
+        </p>
+      </Modal>
+
+      {/* Discard-unsaved-translation Modal */}
+      <Modal
+        open={discardConfirmVisible}
+        onOk={() => {
+          setDiscardConfirmVisible(false);
+          doClose();
+        }}
+        onCancel={() => setDiscardConfirmVisible(false)}
+        okText="Discard"
+        cancelText="Keep editing"
+        okButtonProps={{ danger: true }}
+        title="Discard translation?"
+        zIndex={1100}
+      >
+        <p>You have a translation that hasn&apos;t been saved. Discard it?</p>
       </Modal>
     </>
   );

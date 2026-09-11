@@ -630,9 +630,9 @@ class ReportService:
     # =====================================================
     # GENERATE REPORT (EXPLICIT CALL ONLY)
     # =====================================================
-    def generate_report(self, application_number: str):
+    def generate_report(self, application_number: str, audit_user: AuditUser | None = None):
         self._validate_checklist_before_report_generation(application_number)
-        report = self.repo.generate_report(application_number)
+        report = self.repo.generate_report(application_number, audit_user=audit_user)
         if not report:
             return None
 

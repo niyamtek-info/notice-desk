@@ -42,7 +42,7 @@ def generate_report(
 ):
     service = ReportService(db)
     try:
-        report = service.generate_report(payload.application_number)
+        report = service.generate_report(payload.application_number, audit_user=audit_user)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     if not report:

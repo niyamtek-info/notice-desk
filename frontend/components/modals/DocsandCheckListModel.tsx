@@ -26,19 +26,19 @@ export const DocsandCheckListModel: React.FC<DocsandCheckListModelProps> = ({
 
 
   const isValid = (arr:any) => {
-  const has = (type:any) =>
+  const has = (types: string[]) =>
     arr.some(
       (item:any) =>
-        item.filetype?.toLowerCase() === type.toLowerCase() &&
-        item.error === null &&
+        types.some(t => item.filetype?.toLowerCase() === t.toLowerCase()) &&
+        !item.error &&
         !["",null,undefined].includes(item.document_url) 
     );
 
   return (
-    (has("Sales Deed") &&
-      has("Memorandum of Deposit of Title Deeds")) ||
-    (has("Loan Agreement") &&
-      has("Sanction Letter"))
+    (has(["Sale Deed", "Sales Deed"]) &&
+      has(["Memorandum of Deposit of Title Deed", "Memorandum of Deposit of Title Deeds"])) ||
+    (has(["Loan Agreement"]) &&
+      has(["Sanction Letter"]))
   );
 };
 

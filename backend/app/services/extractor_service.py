@@ -586,7 +586,17 @@ class ExtractorService:
     # -----------------------------------------------------------
     # 4. UPDATE RECORD
     # -----------------------------------------------------------
-    def update_record(self, record_id: str, update_data: Dict[str, Any], audit_user=None):
+    def update_record(
+        self,
+        record_id: str,
+        update_data: Dict[str, Any],
+        audit_user=None,
+        skip_sales_deed_normalization: bool = False,
+    ):
+        # ``skip_sales_deed_normalization`` — when True, do NOT force
+        # ``SalesDeed.raw_description`` back to English. Used by the
+        # translate-apply flow so a non-English translated description persists
+        # verbatim instead of being re-translated to English.
         current = self.repo.get_record(record_id)
         if not current:
             return None
@@ -669,8 +679,9 @@ class ExtractorService:
             current["upsert_parsed_output"] = existing_parsed_normalized
 
             doc_type = current.get("doc_type") or update_data.get("doc_type")
-            self._normalize_sales_deed_descriptions(current["ai_parsed_output"], doc_type)
-            self._normalize_sales_deed_descriptions(current["upsert_parsed_output"], doc_type)
+            if not skip_sales_deed_normalization:
+                self._normalize_sales_deed_descriptions(current["ai_parsed_output"], doc_type)
+                self._normalize_sales_deed_descriptions(current["upsert_parsed_output"], doc_type)
 
         self.repo.save_record(record_id, current, audit_user=audit_user)
 

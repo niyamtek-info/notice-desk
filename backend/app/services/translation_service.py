@@ -356,5 +356,71 @@ class TranslationService:
             original_content=original_data,
             translated_content=translated_content
         )
-        
+
         return translated_content
+
+    def apply_translation(
+        self,
+        *,
+        record_id: str,
+        target_language: str,
+        translated_data: Optional[Dict[str, Any]] = None,
+        audit_user=None,
+    ) -> Dict[str, Any]:
+        """
+        Persist a translated extraction payload into the primary extracted_* tables.
+
+        Reuses the canonical "Edit Data" write path
+        (``ExtractorService.update_record`` with an ``ai_parsed_output`` payload),
+        which versions the extracted_* rows and, for validation-relevant doc types,
+        sets ``ApplicationChecklist.rerun_validation = 1`` and marks the report for
+        rerun (the user then runs validation from the checklist "Run Validation"
+        button, same as a normal Edit Data save). The translated JSON is
+        structurally identical to ``ai_parsed_output`` (only string leaves change),
+        so it is a valid full-payload update.
+
+        ``translated_data`` – the on-screen (possibly hand-edited) translation to
+        apply; when omitted, the cached translation for ``target_language`` is used.
+        """
+        # Local import: extractor_service imports this module (translate_text),
+        # so a top-level import would create a cycle.
+        from app.services.extractor_service import ExtractorService
+
+        record = self.extractor_repo.get_record(record_id)
+        if not record:
+            raise ValueError(f"Extraction record {record_id} not found.")
+
+        application_number = record.get("application_number")
+        doc_type = record.get("doc_type")
+
+        payload = translated_data or self.get_cached_translation(record_id, target_language)
+        if not payload:
+            raise ValueError(
+                f"No translation available for {record_id} / {target_language}. Translate first."
+            )
+
+        # 1. Keep the applied/edited translation as the cached one.
+        self.update_translation(
+            record_id=record_id,
+            language=target_language,
+            translated_content=payload,
+        )
+
+        # 2. Persist into extracted_* via the canonical Edit-Data path.
+        #    skip_sales_deed_normalization: keep the translated SalesDeed
+        #    raw_description verbatim instead of forcing it back to English.
+        updated = ExtractorService(self.db).update_record(
+            record_id,
+            {"ai_parsed_output": payload},
+            audit_user=audit_user,
+            skip_sales_deed_normalization=True,
+        )
+        if updated is None:
+            raise ValueError(f"Extraction record {record_id} not found on update.")
+
+        return {
+            "record_id": record_id,
+            "application_number": application_number,
+            "doc_type": doc_type,
+            "applied": True,
+        }

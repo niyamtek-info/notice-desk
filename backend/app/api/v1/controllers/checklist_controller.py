@@ -47,7 +47,12 @@ class ChecklistController:
         audit_user: AuditUser | None = None,
     ):
         items = obj_in if isinstance(obj_in, list) else [obj_in]
+        if not items:
+            raise HTTPException(status_code=400, detail="No checklist items provided")
         updated = self.service.update_checklist_bulk(application_number, items, audit_user=audit_user)
-        if not updated:
-            raise HTTPException(status_code=404, detail="Checklist row(s) not found")
+        if updated is None:
+            raise HTTPException(
+                status_code=404,
+                detail="No matching checklist row found for the provided attribute_code(s)",
+            )
         return updated

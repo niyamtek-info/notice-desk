@@ -510,6 +510,16 @@ class ChecklistService:
         if not text:
             return None
         stripped = re.sub(r"rs\.?|inr|₹|\$|/-|[,\s]", "", text, flags=re.IGNORECASE)
+        # If any ASCII letter survives, this is descriptive text (an address / property
+        # description that merely contains digits), not an amount — leave it alone.
+        if re.search(r"[A-Za-z]", stripped):
+            return None
+        # Drop a SHORT non-digit prefix/suffix (<=3 chars) so a currency symbol carried
+        # over from a translated document (e.g. Tamil "ரூ.", Hindi "रु.") does not defeat
+        # the numeric comparison, while a longer word-run (e.g. a translated address that
+        # opens with a door number) is left intact so it fails the fullmatch below.
+        stripped = re.sub(r"^[^\d]{1,3}(?=\d)", "", stripped)
+        stripped = re.sub(r"(?<=\d)[^\d.]{1,3}$", "", stripped)
         if not re.fullmatch(r"\d+(\.\d+)?", stripped):
             return None
         try:
@@ -523,6 +533,19 @@ class ChecklistService:
             return None
         tokens = re.findall(r"[a-z0-9]+", value.lower())
         return frozenset(tokens) if tokens else None
+
+    def _contains_non_latin_letters(self, value) -> bool:
+        """True when the text carries alphabetic characters outside the Latin range —
+        i.e. one side comes from a document translated into another script (Tamil,
+        Devanagari, Telugu, ...). Digits and punctuation are ignored so a bare
+        '51,78,288' is not flagged. Such pairs cannot be compared by the ASCII token
+        test and are routed to the LLM for a meaning-based check instead."""
+        if not value:
+            return False
+        for ch in str(value):
+            if ch.isalpha() and ord(ch) > 0x24F:
+                return True
+        return False
 
     def _batch_llm_matching(self, application_number: str, pairs: list) -> list:
         """
@@ -567,21 +590,41 @@ class ChecklistService:
                 })
                 continue
 
-            # property_description (MODT vs Sale Deed) is the one pair that must stay a
-            # semantic/meaning-based comparison (transliteration, verbosity differences, etc.),
-            # so only that pair_code is handed to Gemini.
-            if pair.get("pair_code") == "MODT_SD":
+            # Two kinds of pair need a semantic, meaning-based comparison rather than a
+            # literal token match:
+            #   1. property_description (MODT vs Sale Deed) — transliteration / verbosity
+            #      differences are expected.
+            #   2. Any pair where one side has been translated into another script/language
+            #      (e.g. the Sanction Letter displayed in Tamil against an English Loan
+            #      Agreement) — the ASCII token test cannot see through the translation.
+            # Both are handed to Gemini.
+            cross_language = (
+                self._contains_non_latin_letters(pair.get("doc_a_val"))
+                or self._contains_non_latin_letters(pair.get("doc_b_val"))
+            )
+            if pair.get("pair_code") == "MODT_SD" or cross_language:
                 to_llm.append(pair)
                 continue
 
             # Every other field (names, addresses, dates, ...) is decided deterministically —
-            # order/punctuation/case-insensitive token comparison — instead of relying on the
+            # order/punctuation/case-insensitive comparison — instead of relying on the
             # LLM's subjective judgment, which does not reliably enforce exact-value equality.
+            # MATCH when EITHER holds:
+            #   - word tokens are equal (order-insensitive), or
+            #   - the alphanumeric-only strings are equal (space/punctuation-insensitive,
+            #     so "Rama Krishna Gorada" == "Rama KrishnaGorada").
+            # Both still require the exact same letters/digits, so a genuine spelling
+            # difference stays a MISMATCH.
             tokens_a = self._tokenize_for_comparison(doc_a)
             tokens_b = self._tokenize_for_comparison(doc_b)
+            collapsed_a = re.sub(r"[^a-z0-9]", "", doc_a.lower())
+            collapsed_b = re.sub(r"[^a-z0-9]", "", doc_b.lower())
+            is_match = (tokens_a and tokens_a == tokens_b) or (
+                collapsed_a and collapsed_a == collapsed_b
+            )
             processed_results.append({
                 **pair,
-                "match_status": "MATCH" if tokens_a and tokens_a == tokens_b else "MISMATCH"
+                "match_status": "MATCH" if is_match else "MISMATCH"
             })
 
         if not to_llm:    
@@ -617,8 +660,24 @@ class ChecklistService:
         - Name with prefix/initial: if the initial + surname pattern is structurally consistent
             and differences are plausibly OCR, treat as MATCH
 
+        4a. CROSS-LANGUAGE / TRANSLATED VALUES (very important):
+        - One of the two documents may have been translated, so the two values can be
+          written in different languages or scripts. This applies to ANY language, not
+          a fixed list.
+        - When the two sides are in different languages/scripts, compare by MEANING and
+          PRONUNCIATION (transliteration), NOT by literal spelling.
+        - Return MATCH when, once transliterated / translated to a common language, the
+          two values clearly refer to the same person, organisation, place, amount or
+          date — allowing for the usual currency-symbol, punctuation and date-format
+          differences already covered above.
+        - Still return MISMATCH when the underlying facts differ (a different name, a
+          different number, a different date). Translation is not a reason to pass a
+          genuine mismatch.
+
         5. For NAMES specifically:
         - Be extremely strict. Return MATCH only if the names have the identical spelling (ignoring case, punctuation, spaces, and common honorifics/prefixes).
+        - EXCEPTION: if the two name values are in different scripts/languages (see rule 4a),
+          judge them by transliteration and meaning rather than identical spelling.
         - If there is any spelling difference, missing or extra letters (e.g., 'milkd' vs 'milkdf'), you MUST return MISMATCH. Do not count trailing extra/missing letters as OCR noise.
         - Only match if the first, middle, and last names match. If one name has a different word or suffix, return MISMATCH.
         - When returning MISMATCH for a name, your "reason" field must state the spelling mismatch (e.g. 'milkd' vs 'milkdf').
@@ -871,6 +930,7 @@ class ChecklistService:
         items: list[ApplicationChecklistBulkUpdateItem],
         audit_user=None,
     ):
+        any_row_found = False
         updated_any = False
         rows_to_rematch = []
 
@@ -881,32 +941,35 @@ class ChecklistService:
             )
             if not row:
                 continue
+            any_row_found = True
 
+            # Only act on the fields the client actually sent. This lets a value
+            # sent as null / "" be applied as an intentional clear instead of being
+            # ignored as "unchanged" (previously `is not None` dropped every clear).
+            fields_set = item.model_fields_set
             update_payload = {}
             changed_value_fields = False
 
-            if item.document_a_value is not None and item.document_a_value != row.document_a_value:
+            if "document_a_value" in fields_set and item.document_a_value != row.document_a_value:
                 update_payload["document_a_value"] = item.document_a_value
                 changed_value_fields = True
-            if item.document_b_value is not None and item.document_b_value != row.document_b_value:
+            if "document_b_value" in fields_set and item.document_b_value != row.document_b_value:
                 update_payload["document_b_value"] = item.document_b_value
                 changed_value_fields = True
-            if item.match_status is not None and item.match_status != row.match_status:
+            if "match_status" in fields_set and item.match_status != row.match_status:
                 update_payload["match_status"] = item.match_status
-            if item.confidence is not None and item.confidence != row.confidence:
+            if "confidence" in fields_set and item.confidence != row.confidence:
                 update_payload["confidence"] = item.confidence
-            if item.remarks is not None and item.remarks != row.remarks:
+            if "remarks" in fields_set and item.remarks != row.remarks:
                 update_payload["remarks"] = item.remarks
 
-            value_or_status_changed = False
-            if (
+            value_or_status_changed = (
                 ("document_a_value" in update_payload)
                 or ("document_b_value" in update_payload)
                 or ("match_status" in update_payload)
-            ):
-                value_or_status_changed = True
+            )
 
-            if item.is_match_overridden is not None:
+            if "is_match_overridden" in fields_set and item.is_match_overridden is not None:
                 update_payload["is_match_overridden"] = bool(item.is_match_overridden)
             elif value_or_status_changed:
                 # Auto-mark override only when comparison values/status are manually changed.
@@ -932,13 +995,17 @@ class ChecklistService:
 
             updated_any = True
 
-        if not updated_any:
+        # None => no row matched any attribute_code (genuine 404).
+        # If a row was found but nothing changed, fall through and return the
+        # current checklist so a no-op edit is not reported as "not found".
+        if not any_row_found:
             return None
 
         if rows_to_rematch:
             self._rematch_rows_bulk(application_number, rows_to_rematch, audit_user=audit_user)
 
-        ReportRepository(self.db).mark_rerun_report(application_number, 1, audit_user=audit_user)
+        if updated_any:
+            ReportRepository(self.db).mark_rerun_report(application_number, 1, audit_user=audit_user)
 
         return self.repo.get_by_application(application_number)
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from celery.result import AsyncResult
 
 from app.db.session import get_db
@@ -205,3 +205,46 @@ def update_translation(
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Update failed: {str(e)}")
+
+
+class TranslationApplyRequest(BaseModel):
+    record_id: str
+    target_language: str
+    # Current on-screen (possibly hand-edited) translation. When omitted, the
+    # cached translation for target_language is applied as-is.
+    translated_data: Optional[Dict[str, Any]] = None
+
+
+@router.post("/apply")
+def apply_translation(
+    request: TranslationApplyRequest,
+    db: Session = Depends(get_db),
+    audit_user: AuditUser = Depends(get_current_audit_user),
+):
+    """
+    Persist a translated extraction payload into the primary extracted_* tables
+    (same write path as PUT /extract, minus the sale-deed English normalization)
+    and mark the checklist for re-run. Validation itself is NOT triggered here —
+    the user runs it from the checklist's "Run Validation" button, exactly like
+    a normal Edit Data save.
+    """
+    service = TranslationService(db)
+    try:
+        result = service.apply_translation(
+            record_id=request.record_id,
+            target_language=request.target_language,
+            translated_data=request.translated_data,
+            audit_user=audit_user,
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Apply failed: {str(e)}")
+
+    return {
+        "status": "applied",
+        "record_id": request.record_id,
+        "language": request.target_language,
+        "application_number": result.get("application_number"),
+        "doc_type": result.get("doc_type"),
+    }
