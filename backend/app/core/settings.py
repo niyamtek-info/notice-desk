@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     DB_HOST: str = Field("localhost", alias="DB_HOST")
     DB_PORT: int = Field(3306, alias="DB_PORT")
     DB_USER: str = Field("root", alias="DB_USER")
-    DB_PASSWORD: str = Field("root", alias="DB_PASSWORD")
+    DB_PASSWORD: str = Field("Aietonlabs", alias="DB_PASSWORD")
     DB_NAME: str = Field("matex_db_test", alias="DB_NAME")
     # Optional override: set SQLALCHEMY_DATABASE_URI to skip per-field building
     SQLALCHEMY_DATABASE_URI: str | None = Field(None, alias="SQLALCHEMY_DATABASE_URI")
@@ -31,19 +31,27 @@ class Settings(BaseSettings):
         return f"mysql+pymysql://{self.DB_USER}:{escaped_password}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     # STORAGE_PROVIDER selects where uploaded documents/assets are written:
-    # "cloud" (AWS S3) or "local" (disk-only, no cloud credentials needed).
+    # "cloud" (Google Cloud Storage) or "local" (disk-only, no cloud
+    # credentials needed).
     STORAGE_PROVIDER: str = Field("cloud", alias="STORAGE_PROVIDER")
 
-    # ── AWS S3 ─────────────────────────────────────────────────────
-    AWS_ACCESS_KEY_ID: str | None = Field(None, alias="AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY: str | None = Field(None, alias="AWS_SECRET_ACCESS_KEY")
-    AWS_REGION: str = Field("ap-south-1", alias="AWS_REGION")
-    S3_BUCKET_NAME: str | None = Field(None, alias="S3_BUCKET_NAME")
-    S3_BASE_URL: str = Field("", alias="S3_BASE_URL")
+    # ── Google Cloud Storage (replaces AWS S3) ───────────────────────
+    GCS_BUCKET_NAME: str | None = Field(None, alias="GCS_BUCKET_NAME")
+    GCS_LOCATION: str = Field("asia-south1", alias="GCS_LOCATION")
+    GCS_BASE_URL: str = Field("", alias="GCS_BASE_URL")
 
     # Backend base URL used to construct file-serve URLs as fallback for signed URLs
     # e.g. https://api.niyamtek.com  (no trailing slash)
     BACKEND_BASE_URL: str = Field("", alias="BACKEND_BASE_URL")
+
+    # Backward-compat aliases so existing service code works without changes
+    @property
+    def S3_BUCKET_NAME(self) -> str | None:
+        return self.GCS_BUCKET_NAME
+
+    @property
+    def S3_BASE_URL(self) -> str:
+        return self.GCS_BASE_URL
 
     # Template URL settings (used by template_service.py)
     TEMPLATE_URL_MODE: str = Field("presigned", alias="TEMPLATE_URL_MODE")
@@ -132,10 +140,9 @@ class Settings(BaseSettings):
 settings = Settings()  # pyright: ignore[reportCallIssue]
 
 if settings.STORAGE_PROVIDER == "cloud":
-    if not (settings.AWS_ACCESS_KEY_ID and settings.AWS_SECRET_ACCESS_KEY and settings.S3_BUCKET_NAME):
+    if not settings.GCS_BUCKET_NAME:
         raise RuntimeError(
-            "STORAGE_PROVIDER=cloud requires AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY "
-            "and S3_BUCKET_NAME to be set "
+            "STORAGE_PROVIDER=cloud requires GCS_BUCKET_NAME to be set "
             "(or set STORAGE_PROVIDER=local to run without cloud credentials)."
         )
 elif settings.STORAGE_PROVIDER != "local":
