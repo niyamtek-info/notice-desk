@@ -958,13 +958,24 @@ DocumentType:
 
       This document contains TWO distinct dates. You MUST extract BOTH separately.
       Never use the same date for both fields. Never swap them.
+      They are independent facts — a value found for one MUST NEVER be copied,
+      reused, or defaulted into the other, even when only one of the two dates
+      is present anywhere in the document.
 
       1. loanAgreementDate:
         - Source: Look ONLY in "Schedule" or "Schedule 1" section
-        - Label: "Date of Agreement" (usually handwritten near top of Schedule page)
+        - Label: usually handwritten near top of Schedule page. Accept ANY of these
+          equivalent label wordings for the same field (do not require exact text):
+          "Date of Agreement", "Agreement Date", "Date of Execution", "Executed on",
+          "Dated this ___ day of ___", "This Agreement is made/executed on".
         - Format example: 29-10-23 means 29/10/2023
         - Convert all formats (DD-MM-YY, DD.MM.YY, DD/MM/YY) → DD/MM/YYYY
         - Expand 2-digit years: YY → 20YY
+        - If NONE of the above label variants appear in the Schedule/Schedule 1
+          section, or the date next to them is fully illegible, return null for
+          loanAgreementDate. Do NOT substitute the sanctionDate, any date from
+          the "Sanction Letter" row, or any other date found elsewhere in the
+          document.
 
       2. sanctionDate:
         - PRIMARY source ONLY: The Schedule table row labeled "Sanction Letter"
@@ -997,6 +1008,10 @@ DocumentType:
 
         - Convert all formats (DD-MM-YY, DD.MM.YY, DD/MM/YY, DD-MM-YYYY) → DD/MM/YYYY
         - Expand 2-digit years: YY → 20YY
+        - If the Schedule table "Sanction Letter" row and all fallback sources are
+          absent or fully illegible, return null for sanctionDate. Do NOT
+          substitute the loanAgreementDate or any other date found elsewhere
+          in the document.
       ─────────────────────────────────────────
       BORROWER EXTRACTION — CRITICAL INSTRUCTIONS
       ─────────────────────────────────────────

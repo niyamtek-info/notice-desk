@@ -202,58 +202,61 @@ class ChecklistService:
             if row.is_match_overridden:
                 continue
 
+            # Always re-read from the live extracted-data rows rather than trusting the
+            # checklist row's previously cached document_a_value/document_b_value — those
+            # go stale after a re-extraction (a new version of the Sanction Letter/Loan
+            # Agreement/etc. can extract different values), and re-matching against the
+            # old cached pair silently reconfirms a MATCH that no longer reflects reality.
             doc_a_val = row.document_a_value
             doc_b_val = row.document_b_value
 
             pc = row.pair_code
             attr = row.attribute_code
 
-            if not doc_a_val or not doc_b_val:
+            if pc == "SL_LA":
 
-                if pc == "SL_LA":
+                if attr == "borrower_name":
+                    doc_a_val = sanction.borrower_name if sanction else None
+                    doc_b_val = loan_agr.borrower_name if loan_agr else None
 
-                    if attr == "borrower_name":
-                        doc_a_val = sanction.borrower_name if sanction else None
-                        doc_b_val = loan_agr.borrower_name if loan_agr else None
+                elif attr == "address":
+                    doc_a_val = sanction.borrower_address if sanction else None
+                    doc_b_val = loan_agr.borrower_address if loan_agr else None
 
-                    elif attr == "address":
-                        doc_a_val = sanction.borrower_address if sanction else None
-                        doc_b_val = loan_agr.borrower_address if loan_agr else None
+                elif attr == "property_address":
+                    doc_a_val = sanction.property_address if sanction else None
+                    doc_b_val = loan_agr.property_address if loan_agr else None
 
-                    elif attr == "property_address":
-                        doc_a_val = sanction.property_address if sanction else None
-                        doc_b_val = loan_agr.property_address if loan_agr else None
+                elif attr == "loan_amount":
+                    doc_a_val = (
+                        sanction.sanction_amount
+                        if sanction and sanction.sanction_amount
+                        else (sanction.loan_amount if sanction else None)
+                    )
+                    doc_b_val = loan_agr.loan_amount if loan_agr else None
 
-                    elif attr == "loan_amount":
-                        doc_a_val = (
-                            sanction.sanction_amount
-                            if sanction and sanction.sanction_amount
-                            else (sanction.loan_amount if sanction else None)
-                        )
-                        doc_b_val = loan_agr.loan_amount if loan_agr else None
+                elif attr == "date":
+                    doc_a_val = sanction.sanction_date if sanction else None
+                    doc_b_val = loan_agr.loan_agreement_date if loan_agr else None
 
-                    elif attr == "date":
-                        doc_a_val = sanction.sanction_date if sanction else None
-                        doc_b_val = loan_agr.loan_agreement_date if loan_agr else None
+                elif attr.startswith("co_borrower_"):
+                    doc_a_val = getattr(sanction, attr, None) if sanction else None
+                    doc_b_val = getattr(loan_agr, attr, None) if loan_agr else None
 
-                    elif attr.startswith("co_borrower_"):
-                        doc_a_val = getattr(sanction, attr, None) if sanction else None
-                        doc_b_val = getattr(loan_agr, attr, None) if loan_agr else None
+            elif pc == "MODT_SD":
 
-                elif pc == "MODT_SD":
+                if attr == "property_description" or attr.startswith("property_description_"):
+                    idx = self._extract_property_index(attr)
+                    mapped_sales_deed = self._get_sales_deed_for_row(
+                        sales_deed_rows,
+                        idx,
+                    )
 
-                    if attr == "property_description" or attr.startswith("property_description_"):
-                        idx = self._extract_property_index(attr)
-                        mapped_sales_deed = self._get_sales_deed_for_row(
-                            sales_deed_rows,
-                            idx,
-                        )
-
-                        doc_a_val = self._get_modt_raw_property_description(modt, idx) if modt else None
-                        doc_b_val = (
-                            mapped_sales_deed.raw_description
-                            or self._build_sales_deed_schedule_description(mapped_sales_deed.id, idx)
-                        ) if mapped_sales_deed else None
+                    doc_a_val = self._get_modt_raw_property_description(modt, idx) if modt else None
+                    doc_b_val = (
+                        mapped_sales_deed.raw_description
+                        or self._build_sales_deed_schedule_description(mapped_sales_deed.id, idx)
+                    ) if mapped_sales_deed else None
 
             pairs_to_compare.append({
                 "checklist_row_id": row.id,
@@ -751,7 +754,6 @@ class ChecklistService:
 
                 return processed_results
 
-            import re
             match = re.search(r"\[.*\]", llm_response, re.DOTALL)
             if match:
                 results = json.loads(match.group(0))

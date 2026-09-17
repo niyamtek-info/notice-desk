@@ -41,7 +41,10 @@ FIELD_MAPPING = {
     "dpd": {"source": "document.dpd", "editable": True},
     "disbursal_date": {"source": "document.disbursal_date", "editable": True},
     "disbursal_amount": {"source": "document.disbursal_amount", "editable": True},
-    "loan_agreement_date": {"source": "document.loan_agreement_date", "editable": True},
+    "loan_agreement_date": {
+        "source": "extracted_loan_agreement.loan_agreement_date|document.loan_agreement_date",
+        "editable": True,
+    },
     "loan_amount": {"source": "document.loan_amount", "editable": True},
     "loan_amount_words": {
         "source": "extracted_loan_agreement.loan_amount_in_words",
