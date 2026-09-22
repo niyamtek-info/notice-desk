@@ -259,6 +259,10 @@ const TableWidthConstraint = Extension.create({
       new Plugin({
         key: new PluginKey("tableWidthConstraint"),
         appendTransaction(transactions, oldState, newState) {
+          // Selection-only transactions (e.g. every step of a cell drag-select)
+          // can't have changed table geometry — skip the expensive recompute.
+          if (!transactions.some(t => t.docChanged)) return null;
+
           let tr = newState.tr;
           let modified = false;
 
@@ -494,6 +498,7 @@ const MultiCellSelection = Extension.create({
               const startY = event.clientY;
               const THRESHOLD = 4; // px before switching to cell selection
               let hasCellSel = false;
+              let lastHeadCellStart = -1; // avoid redispatching while hovering the same cell
 
               const onMove = (e: MouseEvent) => {
                 // Require minimum drag distance to avoid accidental cell selection
@@ -509,6 +514,9 @@ const MultiCellSelection = Extension.create({
                 const headCellStart = findCellPos(view.state.doc, moveResult.pos);
                 if (headCellStart === -1) return;
 
+                // Nothing changed since the last mousemove we acted on — skip the dispatch
+                if (headCellStart === lastHeadCellStart) return;
+
                 // Only create CellSelection when head is in a DIFFERENT cell
                 if (headCellStart === anchorCellStart) {
                   // If we were in a cell selection and moved back to anchor cell,
@@ -520,6 +528,7 @@ const MultiCellSelection = Extension.create({
                     view.dispatch(tr);
                     hasCellSel = false;
                   }
+                  lastHeadCellStart = headCellStart;
                   return;
                 }
 
@@ -531,6 +540,7 @@ const MultiCellSelection = Extension.create({
                   );
                   view.dispatch(view.state.tr.setSelection(cellSel));
                   hasCellSel = true;
+                  lastHeadCellStart = headCellStart;
                   e.preventDefault();
                 } catch (_) { /* ignore */ }
               };
@@ -1370,7 +1380,7 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
       setPreviewPages([]);
       return;
     }
-    const id = requestAnimationFrame(() => {
+    const id = setTimeout(() => {
       const pages = splitHtmlIntoPages(editorHtml);
       setPreviewPages(pages);
 
@@ -1428,8 +1438,8 @@ export default function CreateNotice({ setActiveTab, setTrigger, trigger, editTe
           });
         }
       }
-    });
-    return () => cancelAnimationFrame(id);
+    }, 250);
+    return () => clearTimeout(id);
   }, [editorHtml, editor]);
 
   // ─── Table row vertical drag-to-resize ──────────────────────────────────────
